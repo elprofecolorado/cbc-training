@@ -714,6 +714,11 @@ function saveAll() {
   // completions saved to Supabase
 }
 
+const DAY_ORDER = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+function sortByDay(arr) {
+  return [...arr].sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day));
+}
+
 async function loadAllData() {
   showToast('⏳ Cargando...');
   try {
@@ -846,7 +851,7 @@ async function addClient() {
 function openClientWorkout(clientId) {
   currentClientId = clientId;
   const client = clients.find(c => c.id === clientId);
-  const myRoutines = routines.filter(r => String(r.clientId) === String(clientId));
+  const myRoutines = sortByDay(routines.filter(r => String(r.clientId) === String(clientId)));
 
   document.getElementById('client-select-view').style.display = 'none';
   document.getElementById('workout-view').style.display = 'block';
@@ -937,7 +942,7 @@ function renderWorkout(client, myRoutines) {
 function switchDay(day, clientId) {
   currentDay = day;
   const client = clients.find(c => c.id === clientId);
-  const myRoutines = routines.filter(r => String(r.clientId) === String(clientId));
+  const myRoutines = sortByDay(routines.filter(r => String(r.clientId) === String(clientId)));
   renderWorkout(client, myRoutines);
   document.getElementById('main-scroll').scrollTop = 0;
 }
@@ -1142,18 +1147,24 @@ async function saveRoutine() {
   if (!clientId) { showToast('Selecciona un cliente'); return; }
   if (exercises.length === 0) { showToast('Agrega al menos un ejercicio'); return; }
 
-  // Remove existing routine for same client+day
-  const existing = routines.find(r => r.clientId === clientId && r.day === day);
+  const existing = routines.find(r => String(r.clientId) === String(clientId) && r.day === day);
   if (existing) {
-    await dbDelete('training_routines', existing.id);
-    routines = routines.filter(r => !(r.clientId === clientId && r.day === day));
+    // UPDATE existing routine
+    const updated = { ...existing, focus, exercises };
+    const ok = await dbUpdate('training_routines', updated);
+    if (!ok) return;
+    const idx = routines.findIndex(r => r.id === existing.id);
+    if (idx !== -1) routines[idx] = updated;
+  } else {
+    // INSERT new routine
+    const newRoutine = { id: Date.now(), clientId, day, focus, exercises };
+    const ok = await dbInsert('training_routines', newRoutine);
+    if (!ok) return;
+    routines.push(newRoutine);
   }
-  const newRoutine = { id: Date.now(), clientId, day, focus, exercises };
-  const ok = await dbInsert('training_routines', newRoutine);
-  if (!ok) return;
-  routines.push(newRoutine);
   document.getElementById('exercises-builder').innerHTML = '';
   document.getElementById('routine-focus').value = '';
+  exRowCount = 0;
   renderSavedRoutines();
   showToast('✓ Rutina guardada');
 }
@@ -1164,7 +1175,7 @@ function renderSavedRoutines() {
     list.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>Sin rutinas aún.</p></div>';
     return;
   }
-  list.innerHTML = routines.map(r => {
+  list.innerHTML = sortByDay(routines).map(r => {
     const client = clients.find(c => String(c.id) === String(r.clientId));
     return `<div class="card" style="padding:14px;">
       <div style="margin-bottom:10px;">
