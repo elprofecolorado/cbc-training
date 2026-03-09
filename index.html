@@ -523,9 +523,12 @@ async function doLogin() {
 
   if (!allClients.length) {
     try {
-      const {data} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
-      if (data && data.length) allClients = data;
-    } catch(e) { console.error('Fetch clients error:',e); }
+      const res = await fetch(
+        'https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_clients?select=id,name,pin,goal,phone,photo',
+        {headers:{'apikey':'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4','Authorization':'Bearer sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4'}}
+      );
+      if (res.ok) { const d=await res.json(); if(d&&d.length) allClients=d; }
+    } catch(e) { console.error('Fetch error:',e); }
   }
 
   if (!allClients.length) {
@@ -1423,24 +1426,29 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('login-screen').style.display='flex';
 
-// Pre-load clients: try Supabase, fallback to localStorage cache
+// Pre-load clients using direct fetch (more reliable than SDK)
 (async () => {
   try {
-    const {data} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
-    if (data && data.length) {
-      clients = data;
-      localStorage.setItem('cbc_cached_clients', JSON.stringify(
-        data.map(c=>({id:c.id,name:c.name,pin:String(c.pin),goal:c.goal,phone:c.phone}))
-      ));
-    } else {
-      // Use cached version
-      const cached = localStorage.getItem('cbc_cached_clients');
-      if (cached) clients = JSON.parse(cached);
+    const res = await fetch(
+      'https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_clients?select=id,name,pin,goal,phone,photo',
+      { headers: {
+        'apikey': 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4',
+        'Authorization': 'Bearer sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4'
+      }}
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.length) {
+        clients = data;
+        localStorage.setItem('cbc_cached_clients', JSON.stringify(
+          data.map(c=>({id:c.id,name:c.name,pin:String(c.pin),goal:c.goal,phone:c.phone}))
+        ));
+      }
     }
   } catch(e) {
     // Use cached version on error
     const cached = localStorage.getItem('cbc_cached_clients');
-    if (cached) clients = JSON.parse(cached);
+    if (cached) try { clients = JSON.parse(cached); } catch(e2){}
   }
 })();
 </script>
