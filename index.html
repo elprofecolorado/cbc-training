@@ -3,169 +3,195 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Colorado's Boxing — Entrenamiento</title>
-<link rel="apple-touch-icon" href="logo-trainer.png">
-<link rel="icon" type="image/png" href="logo-trainer.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Colorado's Boxing — Coach Panel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold: #c9952a; --gold2: #e8b84b; --black: #0a0a0a; --dark: #111;
-  --dark2: #1a1a1a; --dark3: #222; --white: #f0ede8; --gray: #666;
-  --success: #2ecc71; --danger: #e74c3c;
-}
+:root { --gold: #c9952a; --black: #0a0a0a; --dark: #1a1a1a; --white: #f0ede8; --success: #2ecc71; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { font-family:'Montserrat',sans-serif; background:var(--black); color:var(--white); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+body { font-family:'Montserrat',sans-serif; background:var(--black); color:var(--white); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
 
-.header { background: linear-gradient(135deg, #0a0a0a, #1a1200); border-bottom: 1px solid rgba(201,149,42,0.3); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.header img { width:38px; height:38px; }
-.header-title { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--gold); letter-spacing:2px; }
+.header { background: #000; border-bottom: 1px solid var(--gold); padding: 15px; display: flex; align-items:center; justify-content: space-between; flex-shrink:0; }
+.header-title { font-family:'Bebas Neue'; color:var(--gold); font-size:24px; letter-spacing:2px; }
 
-.main { flex:1; overflow-y:auto; padding:16px; padding-bottom:100px; -webkit-overflow-scrolling: touch; }
-.card { background: var(--dark2); border:1px solid #2a2a2a; border-radius:12px; padding:16px; margin-bottom:12px; }
-.section-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--gold); margin-bottom:12px; border-bottom: 1px solid var(--dark3); padding-bottom: 5px; }
+.main { flex:1; overflow-y:auto; padding:20px; padding-bottom:100px; }
+.card { background: var(--dark); border-radius:12px; padding:15px; margin-bottom:15px; border: 1px solid #333; }
+.section-title { font-family:'Bebas Neue'; color:var(--gold); font-size:22px; margin-bottom:15px; }
 
-.btn { width:100%; padding:14px; border-radius:10px; font-weight:700; border:none; cursor:pointer; text-transform:uppercase; font-family:'Montserrat'; transition: 0.2s; }
-.btn-gold { background:linear-gradient(135deg, var(--gold), #8a6009); color:var(--black); }
-.btn-gold:active { transform: scale(0.98); opacity: 0.9; }
+.btn { width:100%; padding:15px; border-radius:10px; font-weight:700; border:none; cursor:pointer; text-transform:uppercase; margin-top:10px; }
+.btn-gold { background: var(--gold); color: #000; }
+.btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
 
-.exercise-card { background: var(--dark3); border-radius:12px; margin-bottom:15px; padding:15px; border-left: 4px solid var(--gold); }
-.exercise-card.done { border-left-color: var(--success); opacity: 0.6; }
-.video-container { margin-top: 10px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000; }
-.video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0; }
+input, textarea, select { width:100%; background:#222; border:1px solid #444; color:white; padding:12px; border-radius:8px; margin-bottom:10px; font-family:inherit; }
+label { display:block; font-size:12px; color:var(--gold); margin-bottom:5px; font-weight:700; }
 
-.check-btn { width: 100%; background: #222; border: 2px solid var(--gold); color: var(--gold); padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: bold; margin-top: 12px; cursor: pointer; }
-.done .check-btn { background: var(--success); border-color: var(--success); color: white; }
-
-#toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--gold); color:black; padding:10px 24px; border-radius:30px; font-weight:bold; opacity:0; transition:0.3s; z-index:10000; pointer-events:none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-
-#login-screen { position:fixed; inset:0; background:var(--black); z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; }
+.exercise-item { background:#252525; padding:10px; border-radius:8px; margin-bottom:10px; position:relative; }
+#toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--gold); color:black; padding:10px 20px; border-radius:20px; font-weight:bold; opacity:0; transition:0.3s; z-index:10000; }
 </style>
 </head>
 <body>
 
 <div id="toast"></div>
 
-<div id="login-screen">
-    <img src="logo-trainer.png" style="width:110px; margin-bottom:20px;">
-    <h1 style="font-family:'Bebas Neue'; color:var(--gold); font-size:32px; letter-spacing:3px;">COLORADO'S BOXING</h1>
-    <p style="color:var(--gray); font-size:11px; margin-bottom:30px; letter-spacing: 1px;">SÓLO CAMPEONES LLEGAN AQUÍ</p>
-    <input id="pin-input" type="password" inputmode="numeric" placeholder="PIN" style="width:100%; max-width:260px; background:#1a1a1a; border:1px solid #333; color:white; font-size:32px; text-align:center; padding:15px; border-radius:12px; letter-spacing:8px; margin-bottom:20px;">
+<div id="login-screen" style="position:fixed;inset:0;background:#000;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;">
+    <h1 style="font-family:'Bebas Neue'; color:var(--gold); font-size:40px; margin-bottom:40px;">CBC TRAINING</h1>
+    <input id="pin-input" type="password" inputmode="numeric" placeholder="PIN" style="font-size:32px; text-align:center; letter-spacing:8px; max-width:260px;">
     <button onclick="doLogin()" class="btn btn-gold" style="max-width:260px;">ENTRAR</button>
-    <p id="login-error" style="color:var(--danger); margin-top:15px; display:none;">PIN Incorrecto</p>
 </div>
 
 <div class="header">
-    <img src="logo-trainer.png">
-    <div class="header-title">CBC TRAINING</div>
-    <div onclick="logout()" style="cursor:pointer; font-size:22px;">🚪</div>
+    <div class="header-title">COLORADO'S BOXING</div>
+    <button onclick="logout()" style="background:none; border:none; color:white; font-size:20px;">🚪</button>
 </div>
 
-<div class="main" id="app-content">
-    <div id="welcome-area"></div>
-    <div id="routine-container"></div>
-</div>
+<div class="main" id="content">
+    </div>
 
 <script>
-// CONFIGURACIÓN DE TU SUPABASE
 const sb = supabase.createClient('https://btdtpruxntodjuzomdcq.supabase.co', 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4');
-
-let currentUser = null;
-let todayCompletions = [];
+const COACH_PIN = "1234"; // CAMBIA ESTO POR TU PIN SECRETO
+let user = null;
+let isCoach = false;
 
 async function doLogin() {
     const pin = document.getElementById('pin-input').value;
-    const { data, error } = await sb.from('training_clients').select('*').eq('pin', pin).single();
-
-    if (data) {
-        currentUser = data;
-        localStorage.setItem('cbc_pin', pin);
+    if(pin === COACH_PIN) {
+        isCoach = true;
+        localStorage.setItem('cbc_session', 'coach');
         document.getElementById('login-screen').style.display = 'none';
-        loadRoutine();
-    } else {
-        document.getElementById('login-error').style.display = 'block';
-        setTimeout(() => document.getElementById('login-error').style.display = 'none', 3000);
-    }
-}
-
-async function loadRoutine() {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Cargar rutinas y completados en paralelo para velocidad
-    const [resRoutines, resComps] = await Promise.all([
-        sb.from('training_routines').select('*').eq('clientId', currentUser.id),
-        sb.from('training_completions').select('exercise_index').eq('client_id', currentUser.id).eq('completed_at', today)
-    ]);
-    
-    todayCompletions = resComps.data ? resComps.data.map(c => c.exercise_index) : [];
-    renderApp(resRoutines.data || []);
-}
-
-function renderApp(routines) {
-    const container = document.getElementById('routine-container');
-    document.getElementById('welcome-area').innerHTML = `<h2 style="margin-bottom:20px; font-family:'Bebas Neue'; letter-spacing:1px;">Hola, ${currentUser.name} 🥊</h2>`;
-
-    if (routines.length === 0) {
-        container.innerHTML = `<div class="card" style="text-align:center; color:var(--gray);">No tienes rutinas hoy. Descansa o consulta a tu coach.</div>`;
+        showCoachPanel();
         return;
     }
-
-    container.innerHTML = routines.map(r => `
-        <div class="section-title">${r.day} - ${r.focus}</div>
-        ${r.exercises.map((ex, index) => renderExercise(ex, index, r.id)).join('')}
-    `).join('');
+    const { data } = await sb.from('training_clients').select('*').eq('pin', pin).single();
+    if(data) {
+        user = data;
+        localStorage.setItem('cbc_session', pin);
+        document.getElementById('login-screen').style.display = 'none';
+        showClientWorkout();
+    }
 }
 
-function renderExercise(ex, index, routineId) {
-    const isDone = todayCompletions.includes(index);
-    let videoHtml = '';
-    
-    if (ex.videoUrl) {
-        let embedUrl = '';
-        // Soporte para YouTube normal y Shorts
-        if (ex.videoUrl.includes('youtube.com') || ex.videoUrl.includes('youtu.be')) {
-            let vidId = '';
-            if(ex.videoUrl.includes('v=')) vidId = ex.videoUrl.split('v=')[1].split('&')[0];
-            else if(ex.videoUrl.includes('shorts/')) vidId = ex.videoUrl.split('shorts/')[1].split('?')[0];
-            else vidId = ex.videoUrl.split('/').pop();
-            embedUrl = `https://www.youtube.com/embed/${vidId}`;
-        }
-        
-        if (embedUrl) {
-            videoHtml = `<div class="video-container"><iframe src="${embedUrl}" allowfullscreen></iframe></div>`;
-        } else {
-            videoHtml = `<a href="${ex.videoUrl}" target="_blank" style="color:var(--gold2); font-size:12px; text-decoration:none; display:block; margin-top:10px; font-weight:600;">▶ VER VIDEO DE TÉCNICA</a>`;
-        }
-    }
+// --- PANEL DEL COACH ---
+async function showCoachPanel() {
+    const { data: clients } = await sb.from('training_clients').select('*');
+    let html = `<h2 class="section-title">Panel de Control</h2>
+                <button class="btn btn-gold" onclick="showAddClient()">+ Nuevo Alumno</button>
+                <div style="margin-top:20px;">`;
+    clients.forEach(c => {
+        html += `<div class="card" onclick="editRoutine(${c.id}, '${c.name}')">
+                    <strong>${c.name}</strong><br><small>PIN: ${c.pin}</small>
+                 </div>`;
+    });
+    html += `</div>`;
+    document.getElementById('content').innerHTML = html;
+}
 
-    return `
-        <div class="exercise-card ${isDone ? 'done' : ''}" id="ex-${index}">
-            <div style="font-weight:700; font-size:17px; text-transform:uppercase;">${ex.name}</div>
-            <div style="color:var(--gold2); font-weight:600; font-size:14px; margin-top:4px;">${ex.sets}</div>
-            ${videoHtml}
-            <button class="check-btn" onclick="toggleComplete(${routineId}, ${index})">
-                ${isDone ? '✓ COMPLETADO' : 'MARCAR COMO HECHO'}
-            </button>
-        </div>
+function showAddClient() {
+    document.getElementById('content').innerHTML = `
+        <h2 class="section-title">Nuevo Alumno</h2>
+        <input id="new-name" placeholder="Nombre completo">
+        <input id="new-pin" placeholder="PIN (4 dígitos)" inputmode="numeric">
+        <input id="new-goal" placeholder="Objetivo (ej: Bajar de peso)">
+        <button class="btn btn-gold" onclick="saveClient()">Guardar Alumno</button>
+        <button class="btn btn-outline" onclick="showCoachPanel()">Cancelar</button>
     `;
 }
 
-async function toggleComplete(routineId, index) {
-    const today = new Date().toISOString().split('T')[0];
+async function saveClient() {
+    const name = document.getElementById('new-name').value;
+    const pin = document.getElementById('new-pin').value;
+    const goal = document.getElementById('new-goal').value;
+    await sb.from('training_clients').insert([{name, pin, goal}]);
+    showToast("Alumno creado");
+    showCoachPanel();
+}
+
+async function editRoutine(clientId, clientName) {
+    const { data } = await sb.from('training_routines').select('*').eq('clientId', clientId).single();
+    let exercises = data ? data.exercises : [];
     
-    if (todayCompletions.includes(index)) return; 
+    window.currentEditingClient = clientId;
+    window.currentExercises = exercises;
 
-    const { error } = await sb.from('training_completions').insert([{
-        client_id: currentUser.id,
-        routine_id: routineId,
-        exercise_index: index,
-        completed_at: today
-    }]);
+    renderRoutineEditor(clientName);
+}
 
-    if (!error) {
-        todayCompletions.push(index);
-        const card = document.getElementById(`ex-${index}`);
-        card.classList.add('done');
-        card.
+function renderRoutineEditor(name) {
+    let html = `<h2 class="section-title">Rutina de ${name}</h2>
+                <div id="ex-list">`;
+    window.currentExercises.forEach((ex, i) => {
+        html += `<div class="exercise-item">
+                    <input value="${ex.name}" onchange="updateEx(${i}, 'name', this.value)" placeholder="Nombre ejercicio">
+                    <input value="${ex.sets}" onchange="updateEx(${i}, 'sets', this.value)" placeholder="Series/Reps">
+                    <input value="${ex.videoUrl || ''}" onchange="updateEx(${i}, 'videoUrl', this.value)" placeholder="Link Video (YouTube)">
+                    <button onclick="removeEx(${i})" style="color:red; background:none; border:none; font-size:11px;">Eliminar</button>
+                 </div>`;
+    });
+    html += `</div>
+             <button class="btn btn-outline" onclick="addExField()">+ Añadir Ejercicio</button>
+             <button class="btn btn-gold" onclick="saveRoutine()">Actualizar Rutina en la Nube</button>
+             <button class="btn btn-outline" onclick="showCoachPanel()">Volver</button>`;
+    document.getElementById('content').innerHTML = html;
+}
+
+function addExField() {
+    window.currentExercises.push({name: '', sets: '', videoUrl: ''});
+    renderRoutineEditor();
+}
+
+function updateEx(i, field, value) { window.currentExercises[i][field] = value; }
+function removeEx(i) { window.currentExercises.splice(i, 1); renderRoutineEditor(); }
+
+async function saveRoutine() {
+    const clientId = window.currentEditingClient;
+    const { data } = await sb.from('training_routines').select('id').eq('clientId', clientId).single();
+    
+    if(data) {
+        await sb.from('training_routines').update({exercises: window.currentExercises}).eq('id', data.id);
+    } else {
+        await sb.from('training_routines').insert([{clientId, exercises: window.currentExercises, day: 'General'}]);
+    }
+    showToast("¡Rutina Sincronizada!");
+}
+
+// --- VISTA DEL ALUMNO ---
+async function showClientWorkout() {
+    const { data: routine } = await sb.from('training_routines').select('*').eq('clientId', user.id).single();
+    const today = new Date().toISOString().split('T')[0];
+    const { data: comps } = await sb.from('training_completions').select('exercise_index').eq('client_id', user.id).eq('completed_at', today);
+    const doneIdx = comps ? comps.map(c => c.exercise_index) : [];
+
+    let html = `<h2 class="section-title">Hola, ${user.name}</h2>`;
+    if(!routine) html += `<p>No hay rutina asignada.</p>`;
+    else {
+        routine.exercises.forEach((ex, i) => {
+            const isDone = doneIdx.includes(i);
+            html += `<div class="card ${isDone ? 'done' : ''}" style="${isDone ? 'opacity:0.5; border-color:var(--success);' : ''}">
+                        <h3>${ex.name}</h3>
+                        <p style="color:var(--gold);">${ex.sets}</p>
+                        ${ex.videoUrl ? `<a href="${ex.videoUrl}" style="color:lightblue; font-size:12px;">Ver video</a>` : ''}
+                        <button class="btn" onclick="checkEx(${routine.id}, ${i})" style="background:${isDone ? 'var(--success)' : '#333'}; color:white;">
+                            ${isDone ? '✓ LISTO' : 'MARCAR HECHO'}
+                        </button>
+                     </div>`;
+        });
+    }
+    document.getElementById('content').innerHTML = html;
+}
+
+async function checkEx(rId, idx) {
+    const today = new Date().toISOString().split('T')[0];
+    await sb.from('training_completions').insert([{client_id: user.id, routine_id: rId, exercise_index: idx, completed_at: today}]);
+    showToast("¡Así se hace!");
+    showClientWorkout();
+}
+
+function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = 1; setTimeout(()=>t.style.opacity=0, 2000); }
+function logout() { localStorage.clear(); location.reload(); }
+
+// Autologin
+const sess = localStorage.getItem('cbc_session');
+if(sess) { document.getElementById('pin-input').value = sess; doLogin(); }
+</script>
+</body>
+</html>
