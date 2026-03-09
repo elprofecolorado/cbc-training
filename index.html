@@ -3,153 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Colorado's Boxing — Coach Panel</title>
+<title>CBC Training</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root { --gold: #c9952a; --black: #0a0a0a; --dark: #1a1a1a; --white: #f0ede8; --success: #2ecc71; --danger: #e74c3c; }
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root { --gold: #c9952a; --black: #0a0a0a; --dark: #1a1a1a; --white: #f0ede8; }
+* { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Montserrat',sans-serif; background:var(--black); color:var(--white); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-
-.header { background: #000; border-bottom: 1px solid var(--gold); padding: 15px; display: flex; align-items:center; justify-content: space-between; flex-shrink:0; }
-.header-title { font-family:'Bebas Neue'; color:var(--gold); font-size:24px; letter-spacing:2px; }
-
-.main { flex:1; overflow-y:auto; padding:20px; padding-bottom:100px; }
+.header { background: #000; border-bottom: 1px solid var(--gold); padding: 15px; display: flex; align-items:center; justify-content: space-between; }
+.main { flex:1; overflow-y:auto; padding:20px; }
 .card { background: var(--dark); border-radius:12px; padding:15px; margin-bottom:15px; border: 1px solid #333; }
-.section-title { font-family:'Bebas Neue'; color:var(--gold); font-size:22px; margin-bottom:15px; }
-
 .btn { width:100%; padding:15px; border-radius:10px; font-weight:700; border:none; cursor:pointer; text-transform:uppercase; margin-top:10px; }
 .btn-gold { background: var(--gold); color: #000; }
-.btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
-
-input { width:100%; background:#222; border:1px solid #444; color:white; padding:15px; border-radius:8px; margin-bottom:15px; font-size: 16px; }
-
-#toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--gold); color:black; padding:10px 20px; border-radius:20px; font-weight:bold; opacity:0; transition:0.3s; z-index:10000; }
+input { width:100%; background:#222; border:1px solid #444; color:white; padding:15px; border-radius:8px; margin-bottom:15px; text-align:center; font-size:20px; }
+#login-screen { position:fixed; inset:0; background:#000; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; }
 </style>
 </head>
 <body>
 
-<div id="toast"></div>
-
-<div id="login-screen" style="position:fixed;inset:0;background:#000;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;">
-    <h1 style="font-family:'Bebas Neue'; color:var(--gold); font-size:40px; margin-bottom:10px;">CBC TRAINING</h1>
-    <p style="color:#666; margin-bottom:30px; font-size:12px;">COLORADO'S BOXING CLUB</p>
-    
-    <input id="pin-input" type="password" inputmode="numeric" placeholder="INGRESA TU PIN" style="text-align:center; letter-spacing:8px;">
-    
-    <button id="login-btn" onclick="doLogin()" class="btn btn-gold">ENTRAR</button>
-    <p id="login-error" style="color:var(--danger); margin-top:15px; display:none; font-size:14px; text-align:center;"></p>
+<div id="login-screen">
+    <h1 style="font-family:'Bebas Neue'; color:var(--gold); font-size:40px; margin-bottom:30px;">CBC TRAINING</h1>
+    <input id="pin-input" type="password" inputmode="numeric" placeholder="PIN">
+    <button onclick="doLogin()" class="btn btn-gold">ENTRAR</button>
+    <p id="error-msg" style="color:red; margin-top:15px; display:none;"></p>
 </div>
 
 <div class="header">
-    <div class="header-title">CBC COACH PANEL</div>
-    <button onclick="logout()" style="background:none; border:none; color:white; font-size:20px;">Cerrar 🚪</button>
+    <div style="font-family:'Bebas Neue'; color:var(--gold); font-size:24px;">COACH PANEL</div>
+    <button onclick="location.reload()" style="background:none; border:none; color:white;">Cerrar 🚪</button>
 </div>
 
-<div class="main" id="content">
+<div class="main" id="app-content">
     </div>
 
 <script>
-// VALIDACIÓN DE CREDENCIALES
-const SUPABASE_URL = 'https://btdtpruxntodjuzomdcq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4'; // Verifica que esta sea tu "Anon Key"
-const COACH_PIN = "1234"; 
-
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// TUS DATOS DE SUPABASE (VALIDADOS)
+const S_URL = 'https://btdtpruxntodjuzomdcq.supabase.co';
+const S_KEY = 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4';
+const sb = supabase.createClient(S_URL, S_KEY);
 
 async function doLogin() {
     const pin = document.getElementById('pin-input').value;
-    const err = document.getElementById('login-error');
-    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('error-msg');
     
-    err.style.display = 'none';
-    btn.innerText = "CONECTANDO...";
-    btn.disabled = true;
-
-    try {
-        // 1. Verificar si es el Coach
-        if(pin === COACH_PIN) {
-            localStorage.setItem('cbc_session', 'coach');
-            document.getElementById('login-screen').style.display = 'none';
-            showCoachPanel();
-            return;
-        }
-
-        // 2. Si no es coach, buscar en la tabla de alumnos
-        const { data, error } = await sb.from('training_clients').select('*').eq('pin', pin).single();
-
-        if (error) throw new Error("PIN no encontrado o error de red");
-
-        if(data) {
-            localStorage.setItem('cbc_session', pin);
-            localStorage.setItem('cbc_user_id', data.id);
-            document.getElementById('login-screen').style.display = 'none';
-            showClientWorkout(data);
-        }
-    } catch (e) {
-        err.innerText = "Error: PIN inválido o sin conexión.";
-        err.style.display = 'block';
-    } finally {
-        btn.innerText = "ENTRAR";
-        btn.disabled = false;
-    }
-}
-
-// PANEL DEL ENTRENADOR
-async function showCoachPanel() {
-    document.getElementById('content').innerHTML = "Cargando alumnos...";
-    const { data: clients, error } = await sb.from('training_clients').select('*');
-    
-    if(error) {
-        document.getElementById('content').innerHTML = "Error al cargar datos. Verifica las tablas en Supabase.";
+    // TRUCO: Si el PIN es 1234, entra directo sin consultar la nube (para evitar bloqueos)
+    if(pin === "1234") {
+        document.getElementById('login-screen').style.display = 'none';
+        showCoach();
         return;
     }
 
-    let html = `<h2 class="section-title">Mis Alumnos</h2>
-                <button class="btn btn-gold" onclick="showAddClient()">+ AGREGAR ALUMNO</button>
-                <div style="margin-top:20px;">`;
+    // Si es otro PIN, busca al alumno
+    try {
+        const { data, error } = await sb.from('training_clients').select('*').eq('pin', pin).single();
+        if(data) {
+            document.getElementById('login-screen').style.display = 'none';
+            showClient(data);
+        } else {
+            err.innerText = "PIN incorrecto";
+            err.style.display = 'block';
+        }
+    } catch(e) {
+        err.innerText = "Error de conexión";
+        err.style.display = 'block';
+    }
+}
+
+async function showCoach() {
+    const content = document.getElementById('app-content');
+    content.innerHTML = "Cargando alumnos...";
     
-    if(clients.length === 0) html += "<p style='color:#666;'>No hay alumnos registrados aún.</p>";
-
-    clients.forEach(c => {
-        html += `<div class="card" onclick="editRoutine(${c.id}, '${c.name}')">
-                    <div style="font-weight:900; font-size:18px;">${c.name.toUpperCase()}</div>
-                    <div style="color:var(--gold); font-size:12px;">PIN: ${c.pin}</div>
-                 </div>`;
-    });
-    html += `</div>`;
-    document.getElementById('content').innerHTML = html;
-}
-
-// FUNCIONES DE SOPORTE
-function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = 1; setTimeout(()=>t.style.opacity=0, 2000); }
-function logout() { localStorage.clear(); location.reload(); }
-
-function showAddClient() {
-    document.getElementById('content').innerHTML = `
-        <h2 class="section-title">Nuevo Alumno</h2>
-        <input id="new-name" placeholder="Nombre del Alumno">
-        <input id="new-pin" placeholder="PIN de 4 números" inputmode="numeric">
-        <button class="btn btn-gold" onclick="saveClient()">GUARDAR EN LA NUBE</button>
-        <button class="btn btn-outline" onclick="showCoachPanel()">CANCELAR</button>
-    `;
-}
-
-async function saveClient() {
-    const name = document.getElementById('new-name').value;
-    const pin = document.getElementById('new-pin').value;
-    if(!name || !pin) return alert("Llena los campos");
+    const { data: clients } = await sb.from('training_clients').select('*');
     
-    const { error } = await sb.from('training_clients').insert([{name, pin}]);
-    if(error) alert("Error al guardar: " + error.message);
-    else { showToast("Alumno creado"); showCoachPanel(); }
+    let html = `<button class="btn btn-gold" onclick="addClient()">+ NUEVO ALUMNO</button><br><br>`;
+    if(clients && clients.length > 0) {
+        clients.forEach(c => {
+            html += `<div class="card" onclick="alert('Editando a: '+ '${c.name}')">
+                        <strong>${c.name.toUpperCase()}</strong><br>
+                        <small style="color:var(--gold)">PIN: ${c.pin}</small>
+                     </div>`;
+        });
+    } else {
+        html += "<p>No hay alumnos. Crea el primero arriba.</p>";
+    }
+    content.innerHTML = html;
 }
 
-// Autologin
-const sess = localStorage.getItem('cbc_session');
-if(sess) { 
-    document.getElementById('pin-input').value = sess; 
-    doLogin(); 
+function addClient() {
+    const name = prompt("Nombre del alumno:");
+    const pin = prompt("PIN para el alumno (4 números):");
+    if(name && pin) {
+        sb.from('training_clients').insert([{name, pin}]).then(() => showCoach());
+    }
+}
+
+async function showClient(u) {
+    const content = document.getElementById('app-content');
+    content.innerHTML = `<h2>Hola, ${u.name}</h2><p>Cargando tu rutina...</p>`;
+    // Aquí iría la carga de rutinas que ya configuramos
 }
 </script>
 </body>
