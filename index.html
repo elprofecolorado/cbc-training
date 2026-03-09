@@ -136,7 +136,7 @@ body.trainer-mode .client-only{display:none;}
   <div style="font-size:11px;letter-spacing:3px;color:#666;margin-bottom:40px;text-transform:uppercase;">Colorado's Boxing Club</div>
   <div style="width:100%;max-width:340px;">
     <div style="font-size:11px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:8px;font-weight:600;">Tu PIN de acceso</div>
-    <input id="pin-input" type="number" inputmode="numeric" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:16px;color:#f0ede8;font-family:'Montserrat',sans-serif;font-size:28px;text-align:center;letter-spacing:8px;outline:none;margin-bottom:16px;" placeholder="••••" maxlength="6">
+    <input id="pin-input" type="tel" inputmode="numeric" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:16px;color:#f0ede8;font-family:'Montserrat',sans-serif;font-size:28px;text-align:center;letter-spacing:8px;outline:none;margin-bottom:16px;" placeholder="••••" maxlength="6">
     <button onclick="doLogin()" style="width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#0a0a0a;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;border:none;cursor:pointer;text-transform:uppercase;" id="login-btn">ENTRAR</button>
     <div id="login-error" style="text-align:center;color:#e74c3c;font-size:12px;margin-top:12px;display:none;">PIN incorrecto. Intenta de nuevo.</div>
   </div>
@@ -500,66 +500,83 @@ async function doLogin() {
   const err = document.getElementById('login-error');
 
   if (!pin) { showToast('Ingresa tu PIN'); return; }
+
   btn.textContent='VERIFICANDO...'; btn.disabled=true;
+  err.style.display='none';
 
-  try {
-    if (pin === TRAINER_PIN) {
-      isTrainer=true;
-      localStorage.setItem('cbc_mode','trainer');
-      localStorage.setItem('cbc_pin',pin);
-      await afterLogin(); return;
-    }
-
-    // Use pre-loaded clients, or reload if empty
-    if (!clients.length) {
-      try {
-        const {data} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
-        if (data) clients = data;
-      } catch(e) { console.error('Reload error:',e); }
-    }
-
-    if (!clients.length) {
-      showToast('Sin conexión. Verifica tu internet.');
-      btn.textContent='ENTRAR'; btn.disabled=false;
-      return;
-    }
-
-    const client = clients.find(c=>String(c.pin)===String(pin));
-    if (client) {
-      isTrainer=false;
-      localStorage.setItem('cbc_mode','client');
-      localStorage.setItem('cbc_pin',pin);
-      localStorage.setItem('cbc_client_id',String(client.id));
-      await afterLogin(); return;
-    }
-
-    err.style.display='block';
-    document.getElementById('pin-input').value='';
-    setTimeout(()=>err.style.display='none',3000);
-
-  } catch(e) {
-    console.error('Login error:',e);
-    showToast('Error. Intenta de nuevo.');
+  // ── TRAINER ──
+  if (pin === TRAINER_PIN) {
+    isTrainer=true;
+    localStorage.setItem('cbc_mode','trainer');
+    localStorage.setItem('cbc_client_id','');
+    await afterLogin();
+    return;
   }
 
+  // ── CLIENT ── use preloaded, or cache, or fetch
+  let allClients = clients.length ? clients : [];
+
+  if (!allClients.length) {
+    const cached = localStorage.getItem('cbc_cached_clients');
+    if (cached) { try { allClients = JSON.parse(cached); } catch(e){} }
+  }
+
+  if (!allClients.length) {
+    try {
+      const {data} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
+      if (data && data.length) allClients = data;
+    } catch(e) { console.error('Fetch clients error:',e); }
+  }
+
+  if (!allClients.length) {
+    showToast('⚠️ Sin conexión. Intenta de nuevo.');
+    btn.textContent='ENTRAR'; btn.disabled=false;
+    return;
+  }
+
+  clients = allClients;
+  const client = clients.find(c => String(c.pin) === String(pin));
+
+  if (client) {
+    isTrainer=false;
+    localStorage.setItem('cbc_mode','client');
+    localStorage.setItem('cbc_client_id', String(client.id));
+    await afterLogin();
+    return;
+  }
+
+  // PIN not found
   btn.textContent='ENTRAR'; btn.disabled=false;
+  err.style.display='block';
+  document.getElementById('pin-input').value='';
+  setTimeout(()=>err.style.display='none', 3000);
 }
 
 async function afterLogin() {
-  document.getElementById('login-screen').style.display='none';
   showToast('⏳ Cargando...');
   try {
     await loadAllData();
-  } catch(e) {
-    console.error('loadAllData error:', e);
-  }
+    if (clients.length) {
+      localStorage.setItem('cbc_cached_clients', JSON.stringify(
+        clients.map(c=>({id:c.id,name:c.name,pin:String(c.pin),goal:c.goal,phone:c.phone}))
+      ));
+    }
+  } catch(e) { console.error('loadAllData error:',e); }
+
+  document.getElementById('login-screen').style.display='none';
   applyMode();
   populateSelects();
   populateWeekSelectors();
+
   if (!isTrainer) {
     const cid = localStorage.getItem('cbc_client_id');
-    const client = clients.find(c=>String(c.id)===cid);
-    if (client) { renderClients(); openClientWorkout(client.id); showToast('✓ Bienvenido'); return; }
+    const client = clients.find(c=>String(c.id)===String(cid));
+    if (client) {
+      renderClients();
+      openClientWorkout(client.id);
+      showToast('✓ Bienvenido ' + client.name.split(' ')[0]);
+      return;
+    }
   }
   renderClients();
   showToast('✓ Bienvenido');
@@ -1406,12 +1423,25 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('login-screen').style.display='flex';
 
-// Pre-load clients silently so PIN check works instantly
+// Pre-load clients: try Supabase, fallback to localStorage cache
 (async () => {
   try {
     const {data} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
-    if (data) clients = data;
-  } catch(e) { console.log('Pre-load failed, will retry on login'); }
+    if (data && data.length) {
+      clients = data;
+      localStorage.setItem('cbc_cached_clients', JSON.stringify(
+        data.map(c=>({id:c.id,name:c.name,pin:String(c.pin),goal:c.goal,phone:c.phone}))
+      ));
+    } else {
+      // Use cached version
+      const cached = localStorage.getItem('cbc_cached_clients');
+      if (cached) clients = JSON.parse(cached);
+    }
+  } catch(e) {
+    // Use cached version on error
+    const cached = localStorage.getItem('cbc_cached_clients');
+    if (cached) clients = JSON.parse(cached);
+  }
 })();
 </script>
 </body>
