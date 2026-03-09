@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root { --gold: #c9952a; --black: #0a0a0a; --dark: #1a1a1a; --white: #f0ede8; --success: #2ecc71; }
+:root { --gold: #c9952a; --black: #0a0a0a; --dark: #1a1a1a; --white: #f0ede8; --success: #2ecc71; --danger: #e74c3c; }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { font-family:'Montserrat',sans-serif; background:var(--black); color:var(--white); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
 
@@ -22,10 +22,8 @@ body { font-family:'Montserrat',sans-serif; background:var(--black); color:var(-
 .btn-gold { background: var(--gold); color: #000; }
 .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
 
-input, textarea, select { width:100%; background:#222; border:1px solid #444; color:white; padding:12px; border-radius:8px; margin-bottom:10px; font-family:inherit; }
-label { display:block; font-size:12px; color:var(--gold); margin-bottom:5px; font-weight:700; }
+input { width:100%; background:#222; border:1px solid #444; color:white; padding:15px; border-radius:8px; margin-bottom:15px; font-size: 16px; }
 
-.exercise-item { background:#252525; padding:10px; border-radius:8px; margin-bottom:10px; position:relative; }
 #toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--gold); color:black; padding:10px 20px; border-radius:20px; font-weight:bold; opacity:0; transition:0.3s; z-index:10000; }
 </style>
 </head>
@@ -34,164 +32,125 @@ label { display:block; font-size:12px; color:var(--gold); margin-bottom:5px; fon
 <div id="toast"></div>
 
 <div id="login-screen" style="position:fixed;inset:0;background:#000;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;">
-    <h1 style="font-family:'Bebas Neue'; color:var(--gold); font-size:40px; margin-bottom:40px;">CBC TRAINING</h1>
-    <input id="pin-input" type="password" inputmode="numeric" placeholder="PIN" style="font-size:32px; text-align:center; letter-spacing:8px; max-width:260px;">
-    <button onclick="doLogin()" class="btn btn-gold" style="max-width:260px;">ENTRAR</button>
+    <h1 style="font-family:'Bebas Neue'; color:var(--gold); font-size:40px; margin-bottom:10px;">CBC TRAINING</h1>
+    <p style="color:#666; margin-bottom:30px; font-size:12px;">COLORADO'S BOXING CLUB</p>
+    
+    <input id="pin-input" type="password" inputmode="numeric" placeholder="INGRESA TU PIN" style="text-align:center; letter-spacing:8px;">
+    
+    <button id="login-btn" onclick="doLogin()" class="btn btn-gold">ENTRAR</button>
+    <p id="login-error" style="color:var(--danger); margin-top:15px; display:none; font-size:14px; text-align:center;"></p>
 </div>
 
 <div class="header">
-    <div class="header-title">COLORADO'S BOXING</div>
-    <button onclick="logout()" style="background:none; border:none; color:white; font-size:20px;">🚪</button>
+    <div class="header-title">CBC COACH PANEL</div>
+    <button onclick="logout()" style="background:none; border:none; color:white; font-size:20px;">Cerrar 🚪</button>
 </div>
 
 <div class="main" id="content">
     </div>
 
 <script>
-const sb = supabase.createClient('https://btdtpruxntodjuzomdcq.supabase.co', 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4');
-const COACH_PIN = "1234"; // CAMBIA ESTO POR TU PIN SECRETO
-let user = null;
-let isCoach = false;
+// VALIDACIÓN DE CREDENCIALES
+const SUPABASE_URL = 'https://btdtpruxntodjuzomdcq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4'; // Verifica que esta sea tu "Anon Key"
+const COACH_PIN = "1234"; 
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function doLogin() {
     const pin = document.getElementById('pin-input').value;
-    if(pin === COACH_PIN) {
-        isCoach = true;
-        localStorage.setItem('cbc_session', 'coach');
-        document.getElementById('login-screen').style.display = 'none';
-        showCoachPanel();
-        return;
-    }
-    const { data } = await sb.from('training_clients').select('*').eq('pin', pin).single();
-    if(data) {
-        user = data;
-        localStorage.setItem('cbc_session', pin);
-        document.getElementById('login-screen').style.display = 'none';
-        showClientWorkout();
+    const err = document.getElementById('login-error');
+    const btn = document.getElementById('login-btn');
+    
+    err.style.display = 'none';
+    btn.innerText = "CONECTANDO...";
+    btn.disabled = true;
+
+    try {
+        // 1. Verificar si es el Coach
+        if(pin === COACH_PIN) {
+            localStorage.setItem('cbc_session', 'coach');
+            document.getElementById('login-screen').style.display = 'none';
+            showCoachPanel();
+            return;
+        }
+
+        // 2. Si no es coach, buscar en la tabla de alumnos
+        const { data, error } = await sb.from('training_clients').select('*').eq('pin', pin).single();
+
+        if (error) throw new Error("PIN no encontrado o error de red");
+
+        if(data) {
+            localStorage.setItem('cbc_session', pin);
+            localStorage.setItem('cbc_user_id', data.id);
+            document.getElementById('login-screen').style.display = 'none';
+            showClientWorkout(data);
+        }
+    } catch (e) {
+        err.innerText = "Error: PIN inválido o sin conexión.";
+        err.style.display = 'block';
+    } finally {
+        btn.innerText = "ENTRAR";
+        btn.disabled = false;
     }
 }
 
-// --- PANEL DEL COACH ---
+// PANEL DEL ENTRENADOR
 async function showCoachPanel() {
-    const { data: clients } = await sb.from('training_clients').select('*');
-    let html = `<h2 class="section-title">Panel de Control</h2>
-                <button class="btn btn-gold" onclick="showAddClient()">+ Nuevo Alumno</button>
+    document.getElementById('content').innerHTML = "Cargando alumnos...";
+    const { data: clients, error } = await sb.from('training_clients').select('*');
+    
+    if(error) {
+        document.getElementById('content').innerHTML = "Error al cargar datos. Verifica las tablas en Supabase.";
+        return;
+    }
+
+    let html = `<h2 class="section-title">Mis Alumnos</h2>
+                <button class="btn btn-gold" onclick="showAddClient()">+ AGREGAR ALUMNO</button>
                 <div style="margin-top:20px;">`;
+    
+    if(clients.length === 0) html += "<p style='color:#666;'>No hay alumnos registrados aún.</p>";
+
     clients.forEach(c => {
         html += `<div class="card" onclick="editRoutine(${c.id}, '${c.name}')">
-                    <strong>${c.name}</strong><br><small>PIN: ${c.pin}</small>
+                    <div style="font-weight:900; font-size:18px;">${c.name.toUpperCase()}</div>
+                    <div style="color:var(--gold); font-size:12px;">PIN: ${c.pin}</div>
                  </div>`;
     });
     html += `</div>`;
     document.getElementById('content').innerHTML = html;
 }
 
+// FUNCIONES DE SOPORTE
+function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = 1; setTimeout(()=>t.style.opacity=0, 2000); }
+function logout() { localStorage.clear(); location.reload(); }
+
 function showAddClient() {
     document.getElementById('content').innerHTML = `
         <h2 class="section-title">Nuevo Alumno</h2>
-        <input id="new-name" placeholder="Nombre completo">
-        <input id="new-pin" placeholder="PIN (4 dígitos)" inputmode="numeric">
-        <input id="new-goal" placeholder="Objetivo (ej: Bajar de peso)">
-        <button class="btn btn-gold" onclick="saveClient()">Guardar Alumno</button>
-        <button class="btn btn-outline" onclick="showCoachPanel()">Cancelar</button>
+        <input id="new-name" placeholder="Nombre del Alumno">
+        <input id="new-pin" placeholder="PIN de 4 números" inputmode="numeric">
+        <button class="btn btn-gold" onclick="saveClient()">GUARDAR EN LA NUBE</button>
+        <button class="btn btn-outline" onclick="showCoachPanel()">CANCELAR</button>
     `;
 }
 
 async function saveClient() {
     const name = document.getElementById('new-name').value;
     const pin = document.getElementById('new-pin').value;
-    const goal = document.getElementById('new-goal').value;
-    await sb.from('training_clients').insert([{name, pin, goal}]);
-    showToast("Alumno creado");
-    showCoachPanel();
-}
-
-async function editRoutine(clientId, clientName) {
-    const { data } = await sb.from('training_routines').select('*').eq('clientId', clientId).single();
-    let exercises = data ? data.exercises : [];
+    if(!name || !pin) return alert("Llena los campos");
     
-    window.currentEditingClient = clientId;
-    window.currentExercises = exercises;
-
-    renderRoutineEditor(clientName);
+    const { error } = await sb.from('training_clients').insert([{name, pin}]);
+    if(error) alert("Error al guardar: " + error.message);
+    else { showToast("Alumno creado"); showCoachPanel(); }
 }
-
-function renderRoutineEditor(name) {
-    let html = `<h2 class="section-title">Rutina de ${name}</h2>
-                <div id="ex-list">`;
-    window.currentExercises.forEach((ex, i) => {
-        html += `<div class="exercise-item">
-                    <input value="${ex.name}" onchange="updateEx(${i}, 'name', this.value)" placeholder="Nombre ejercicio">
-                    <input value="${ex.sets}" onchange="updateEx(${i}, 'sets', this.value)" placeholder="Series/Reps">
-                    <input value="${ex.videoUrl || ''}" onchange="updateEx(${i}, 'videoUrl', this.value)" placeholder="Link Video (YouTube)">
-                    <button onclick="removeEx(${i})" style="color:red; background:none; border:none; font-size:11px;">Eliminar</button>
-                 </div>`;
-    });
-    html += `</div>
-             <button class="btn btn-outline" onclick="addExField()">+ Añadir Ejercicio</button>
-             <button class="btn btn-gold" onclick="saveRoutine()">Actualizar Rutina en la Nube</button>
-             <button class="btn btn-outline" onclick="showCoachPanel()">Volver</button>`;
-    document.getElementById('content').innerHTML = html;
-}
-
-function addExField() {
-    window.currentExercises.push({name: '', sets: '', videoUrl: ''});
-    renderRoutineEditor();
-}
-
-function updateEx(i, field, value) { window.currentExercises[i][field] = value; }
-function removeEx(i) { window.currentExercises.splice(i, 1); renderRoutineEditor(); }
-
-async function saveRoutine() {
-    const clientId = window.currentEditingClient;
-    const { data } = await sb.from('training_routines').select('id').eq('clientId', clientId).single();
-    
-    if(data) {
-        await sb.from('training_routines').update({exercises: window.currentExercises}).eq('id', data.id);
-    } else {
-        await sb.from('training_routines').insert([{clientId, exercises: window.currentExercises, day: 'General'}]);
-    }
-    showToast("¡Rutina Sincronizada!");
-}
-
-// --- VISTA DEL ALUMNO ---
-async function showClientWorkout() {
-    const { data: routine } = await sb.from('training_routines').select('*').eq('clientId', user.id).single();
-    const today = new Date().toISOString().split('T')[0];
-    const { data: comps } = await sb.from('training_completions').select('exercise_index').eq('client_id', user.id).eq('completed_at', today);
-    const doneIdx = comps ? comps.map(c => c.exercise_index) : [];
-
-    let html = `<h2 class="section-title">Hola, ${user.name}</h2>`;
-    if(!routine) html += `<p>No hay rutina asignada.</p>`;
-    else {
-        routine.exercises.forEach((ex, i) => {
-            const isDone = doneIdx.includes(i);
-            html += `<div class="card ${isDone ? 'done' : ''}" style="${isDone ? 'opacity:0.5; border-color:var(--success);' : ''}">
-                        <h3>${ex.name}</h3>
-                        <p style="color:var(--gold);">${ex.sets}</p>
-                        ${ex.videoUrl ? `<a href="${ex.videoUrl}" style="color:lightblue; font-size:12px;">Ver video</a>` : ''}
-                        <button class="btn" onclick="checkEx(${routine.id}, ${i})" style="background:${isDone ? 'var(--success)' : '#333'}; color:white;">
-                            ${isDone ? '✓ LISTO' : 'MARCAR HECHO'}
-                        </button>
-                     </div>`;
-        });
-    }
-    document.getElementById('content').innerHTML = html;
-}
-
-async function checkEx(rId, idx) {
-    const today = new Date().toISOString().split('T')[0];
-    await sb.from('training_completions').insert([{client_id: user.id, routine_id: rId, exercise_index: idx, completed_at: today}]);
-    showToast("¡Así se hace!");
-    showClientWorkout();
-}
-
-function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = 1; setTimeout(()=>t.style.opacity=0, 2000); }
-function logout() { localStorage.clear(); location.reload(); }
 
 // Autologin
 const sess = localStorage.getItem('cbc_session');
-if(sess) { document.getElementById('pin-input').value = sess; doLogin(); }
+if(sess) { 
+    document.getElementById('pin-input').value = sess; 
+    doLogin(); 
+}
 </script>
 </body>
 </html>
