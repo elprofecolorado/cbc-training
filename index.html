@@ -12,461 +12,133 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold: #c9952a;
-  --gold2: #e8b84b;
-  --gold-dim: rgba(201,149,42,0.15);
-  --black: #0a0a0a;
-  --dark: #111;
-  --dark2: #1a1a1a;
-  --dark3: #222;
-  --dark4: #2a2a2a;
-  --white: #f0ede8;
-  --gray: #666;
-  --gray2: #999;
-  --success: #2ecc71;
-  --danger: #e74c3c;
-  --warning: #f39c12;
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body { height:100%; overflow:hidden; }
-body { font-family:'Montserrat',sans-serif; background:var(--black); color:var(--white); display:flex; flex-direction:column; }
-
-/* ── HEADER ── */
-.header {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1200 100%);
-  border-bottom: 1px solid rgba(201,149,42,0.3);
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  position: relative;
-}
-.header::after {
-  content:'';
-  position:absolute;
-  bottom:0; left:0; right:0;
-  height:1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-.header-logo { display:flex; align-items:center; gap:10px; }
-.header-logo img { width:42px; height:42px; object-fit:contain; filter:drop-shadow(0 0 8px rgba(201,149,42,0.5)); }
-.header-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:3px; color:var(--gold); line-height:1; }
-.header-sub { font-size:9px; letter-spacing:2px; color:var(--gray2); text-transform:uppercase; }
-.header-right { display:flex; align-items:center; gap:8px; }
-.mode-badge {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:11px;
-  letter-spacing:2px;
-  padding:4px 10px;
-  border-radius:20px;
-  border:1px solid var(--gold);
-  color:var(--gold);
-  cursor:pointer;
-  transition: all 0.2s;
-}
-.mode-badge.trainer { background:var(--gold); color:var(--black); }
-
-/* ── BOTTOM NAV ── */
-.bottom-nav {
-  background: var(--dark);
-  border-top: 1px solid #222;
-  display: flex;
-  flex-shrink: 0;
-  position: relative;
-}
-.bottom-nav::before {
-  content:'';
-  position:absolute;
-  top:0; left:0; right:0;
-  height:1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-.nav-btn {
-  flex:1;
-  padding:10px 4px 8px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:3px;
-  cursor:pointer;
-  transition: all 0.2s;
-  border:none;
-  background:none;
-  color:var(--gray);
-}
-.nav-btn .nav-icon { font-size:20px; }
-.nav-btn .nav-label { font-size:9px; letter-spacing:1px; text-transform:uppercase; font-weight:600; }
-.nav-btn.active { color:var(--gold); }
-.nav-btn.active .nav-label { color:var(--gold); }
-
-/* ── MAIN SCROLL ── */
-.main { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
-
-/* ── PAGES ── */
-.page { display:none; padding:16px; min-height:100%; }
-.page.active { display:block; }
-
-/* ── SECTION TITLE ── */
-.section-title {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:18px;
-  letter-spacing:3px;
-  color:var(--gold);
-  margin-bottom:12px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.section-title::after {
-  content:'';
-  flex:1;
-  height:1px;
-  background: linear-gradient(90deg, rgba(201,149,42,0.4), transparent);
-}
-
-/* ── CARDS ── */
-.card {
-  background: var(--dark2);
-  border:1px solid #2a2a2a;
-  border-radius:12px;
-  padding:16px;
-  margin-bottom:12px;
-  position:relative;
-  overflow:hidden;
-}
-.card::before {
-  content:'';
-  position:absolute;
-  top:0; left:0;
-  width:3px; height:100%;
-  background: var(--gold);
-}
-
-/* ── CLIENT CARD ── */
-.client-card {
-  background: var(--dark2);
-  border:1px solid #252525;
-  border-radius:12px;
-  padding:14px 16px;
-  margin-bottom:10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  cursor:pointer;
-  transition: all 0.2s;
-  position:relative;
-  overflow:hidden;
-}
-.client-card:active { transform:scale(0.98); }
-.client-card .cc-left { display:flex; align-items:center; gap:12px; }
-.client-avatar {
-  width:44px; height:44px;
-  border-radius:50%;
-  background: linear-gradient(135deg, var(--gold), #8a6009);
-  display:flex; align-items:center; justify-content:center;
-  font-family:'Bebas Neue',sans-serif;
-  font-size:18px;
-  color:var(--black);
-  flex-shrink:0;
-}
-.client-name { font-weight:700; font-size:14px; margin-bottom:2px; }
-.client-meta { font-size:11px; color:var(--gray2); }
-.client-arrow { color:var(--gold); font-size:18px; }
-
-/* ── EXERCISE CARD ── */
-.exercise-card {
-  background: var(--dark2);
-  border:1px solid #252525;
-  border-radius:10px;
-  margin-bottom:8px;
-  overflow:hidden;
-  transition: all 0.3s;
-}
-.exercise-card.done { opacity:0.5; }
-.exercise-header {
-  padding:12px 14px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  cursor:pointer;
-}
-.ex-check {
-  width:28px; height:28px;
-  border-radius:50%;
-  border:2px solid var(--gold);
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0;
-  transition: all 0.2s;
-  font-size:14px;
-}
-.exercise-card.done .ex-check { background:var(--success); border-color:var(--success); }
-.ex-info { flex:1; }
-.ex-name { font-weight:700; font-size:13px; margin-bottom:2px; }
-.ex-sets { font-size:11px; color:var(--gold2); font-weight:600; }
-.ex-video-btn {
-  background: rgba(201,149,42,0.15);
-  border:1px solid rgba(201,149,42,0.3);
-  border-radius:6px;
-  padding:5px 10px;
-  font-size:11px;
-  color:var(--gold);
-  cursor:pointer;
-  font-family:'Montserrat',sans-serif;
-  font-weight:600;
-  transition: all 0.2s;
-  flex-shrink:0;
-}
-.ex-video-btn:active { background:rgba(201,149,42,0.3); }
-.ex-notes { padding:0 14px 12px 54px; font-size:11px; color:var(--gray2); display:none; }
-.exercise-card.expanded .ex-notes { display:block; }
-
-/* ── VIDEO EMBED ── */
-.video-wrap {
-  padding:0 14px 12px;
-  display:none;
-}
-.video-wrap.visible { display:block; }
-.video-wrap iframe {
-  width:100%;
-  height:180px;
-  border-radius:8px;
-  border:none;
-}
-
-/* ── PROGRESS ── */
-.progress-bar-wrap { background:#222; border-radius:20px; height:6px; overflow:hidden; margin:8px 0; }
-.progress-bar-fill { height:100%; background:linear-gradient(90deg, var(--gold), var(--gold2)); border-radius:20px; transition:width 0.5s; }
-
-/* ── STATS ROW ── */
-.stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
-.stat-box {
-  background:var(--dark2);
-  border:1px solid #252525;
-  border-radius:10px;
-  padding:12px 10px;
-  text-align:center;
-}
-.stat-box .sv { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); line-height:1; }
-.stat-box .sl { font-size:9px; letter-spacing:1px; color:var(--gray2); text-transform:uppercase; margin-top:2px; }
-
-/* ── FORM ── */
-.form-group { margin-bottom:14px; }
-.form-label { font-size:10px; letter-spacing:2px; color:var(--gray2); text-transform:uppercase; margin-bottom:6px; display:block; font-weight:600; }
-.form-input {
-  width:100%;
-  background:var(--dark3);
-  border:1px solid #333;
-  border-radius:8px;
-  padding:11px 14px;
-  color:var(--white);
-  font-family:'Montserrat',sans-serif;
-  font-size:14px;
-  outline:none;
-  transition: border-color 0.2s;
-}
-.form-input:focus { border-color:var(--gold); }
-select.form-input option { background:var(--dark3); }
-textarea.form-input { resize:vertical; min-height:80px; }
-
-/* ── BUTTONS ── */
-.btn {
-  padding:12px 20px;
-  border-radius:8px;
-  font-family:'Montserrat',sans-serif;
-  font-size:13px;
-  font-weight:700;
-  letter-spacing:1px;
-  cursor:pointer;
-  border:none;
-  transition: all 0.2s;
-  text-transform:uppercase;
-  width:100%;
-}
-.btn-gold { background:linear-gradient(135deg, var(--gold), #a07010); color:var(--black); }
-.btn-gold:active { transform:scale(0.98); }
-.btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold); }
-.btn-danger { background:var(--danger); color:white; }
-.btn-sm { padding:7px 14px; font-size:11px; width:auto; }
-.btn-row { display:flex; gap:8px; }
-
-/* ── MODAL ── */
-.modal-overlay {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.9);
-  z-index:1000;
-  align-items:flex-end;
-  justify-content:center;
-  backdrop-filter:blur(4px);
-}
-.modal-overlay.open { display:flex; }
-.modal {
-  background:var(--dark2);
-  border:1px solid #333;
-  border-radius:20px 20px 0 0;
-  width:100%;
-  max-width:600px;
-  max-height:90vh;
-  overflow-y:auto;
-  animation:slideUp 0.3s ease;
-}
-@keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
-.modal-header {
-  padding:20px 20px 14px;
-  border-bottom:1px solid #2a2a2a;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  position:sticky;
-  top:0;
-  background:var(--dark2);
-  z-index:10;
-}
-.modal-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px; color:var(--gold); }
-.modal-close { background:none; border:none; color:var(--gray2); font-size:22px; cursor:pointer; padding:4px; }
-.modal-body { padding:20px; }
-.modal-footer { padding:0 20px 24px; }
-
-/* ── DAY TABS ── */
-.day-tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:16px; scrollbar-width:none; }
-.day-tabs::-webkit-scrollbar { display:none; }
-.day-tab {
-  flex-shrink:0;
-  padding:7px 14px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:1px;
-  cursor:pointer;
-  border:1px solid #333;
-  color:var(--gray2);
-  transition: all 0.2s;
-  text-transform:uppercase;
-  background:var(--dark2);
-}
-.day-tab.active { background:var(--gold); color:var(--black); border-color:var(--gold); }
-
-/* ── PROGRESS LOG ── */
-.progress-entry {
-  background:var(--dark2);
-  border:1px solid #252525;
-  border-radius:10px;
-  padding:14px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.pe-left .pe-date { font-size:11px; color:var(--gray2); margin-bottom:4px; }
-.pe-left .pe-weight { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); line-height:1; }
-.pe-right { text-align:right; font-size:11px; color:var(--gray2); }
-.pe-right span { display:block; margin-bottom:2px; }
-
-/* ── TOAST ── */
-#toast {
-  position:fixed;
-  bottom:80px;
-  left:50%;
-  transform:translateX(-50%);
-  background:var(--dark3);
-  border:1px solid var(--gold);
-  color:var(--white);
-  padding:10px 20px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:600;
-  letter-spacing:1px;
-  z-index:9999;
-  opacity:0;
-  transition:opacity 0.3s;
-  pointer-events:none;
-  white-space:nowrap;
-}
-
-/* ── TRAINER BADGE ── */
-.trainer-only { display:none; }
-body.trainer-mode .trainer-only { display:block; }
-body.trainer-mode .client-only { display:none; }
-
-/* ── EMPTY STATE ── */
-.empty-state {
-  text-align:center;
-  padding:40px 20px;
-  color:var(--gray);
-}
-.empty-state .ei { font-size:48px; margin-bottom:12px; }
-.empty-state p { font-size:13px; line-height:1.6; }
-
-/* ── WORKOUT HEADER ── */
-.workout-header {
-  background: linear-gradient(135deg, #1a1200, #0a0a0a);
-  border:1px solid rgba(201,149,42,0.2);
-  border-radius:12px;
-  padding:16px;
-  margin-bottom:16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.wh-left .wh-day { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--gold); letter-spacing:2px; line-height:1; }
-.wh-left .wh-focus { font-size:11px; color:var(--gray2); margin-top:2px; }
-.wh-right { text-align:right; }
-.wh-right .wh-count { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--white); line-height:1; }
-.wh-right .wh-label { font-size:9px; color:var(--gray2); letter-spacing:1px; text-transform:uppercase; }
-
-/* ── BACK BTN ── */
-.back-btn {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  color:var(--gold);
-  font-size:13px;
-  font-weight:600;
-  cursor:pointer;
-  margin-bottom:14px;
-  background:none;
-  border:none;
-  padding:0;
-}
-
-/* ── SELECT CLIENT VIEW ── */
-#client-select-view { display:block; }
-#workout-view { display:none; }
+:root{--gold:#c9952a;--gold2:#e8b84b;--black:#0a0a0a;--dark:#111;--dark2:#1a1a1a;--dark3:#222;--dark4:#2a2a2a;--white:#f0ede8;--gray:#666;--gray2:#999;--success:#2ecc71;--danger:#e74c3c;--warning:#f39c12;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Montserrat',sans-serif;background:var(--black);color:var(--white);display:flex;flex-direction:column;}
+.header{background:linear-gradient(135deg,#0a0a0a,#1a1200);border-bottom:1px solid rgba(201,149,42,0.3);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.header-logo{display:flex;align-items:center;gap:10px;}
+.header-logo img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(201,149,42,0.5));}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--gold);line-height:1;}
+.header-sub{font-size:9px;letter-spacing:2px;color:var(--gray2);text-transform:uppercase;}
+.mode-badge{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);}
+.mode-badge.trainer{background:var(--gold);color:var(--black);}
+.bottom-nav{background:var(--dark);border-top:1px solid #222;display:flex;flex-shrink:0;position:relative;}
+.bottom-nav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.nav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all 0.2s;border:none;background:none;color:var(--gray);}
+.nav-btn .nav-icon{font-size:20px;}
+.nav-btn .nav-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.nav-btn.active{color:var(--gold);}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.page{display:none;padding:16px;min-height:100%;}
+.page.active{display:block;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,149,42,0.4),transparent);}
+.card{background:var(--dark2);border:1px solid #2a2a2a;border-radius:12px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
+.client-card{background:var(--dark2);border:1px solid #252525;border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:all 0.2s;position:relative;}
+.client-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8a6009);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--black);flex-shrink:0;}
+.client-photo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);}
+.exercise-card{background:var(--dark2);border:1px solid #252525;border-radius:10px;margin-bottom:8px;overflow:hidden;transition:all 0.3s;}
+.exercise-card.done{opacity:0.5;}
+.exercise-header{padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.ex-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-size:14px;cursor:pointer;}
+.exercise-card.done .ex-check{background:var(--success);border-color:var(--success);}
+.ex-info{flex:1;}
+.ex-name{font-weight:700;font-size:13px;margin-bottom:2px;}
+.ex-sets{font-size:11px;color:var(--gold2);font-weight:600;}
+.ex-video-btn{background:rgba(201,149,42,0.15);border:1px solid rgba(201,149,42,0.3);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;flex-shrink:0;}
+.video-wrap{padding:0 14px 12px;display:none;}
+.video-wrap.visible{display:block;}
+.progress-bar-wrap{background:#222;border-radius:20px;height:6px;overflow:hidden;margin:8px 0;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:20px;transition:width 0.5s;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-box{background:var(--dark2);border:1px solid #252525;border-radius:10px;padding:12px 10px;text-align:center;}
+.stat-box .sv{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1;}
+.stat-box .sl{font-size:9px;letter-spacing:1px;color:var(--gray2);text-transform:uppercase;margin-top:2px;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:10px;letter-spacing:2px;color:var(--gray2);text-transform:uppercase;margin-bottom:6px;display:block;font-weight:600;}
+.form-input{width:100%;background:var(--dark3);border:1px solid #333;border-radius:8px;padding:11px 14px;color:var(--white);font-family:'Montserrat',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--gold);}
+select.form-input option{background:var(--dark3);}
+textarea.form-input{resize:vertical;min-height:80px;}
+.btn{padding:12px 20px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;border:none;transition:all 0.2s;text-transform:uppercase;width:100%;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#a07010);color:var(--black);}
+.btn-gold:active{transform:scale(0.98);}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-danger{background:var(--danger);color:white;}
+.btn-green{background:#25d366;color:white;}
+.btn-sm{padding:7px 14px;font-size:11px;width:auto;}
+.btn-row{display:flex;gap:8px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1000;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--dark2);border:1px solid #333;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{padding:20px 20px 14px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--dark2);z-index:10;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--gold);}
+.modal-close{background:none;border:none;color:var(--gray2);font-size:22px;cursor:pointer;padding:4px;}
+.modal-body{padding:20px;}
+.modal-footer{padding:0 20px 24px;}
+.week-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;}
+.week-tabs::-webkit-scrollbar{display:none;}
+.week-tab{flex-shrink:0;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid #333;color:var(--gray2);transition:all 0.2s;text-transform:uppercase;background:var(--dark2);}
+.week-tab.active{background:var(--gold);color:var(--black);border-color:var(--gold);}
+.week-tab.current{border-color:var(--gold);color:var(--gold);}
+.day-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none;}
+.day-tabs::-webkit-scrollbar{display:none;}
+.day-tab{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid #333;color:var(--gray2);transition:all 0.2s;text-transform:uppercase;background:var(--dark2);}
+.day-tab.active{background:var(--gold);color:var(--black);border-color:var(--gold);}
+.workout-header{background:linear-gradient(135deg,#1a1200,#0a0a0a);border:1px solid rgba(201,149,42,0.2);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.wh-left .wh-day{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);letter-spacing:2px;line-height:1;}
+.wh-left .wh-focus{font-size:11px;color:var(--gray2);margin-top:2px;}
+.wh-right{text-align:right;}
+.wh-right .wh-count{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--white);line-height:1;}
+.wh-right .wh-label{font-size:9px;color:var(--gray2);letter-spacing:1px;text-transform:uppercase;}
+.streak-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#ff6b00,#ff4500);color:white;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+.motivation-banner{background:linear-gradient(135deg,#1a1200,#2a1f00);border:1px solid rgba(201,149,42,0.4);border-radius:12px;padding:14px 16px;margin-bottom:16px;position:relative;overflow:hidden;}
+.motivation-banner::before{content:'💬';position:absolute;right:12px;top:10px;font-size:24px;opacity:0.3;}
+.motivation-trainer{font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px;}
+.motivation-text{font-size:14px;color:var(--white);line-height:1.5;font-style:italic;}
+.rating-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:2000;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
+.rating-popup.open{display:flex;}
+.rating-box{background:var(--dark2);border:1px solid var(--gold);border-radius:20px;padding:28px 24px;width:100%;max-width:380px;text-align:center;animation:slideUp 0.3s ease;}
+.rating-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;}
+.stars{display:flex;justify-content:center;gap:10px;margin-bottom:16px;}
+.star{font-size:36px;cursor:pointer;opacity:0.3;transition:all 0.15s;}
+.star.active{opacity:1;transform:scale(1.2);}
+.dashboard-client{background:var(--dark2);border:1px solid #252525;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.dc-status{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dc-trained{background:var(--success);}
+.dc-rest{background:#444;}
+.dc-missed{background:var(--danger);}
+.ex-lib-item{background:var(--dark2);border:1px solid #252525;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.template-card{background:var(--dark2);border:1px solid rgba(201,149,42,0.3);border-radius:12px;padding:16px;margin-bottom:12px;}
+.progress-entry{background:var(--dark2);border:1px solid #252525;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:14px;background:none;border:none;padding:0;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--gray);}
+.empty-state .ei{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:13px;line-height:1.6;}
+.msg-card{background:var(--dark2);border:1px solid #252525;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--dark3);border:1px solid var(--gold);color:var(--white);padding:10px 20px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:1px;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.trainer-only{display:none;}
+body.trainer-mode .trainer-only{display:block;}
+body.trainer-mode .client-only{display:none;}
 </style>
 </head>
 <body>
-
 <div id="toast"></div>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen" style="
-  position:fixed;inset:0;background:linear-gradient(135deg,#0a0a0a 0%,#1a1200 50%,#0a0a0a 100%);
-  z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;
-">
+<!-- LOGIN -->
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a0a0a,#1a1200,#0a0a0a);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;">
   <img src="logo-trainer.png" style="width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(201,149,42,0.6));margin-bottom:16px;">
   <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:#c9952a;margin-bottom:4px;">CBC TRAINING</div>
   <div style="font-size:11px;letter-spacing:3px;color:#666;margin-bottom:40px;text-transform:uppercase;">Colorado's Boxing Club</div>
-
   <div style="width:100%;max-width:340px;">
     <div style="font-size:11px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:8px;font-weight:600;">Tu PIN de acceso</div>
-    <input id="pin-input" type="number" inputmode="numeric" pattern="[0-9]*"
-      style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:16px;
-             color:#f0ede8;font-family:'Montserrat',sans-serif;font-size:28px;text-align:center;
-             letter-spacing:8px;outline:none;margin-bottom:16px;"
-      placeholder="••••" maxlength="6"
-      oninput="if(this.value.length>6)this.value=this.value.slice(0,6)">
-    <button onclick="doLogin()"
-      style="width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);
-             color:#0a0a0a;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;
-             letter-spacing:2px;border:none;cursor:pointer;text-transform:uppercase;">
-      ENTRAR
-    </button>
-    <div id="login-error" style="text-align:center;color:#e74c3c;font-size:12px;margin-top:12px;display:none;">
-      PIN incorrecto. Intenta de nuevo.
-    </div>
+    <input id="pin-input" type="number" inputmode="numeric" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:16px;color:#f0ede8;font-family:'Montserrat',sans-serif;font-size:28px;text-align:center;letter-spacing:8px;outline:none;margin-bottom:16px;" placeholder="••••" maxlength="6">
+    <button onclick="doLogin()" style="width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#0a0a0a;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;border:none;cursor:pointer;text-transform:uppercase;" id="login-btn">ENTRAR</button>
+    <div id="login-error" style="text-align:center;color:#e74c3c;font-size:12px;margin-top:12px;display:none;">PIN incorrecto. Intenta de nuevo.</div>
   </div>
 </div>
 
@@ -474,24 +146,19 @@ body.trainer-mode .client-only { display:none; }
 <div class="header">
   <div class="header-logo">
     <img src="logo-trainer.png" alt="CBC">
-    <div>
-      <div class="header-title">CBC Training</div>
-      <div class="header-sub">Colorado's Boxing Club</div>
-    </div>
+    <div><div class="header-title">CBC Training</div><div class="header-sub">Colorado's Boxing Club</div></div>
   </div>
-  <div class="header-right" style="display:flex;gap:8px;align-items:center;">
-    <div class="mode-badge trainer" id="mode-toggle">ENTRENADOR</div>
-    <div onclick="logout()" style="cursor:pointer;background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:6px 10px;font-size:12px;color:#999;font-family:Montserrat,sans-serif;font-weight:600;" title="Cerrar sesión">SALIR</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="mode-badge trainer" id="mode-badge">ENTRENADOR</div>
+    <div onclick="logout()" style="cursor:pointer;font-size:18px;">🚪</div>
   </div>
 </div>
 
 <!-- MAIN -->
 <div class="main" id="main-scroll">
 
-  <!-- PAGE: RUTINAS -->
+  <!-- RUTINAS -->
   <div class="page active" id="page-rutinas">
-
-    <!-- CLIENT SELECT VIEW -->
     <div id="client-select-view">
       <div class="section-title trainer-only">🥊 Mis Clientes</div>
       <div class="section-title client-only">🥊 Mi Entrenamiento</div>
@@ -500,729 +167,804 @@ body.trainer-mode .client-only { display:none; }
         <button class="btn btn-gold" onclick="openModal('modal-add-client')">+ Agregar Cliente</button>
       </div>
     </div>
-
-    <!-- WORKOUT VIEW -->
-    <div id="workout-view">
+    <div id="workout-view" style="display:none;">
       <button class="back-btn" onclick="backToClients()">← Regresar</button>
       <div id="workout-content"></div>
     </div>
-
   </div>
 
-  <!-- PAGE: PROGRESO -->
+  <!-- DASHBOARD -->
+  <div class="page trainer-only" id="page-dashboard">
+    <div class="section-title">📊 Dashboard</div>
+    <div id="dashboard-content"></div>
+  </div>
+
+  <!-- PROGRESO -->
   <div class="page" id="page-progreso">
-    <div class="section-title">📊 Progreso</div>
-    <div id="progress-client-select" style="margin-bottom:16px;" class="trainer-only">
-      <div class="form-group">
-        <label class="form-label">Seleccionar Cliente</label>
-        <select class="form-input" id="progress-client-sel" onchange="loadProgressView()">
-          <option value="">-- Selecciona --</option>
-        </select>
-      </div>
+    <div class="section-title">📈 Progreso</div>
+    <div class="trainer-only form-group" style="margin-bottom:16px;">
+      <label class="form-label">Cliente</label>
+      <select class="form-input" id="progress-client-sel" onchange="loadProgressView()">
+        <option value="">-- Selecciona --</option>
+      </select>
     </div>
     <div id="progress-content"></div>
   </div>
 
-  <!-- PAGE: AJUSTES (TRAINER) -->
+  <!-- GESTIÓN -->
   <div class="page trainer-only" id="page-ajustes">
-    <div class="section-title">⚙️ Gestión</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;">
+      <button class="week-tab active" id="tab-rutinas" onclick="switchGestionTab('rutinas')">📋 Rutinas</button>
+      <button class="week-tab" id="tab-biblioteca" onclick="switchGestionTab('biblioteca')">📚 Biblioteca</button>
+      <button class="week-tab" id="tab-mensajes" onclick="switchGestionTab('mensajes')">💬 Mensajes</button>
+      <button class="week-tab" id="tab-plantillas" onclick="switchGestionTab('plantillas')">🗂 Plantillas</button>
+    </div>
 
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:12px;">CREAR RUTINA</div>
-      <input type="hidden" id="editing-routine-id" value="">
-      <div class="form-group">
-        <label class="form-label">Cliente</label>
-        <select class="form-input" id="routine-client-sel" onchange="updateAvailableDays()" ></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Día</label>
-        <select class="form-input" id="routine-day-sel" onchange="checkDayAvailable()">
-          <option>Lunes</option><option>Martes</option><option>Miércoles</option>
-          <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
-        </select>
-        <div id="day-warning" style="font-size:11px;color:#e74c3c;margin-top:5px;display:none;">
-          ⚠️ Este día ya tiene rutina — usa ✏️ Editar en Rutinas Guardadas
+    <!-- TAB RUTINAS -->
+    <div id="gtab-rutinas">
+      <div class="card">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:12px;" id="routine-form-title">CREAR RUTINA</div>
+        <input type="hidden" id="editing-routine-id" value="">
+        <div class="form-group">
+          <label class="form-label">Cliente</label>
+          <select class="form-input" id="routine-client-sel" onchange="updateAvailableDays()"></select>
         </div>
+        <div class="form-group">
+          <label class="form-label">Semana del año</label>
+          <select class="form-input" id="routine-week-sel" onchange="updateAvailableDays()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Día</label>
+          <select class="form-input" id="routine-day-sel">
+            <option>Lunes</option><option>Martes</option><option>Miércoles</option>
+            <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
+          </select>
+          <div id="day-warning" style="font-size:11px;color:#e74c3c;margin-top:5px;display:none;">⚠️ Este día ya tiene rutina en esta semana</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Enfoque del día</label>
+          <input class="form-input" type="text" id="routine-focus" placeholder="ej: Pecho y Tríceps, Cardio...">
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--gold2);">EJERCICIOS</div>
+          <button class="btn btn-outline btn-sm" onclick="openLibraryPicker()">📚 Biblioteca</button>
+        </div>
+        <div id="exercises-builder"></div>
+        <button class="btn btn-outline" style="margin-bottom:10px;" onclick="addExerciseRow()">+ Agregar ejercicio</button>
+        <button class="btn btn-gold" id="save-routine-btn" onclick="saveRoutine()">💾 GUARDAR RUTINA</button>
+        <button class="btn btn-outline" style="margin-top:8px;display:none;" id="cancel-edit-btn" onclick="cancelEditRoutine()">✕ Cancelar edición</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Enfoque del día</label>
-        <input class="form-input" type="text" id="routine-focus" placeholder="ej: Pecho y Triceps, Cardio, Full Body...">
+
+      <div class="section-title">📋 Rutinas Guardadas</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+        <select class="form-input" id="filter-routines-client" onchange="renderSavedRoutines()"><option value="">— Todos —</option></select>
+        <select class="form-input" id="filter-routines-week" onchange="renderSavedRoutines()"><option value="">— Todas las semanas —</option></select>
       </div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--gold2);margin-bottom:10px;margin-top:4px;">EJERCICIOS</div>
-      <div id="exercises-builder"></div>
-      <button class="btn btn-outline" style="margin-bottom:10px;" onclick="addExerciseRow()">+ Agregar Ejercicio</button>
-      <button class="btn btn-gold" id="save-routine-btn" onclick="saveRoutine()">💾 GUARDAR RUTINA</button>
+      <div style="margin-bottom:12px;">
+        <button class="btn btn-outline btn-sm" onclick="openCopyWeekModal()">📋 Copiar semana completa</button>
+      </div>
+      <div id="saved-routines-list"></div>
     </div>
 
-    <div class="section-title">📋 Rutinas Guardadas</div>
-    <div class="form-group" style="margin-bottom:12px;">
-      <select class="form-input" id="filter-routines-client" onchange="renderSavedRoutines()">
-        <option value="">— Todos los clientes —</option>
-      </select>
+    <!-- TAB BIBLIOTECA -->
+    <div id="gtab-biblioteca" style="display:none;">
+      <div class="section-title">📚 Biblioteca de Ejercicios</div>
+      <p style="font-size:12px;color:var(--gray2);margin-bottom:14px;">Se agrega automáticamente al guardar rutinas. También puedes agregar manualmente.</p>
+      <button class="btn btn-gold" style="margin-bottom:16px;" onclick="openModal('modal-add-exercise')">+ Agregar ejercicio</button>
+      <div id="library-list"></div>
     </div>
-    <div id="saved-routines-list"></div>
+
+    <!-- TAB MENSAJES -->
+    <div id="gtab-mensajes" style="display:none;">
+      <div class="section-title">💬 Mensajes a Clientes</div>
+      <button class="btn btn-gold" style="margin-bottom:16px;" onclick="openModal('modal-send-message')">+ Nuevo mensaje</button>
+      <div id="messages-list"></div>
+    </div>
+
+    <!-- TAB PLANTILLAS -->
+    <div id="gtab-plantillas" style="display:none;">
+      <div class="section-title">🗂 Plantillas de Programas</div>
+      <p style="font-size:12px;color:var(--gray2);margin-bottom:14px;">Programas de 4 semanas reutilizables para clientes nuevos o avanzados.</p>
+      <button class="btn btn-gold" style="margin-bottom:16px;" onclick="openModal('modal-create-template')">+ Nueva plantilla</button>
+      <div id="templates-list"></div>
+    </div>
   </div>
 
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 <div class="bottom-nav">
-  <button class="nav-btn active" onclick="showPage('rutinas', this)">
-    <span class="nav-icon">🥊</span>
-    <span class="nav-label">Rutinas</span>
-  </button>
-  <button class="nav-btn" onclick="showPage('progreso', this)">
-    <span class="nav-icon">📊</span>
-    <span class="nav-label">Progreso</span>
-  </button>
-  <button class="nav-btn trainer-only" onclick="showPage('ajustes', this)">
-    <span class="nav-icon">⚙️</span>
-    <span class="nav-label">Gestión</span>
-  </button>
+  <button class="nav-btn active" onclick="showPage('rutinas',this)"><span class="nav-icon">🥊</span><span class="nav-label">Rutinas</span></button>
+  <button class="nav-btn trainer-only" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
+  <button class="nav-btn" onclick="showPage('progreso',this)"><span class="nav-icon">📈</span><span class="nav-label">Progreso</span></button>
+  <button class="nav-btn trainer-only" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
 </div>
 
-<!-- MODAL: ADD CLIENT -->
+<!-- RATING POPUP -->
+<div class="rating-popup" id="rating-popup">
+  <div class="rating-box">
+    <div style="font-size:48px;margin-bottom:8px;">🏆</div>
+    <div class="rating-title">¡RUTINA COMPLETADA!</div>
+    <div style="font-size:12px;color:var(--gray2);margin-bottom:20px;">¿Cómo estuvo el entrenamiento?</div>
+    <div class="stars" id="stars-row">
+      <span class="star" onclick="selectStar(1)">⭐</span>
+      <span class="star" onclick="selectStar(2)">⭐</span>
+      <span class="star" onclick="selectStar(3)">⭐</span>
+      <span class="star" onclick="selectStar(4)">⭐</span>
+      <span class="star" onclick="selectStar(5)">⭐</span>
+    </div>
+    <textarea class="form-input" id="rating-comment" placeholder="Comentario opcional..." style="margin-bottom:16px;min-height:70px;"></textarea>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" style="flex:1;padding:10px;" onclick="submitRating(false)">Solo guardar</button>
+      <button class="btn btn-gold" style="flex:1;padding:10px;" onclick="submitRating(true)">📲 Enviar al entrenador</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADD CLIENT -->
 <div class="modal-overlay" id="modal-add-client">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">NUEVO CLIENTE</div>
-      <button class="modal-close" onclick="closeModal('modal-add-client')">✕</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">NUEVO CLIENTE</div><button class="modal-close" onclick="closeModal('modal-add-client')">✕</button></div>
     <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Nombre completo</label>
-        <input class="form-input" type="text" id="new-client-name" placeholder="Juan García">
+      <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" id="new-client-name" placeholder="Juan García"></div>
+      <div class="form-group"><label class="form-label">Objetivo</label>
+        <select class="form-input" id="new-client-goal"><option>Perder peso</option><option>Ganar músculo</option><option>Rendimiento deportivo</option><option>Tonificar</option><option>Salud general</option></select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Objetivo</label>
-        <select class="form-input" id="new-client-goal">
-          <option>Perder peso</option>
-          <option>Ganar músculo</option>
-          <option>Rendimiento deportivo</option>
-          <option>Tonificar</option>
-          <option>Salud general</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Teléfono (WhatsApp)</label>
-        <input class="form-input" type="text" id="new-client-phone" placeholder="52 33 1234 5678">
-      </div>
-      <div class="form-group">
-        <label class="form-label">PIN del cliente (4-6 dígitos)</label>
-        <input class="form-input" type="number" id="new-client-pin" placeholder="ej: 4521" inputmode="numeric">
-      </div>
+      <div class="form-group"><label class="form-label">Teléfono (WhatsApp)</label><input class="form-input" type="text" id="new-client-phone" placeholder="52 33 1234 5678"></div>
+      <div class="form-group"><label class="form-label">PIN (4-6 dígitos)</label><input class="form-input" type="number" id="new-client-pin" inputmode="numeric" placeholder="ej: 4521"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-gold" onclick="addClient()">Guardar Cliente</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="addClient()">Guardar Cliente</button></div>
   </div>
 </div>
 
-<!-- MODAL: EDIT CLIENT -->
+<!-- MODAL EDIT CLIENT -->
 <div class="modal-overlay" id="modal-edit-client">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">EDITAR CLIENTE</div>
-      <button class="modal-close" onclick="closeModal('modal-edit-client')">✕</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">EDITAR CLIENTE</div><button class="modal-close" onclick="closeModal('modal-edit-client')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="edit-client-id">
-      <div class="form-group">
-        <label class="form-label">Nombre completo</label>
-        <input class="form-input" type="text" id="edit-client-name">
+      <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" id="edit-client-name"></div>
+      <div class="form-group"><label class="form-label">Objetivo</label>
+        <select class="form-input" id="edit-client-goal"><option>Perder peso</option><option>Ganar músculo</option><option>Rendimiento deportivo</option><option>Tonificar</option><option>Salud general</option></select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Objetivo</label>
-        <select class="form-input" id="edit-client-goal">
-          <option>Perder peso</option>
-          <option>Ganar músculo</option>
-          <option>Rendimiento deportivo</option>
-          <option>Tonificar</option>
-          <option>Salud general</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Teléfono (WhatsApp)</label>
-        <input class="form-input" type="text" id="edit-client-phone">
-      </div>
-      <div class="form-group">
-        <label class="form-label">PIN del cliente</label>
-        <input class="form-input" type="number" id="edit-client-pin" inputmode="numeric">
-      </div>
+      <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" type="text" id="edit-client-phone"></div>
+      <div class="form-group"><label class="form-label">PIN</label><input class="form-input" type="number" id="edit-client-pin" inputmode="numeric"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-gold" onclick="saveEditClient()">💾 Guardar Cambios</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="saveEditClient()">💾 Guardar Cambios</button></div>
   </div>
 </div>
 
-<!-- MODAL: LOG PROGRESS -->
+<!-- MODAL LOG PROGRESS -->
 <div class="modal-overlay" id="modal-log-progress">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">REGISTRAR PROGRESO</div>
-      <button class="modal-close" onclick="closeModal('modal-log-progress')">✕</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">REGISTRAR PROGRESO</div><button class="modal-close" onclick="closeModal('modal-log-progress')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="prog-client-id">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group">
-          <label class="form-label">Peso (kg)</label>
-          <input class="form-input" type="number" id="prog-weight" placeholder="75">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Fecha</label>
-          <input class="form-input" type="date" id="prog-date">
-        </div>
+        <div class="form-group"><label class="form-label">Peso (kg)</label><input class="form-input" type="number" id="prog-weight" placeholder="75"></div>
+        <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" type="date" id="prog-date"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group">
-          <label class="form-label">Cintura (cm)</label>
-          <input class="form-input" type="number" id="prog-waist" placeholder="80">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cadera (cm)</label>
-          <input class="form-input" type="number" id="prog-hip" placeholder="95">
-        </div>
+        <div class="form-group"><label class="form-label">Cintura (cm)</label><input class="form-input" type="number" id="prog-waist"></div>
+        <div class="form-group"><label class="form-label">Cadera (cm)</label><input class="form-input" type="number" id="prog-hip"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group">
-          <label class="form-label">Pecho (cm)</label>
-          <input class="form-input" type="number" id="prog-chest" placeholder="100">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Brazo (cm)</label>
-          <input class="form-input" type="number" id="prog-arm" placeholder="35">
-        </div>
+        <div class="form-group"><label class="form-label">Pecho (cm)</label><input class="form-input" type="number" id="prog-chest"></div>
+        <div class="form-group"><label class="form-label">Brazo (cm)</label><input class="form-input" type="number" id="prog-arm"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Notas</label>
-        <textarea class="form-input" id="prog-notes" placeholder="Observaciones..."></textarea>
+      <div class="form-group"><label class="form-label">Notas</label><textarea class="form-input" id="prog-notes" placeholder="Observaciones..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="saveProgress()">Guardar Progreso</button></div>
+  </div>
+</div>
+
+<!-- MODAL SEND MESSAGE -->
+<div class="modal-overlay" id="modal-send-message">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">💬 MENSAJE</div><button class="modal-close" onclick="closeModal('modal-send-message')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Para</label>
+        <select class="form-input" id="msg-client-sel"><option value="">— Todos los clientes —</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Tipo</label>
+        <select class="form-input" id="msg-type">
+          <option value="motivacion">💪 Frase motivadora</option>
+          <option value="recordatorio">⏰ Recordatorio</option>
+          <option value="felicitacion">🏆 Felicitación</option>
+          <option value="info">📋 Información</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Mensaje</label><textarea class="form-input" id="msg-text" placeholder="Escribe aquí..." style="min-height:100px;"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="sendMessage()">📤 Publicar</button></div>
+  </div>
+</div>
+
+<!-- MODAL ADD EXERCISE -->
+<div class="modal-overlay" id="modal-add-exercise">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">+ EJERCICIO</div><button class="modal-close" onclick="closeModal('modal-add-exercise')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" id="lib-ex-name" placeholder="Sentadilla con barra"></div>
+      <div class="form-group"><label class="form-label">Series y reps</label><input class="form-input" type="text" id="lib-ex-sets" placeholder="4x12 reps"></div>
+      <div class="form-group"><label class="form-label">Video YouTube</label><input class="form-input" type="text" id="lib-ex-video" placeholder="https://youtube.com/..."></div>
+      <div class="form-group"><label class="form-label">Notas</label><input class="form-input" type="text" id="lib-ex-notes" placeholder="Técnica, consejos..."></div>
+      <div class="form-group"><label class="form-label">Grupo muscular</label>
+        <select class="form-input" id="lib-ex-muscle">
+          <option>Pecho</option><option>Espalda</option><option>Hombros</option><option>Bíceps</option>
+          <option>Tríceps</option><option>Piernas</option><option>Glúteos</option><option>Core</option><option>Cardio</option><option>Full Body</option>
+        </select>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-gold" onclick="saveProgress()">Guardar Progreso</button>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="saveLibraryExercise()">Guardar en biblioteca</button></div>
+  </div>
+</div>
+
+<!-- MODAL LIBRARY PICKER -->
+<div class="modal-overlay" id="modal-library-picker">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📚 ELEGIR EJERCICIO</div><button class="modal-close" onclick="closeModal('modal-library-picker')">✕</button></div>
+    <div class="modal-body">
+      <input class="form-input" type="text" id="lib-search" placeholder="Buscar..." oninput="renderLibraryPicker()" style="margin-bottom:12px;">
+      <div id="library-picker-list"></div>
     </div>
+  </div>
+</div>
+
+<!-- MODAL COPY WEEK -->
+<div class="modal-overlay" id="modal-copy-week">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📋 COPIAR SEMANA</div><button class="modal-close" onclick="closeModal('modal-copy-week')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Cliente</label><select class="form-input" id="copy-client-sel"></select></div>
+      <div class="form-group"><label class="form-label">Copiar DE la semana</label><select class="form-input" id="copy-from-week"></select></div>
+      <div class="form-group"><label class="form-label">Copiar A la semana</label><select class="form-input" id="copy-to-week"></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="copyWeek()">📋 Copiar semana</button></div>
+  </div>
+</div>
+
+<!-- MODAL CREATE TEMPLATE -->
+<div class="modal-overlay" id="modal-create-template">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🗂 NUEVA PLANTILLA</div><button class="modal-close" onclick="closeModal('modal-create-template')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" id="tmpl-name" placeholder="ej: Programa Principiantes 4 semanas"></div>
+      <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-input" id="tmpl-desc" placeholder="Para quién es este programa..."></textarea></div>
+      <p style="font-size:12px;color:var(--gold2);">💡 Después de crear, agrega rutinas semana por semana y asígnala a clientes.</p>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="saveTemplate()">Crear Plantilla</button></div>
   </div>
 </div>
 
 <script>
-// ========= SUPABASE =========
-const sb = supabase.createClient('https://btdtpruxntodjuzomdcq.supabase.co', 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4');
-
-let clients = [];
-let routines = [];
-let progress = [];
-let completions = {}; // loaded from Supabase
-let isTrainer = localStorage.getItem('cbc_t_mode') !== 'client';
-let currentClientId = null;
-let currentDay = null;
-let exRowCount = 0;
-
-function saveAll() {
-  // completions saved to Supabase
-}
-
+const sb = supabase.createClient('https://btdtpruxntodjuzomdcq.supabase.co','sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4');
+const TRAINER_PIN = '1234';
 const DAY_ORDER = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
-function sortByDay(arr) {
-  return [...arr].sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day));
+const DAY_NAMES_JS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+let clients=[], routines=[], progress=[], completions={}, messages=[], ratings=[];
+let exerciseLibrary=[], templates=[], templateRoutines=[];
+let isTrainer=true, currentClientId=null, currentDay=null, currentWeek=getWeekNum(), exRowCount=0;
+let currentRating={routineId:null,clientId:null,stars:0};
+
+function getWeekNum(date) {
+  const d = date ? new Date(date) : new Date();
+  const jan1 = new Date(d.getFullYear(),0,1);
+  return Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
 }
+
+function getWeekRange(week) {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(),0,1);
+  const days = (week-1)*7 - jan1.getDay() + 1;
+  const mon = new Date(now.getFullYear(),0,1+days);
+  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  return `${mon.getDate()}/${mon.getMonth()+1}–${sun.getDate()}/${sun.getMonth()+1}`;
+}
+
+function sortByDay(arr) { return [...arr].sort((a,b)=>DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day)); }
+
+async function dbInsert(t,r) { const {error}=await sb.from(t).insert([r]); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
+async function dbUpdate(t,r) { const {error}=await sb.from(t).update(r).eq('id',r.id); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
+async function dbDelete(t,id) { const {error}=await sb.from(t).delete().eq('id',id); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
 
 async function loadAllData() {
-  showToast('⏳ Cargando...');
   try {
-    const [cr, rr, pr, compr] = await Promise.all([
+    const [cr,rr,pr,compr,mr,rr2,libr,tmplr,tmplrr] = await Promise.all([
       sb.from('training_clients').select('*'),
       sb.from('training_routines').select('*'),
       sb.from('training_progress').select('*'),
       sb.from('training_completions').select('*'),
+      sb.from('training_messages').select('*').order('id',{ascending:false}),
+      sb.from('training_ratings').select('*'),
+      sb.from('training_exercises').select('*'),
+      sb.from('training_templates').select('*'),
+      sb.from('training_template_routines').select('*'),
     ]);
-    clients = cr.data || [];
-    routines = rr.data || [];
-    progress = pr.data || [];
-    // Build completions object from DB rows
-    completions = {};
-    (compr.data || []).forEach(row => {
-      const key = `${row.clientId}_${row.routineId}_${row.date}`;
-      completions[key] = row.exercises || [];
+    clients=cr.data||[]; routines=rr.data||[]; progress=pr.data||[];
+    messages=mr.data||[]; ratings=rr2.data||[]; exerciseLibrary=libr.data||[];
+    templates=tmplr.data||[]; templateRoutines=tmplrr.data||[];
+    completions={};
+    (compr.data||[]).forEach(row=>{
+      const key=`${row.clientId}_${row.routineId}_${row.date}`;
+      completions[key]=row.exercises||[];
     });
-  } catch(e) {
-    showToast('✗ Error de conexión');
-    console.error(e);
+  } catch(e) { showToast('✗ Error de conexión'); console.error(e); }
+}
+
+// ─── LOGIN ───
+async function doLogin() {
+  const pin = document.getElementById('pin-input').value.trim();
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  btn.textContent='VERIFICANDO...'; btn.disabled=true;
+
+  if (pin===TRAINER_PIN) {
+    isTrainer=true;
+    localStorage.setItem('cbc_mode','trainer');
+    localStorage.setItem('cbc_pin',pin);
+    await afterLogin(); return;
   }
+
+  const {data} = await sb.from('training_clients').select('*').catch(()=>({data:[]}));
+  clients = data||[];
+  const client = clients.find(c=>c.pin===pin);
+  if (client) {
+    isTrainer=false;
+    localStorage.setItem('cbc_mode','client');
+    localStorage.setItem('cbc_pin',pin);
+    localStorage.setItem('cbc_client_id',String(client.id));
+    await afterLogin(); return;
+  }
+
+  btn.textContent='ENTRAR'; btn.disabled=false;
+  err.style.display='block';
+  document.getElementById('pin-input').value='';
+  setTimeout(()=>err.style.display='none',3000);
 }
 
-async function dbInsert(table, row) {
-  const { error } = await sb.from(table).insert([row]);
-  if (error) { showToast('✗ Error al guardar'); console.error(error); return false; }
-  return true;
-}
-
-async function dbUpdate(table, row) {
-  const { error } = await sb.from(table).update(row).eq('id', row.id);
-  if (error) { showToast('✗ Error al actualizar'); console.error(error); return false; }
-  return true;
-}
-
-async function dbDelete(table, id) {
-  const { error } = await sb.from(table).delete().eq('id', id);
-  if (error) { showToast('✗ Error al eliminar'); console.error(error); return false; }
-  return true;
-}
-
-// ========= MODE =========
-function toggleMode() {
-  // Mode is controlled by PIN login only
-}
-
-function applyMode() {
-  const badge = document.getElementById('mode-toggle');
-  if (isTrainer) {
-    document.body.classList.add('trainer-mode');
-    badge.textContent = 'ENTRENADOR';
-    badge.classList.add('trainer');
-  } else {
-    document.body.classList.remove('trainer-mode');
-    badge.textContent = 'CLIENTE';
-    badge.classList.remove('trainer');
+async function afterLogin() {
+  document.getElementById('login-screen').style.display='none';
+  showToast('⏳ Cargando...');
+  await loadAllData();
+  applyMode();
+  populateSelects();
+  populateWeekSelectors();
+  if (!isTrainer) {
+    const cid = localStorage.getItem('cbc_client_id');
+    const client = clients.find(c=>String(c.id)===cid);
+    if (client) { renderClients(); openClientWorkout(client.id); return; }
   }
   renderClients();
-  populateSelects();
+  showToast('✓ Bienvenido');
 }
 
-// ========= NAVIGATION =========
+function logout() { localStorage.clear(); location.reload(); }
+
+function applyMode() {
+  const badge = document.getElementById('mode-badge');
+  if (isTrainer) {
+    document.body.classList.add('trainer-mode');
+    badge.textContent='ENTRENADOR'; badge.classList.add('trainer');
+  } else {
+    document.body.classList.remove('trainer-mode');
+    badge.textContent='CLIENTE'; badge.classList.remove('trainer');
+  }
+}
+
+// ─── NAVIGATION ───
 function showPage(page, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  btn.classList.add('active');
-  document.getElementById('main-scroll').scrollTop = 0;
-  if (page === 'ajustes') { renderSavedRoutines(); }
-  if (page === 'progreso') {
-    if (currentClientId) {
-      const progSel = document.getElementById('progress-client-sel');
-      if (progSel) progSel.value = currentClientId;
-    }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(btn) btn.classList.add('active');
+  document.getElementById('main-scroll').scrollTop=0;
+  if(page==='ajustes'){renderSavedRoutines();renderMessagesList();renderLibrary();renderTemplates();}
+  if(page==='progreso'){
+    if(currentClientId){ const ps=document.getElementById('progress-client-sel'); if(ps) ps.value=currentClientId; }
     loadProgressView();
   }
+  if(page==='dashboard') renderDashboard();
 }
 
-// ========= CLIENTS =========
+function switchGestionTab(tab) {
+  ['rutinas','biblioteca','mensajes','plantillas'].forEach(t=>{
+    document.getElementById('gtab-'+t).style.display=t===tab?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='biblioteca') renderLibrary();
+  if(tab==='plantillas') renderTemplates();
+}
+
+// ─── CLIENTS ───
 function renderClients() {
   const list = document.getElementById('clients-list');
-  if (clients.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="ei">🥊</div><p>No hay clientes aún.<br>Agrega tu primer cliente.</p></div>`;
-    return;
-  }
-  list.innerHTML = clients.map(c => {
-    const myRoutines = routines.filter(r => r.clientId === c.id);
+  if(!clients.length){list.innerHTML='<div class="empty-state"><div class="ei">🥊</div><p>No hay clientes aún.</p></div>';return;}
+  list.innerHTML = clients.map(c=>{
+    const myR = routines.filter(r=>String(r.clientId)===String(c.id));
+    const weeks = [...new Set(myR.map(r=>r.week||0))];
     const initials = c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    return `<div class="client-card" style="flex-direction:column;align-items:stretch;gap:10px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;" onclick="openClientWorkout(${c.id})">
-        <div class="cc-left">
-          <div class="client-avatar">${initials}</div>
+    const avatar = c.photo
+      ? `<img src="${c.photo}" class="client-photo" onclick="event.stopPropagation();openPhotoUpload(${c.id})">`
+      : `<div class="client-avatar" onclick="event.stopPropagation();openPhotoUpload(${c.id})">${initials}</div>`;
+    return `<div class="client-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="openClientWorkout(${c.id})">
+        <div style="display:flex;align-items:center;gap:12px;">${avatar}
           <div>
-            <div class="client-name">${c.name}</div>
-            <div class="client-meta">${c.goal} · ${myRoutines.length} días · PIN: <strong style="color:var(--gold)">${c.pin || '—'}</strong></div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${c.name}</div>
+            <div style="font-size:11px;color:var(--gray2);">${c.goal} · ${weeks.length} sem · PIN: <strong style="color:var(--gold)">${c.pin||'—'}</strong></div>
           </div>
         </div>
-        <div class="client-arrow">›</div>
+        <div style="color:var(--gold);font-size:18px;">›</div>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="event.stopPropagation();openEditClient(${c.id})">✏️ Editar</button>
-        <button class="btn btn-danger btn-sm" style="flex:1;" onclick="event.stopPropagation();deleteClient(${c.id})">🗑 Borrar</button>
-        <button class="btn btn-sm" style="flex:1;background:#25d366;color:white;border:none;" onclick="event.stopPropagation();sendWA(${c.id})">💬 WA</button>
+      <div class="btn-row trainer-only" style="margin-top:10px;">
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openEditClient(${c.id})">✏️ Editar</button>
+        <button class="btn btn-danger btn-sm" style="flex:1;" onclick="deleteClient(${c.id})">🗑 Borrar</button>
+        <button class="btn btn-green btn-sm" style="flex:1;" onclick="sendWA(${c.id})">💬 WA</button>
       </div>
     </div>`;
   }).join('');
 }
 
 async function addClient() {
-  const name = document.getElementById('new-client-name').value.trim();
-  if (!name) { showToast('Ingresa el nombre'); return; }
-  const pin = document.getElementById('new-client-pin').value.trim();
-  if (!pin) { showToast('Ingresa un PIN para el cliente'); return; }
-  if (clients.find(c => c.pin === pin)) { showToast('Ese PIN ya está en uso'); return; }
-  const client = {
-    id: Date.now(),
-    name,
-    goal: document.getElementById('new-client-goal').value,
-    phone: document.getElementById('new-client-phone').value.trim(),
-    pin
-  };
-  const ok = await dbInsert('training_clients', client);
-  if (!ok) return;
+  const name=document.getElementById('new-client-name').value.trim();
+  const pin=document.getElementById('new-client-pin').value.trim();
+  if(!name){showToast('Ingresa el nombre');return;}
+  if(!pin){showToast('Ingresa un PIN');return;}
+  if(clients.find(c=>c.pin===pin)){showToast('PIN ya en uso');return;}
+  const client={id:Date.now(),name,goal:document.getElementById('new-client-goal').value,phone:document.getElementById('new-client-phone').value.trim(),pin};
+  if(!await dbInsert('training_clients',client)) return;
   clients.push(client);
   closeModal('modal-add-client');
-  document.getElementById('new-client-name').value = '';
-  document.getElementById('new-client-phone').value = '';
-  document.getElementById('new-client-pin').value = '';
-  renderClients();
-  populateSelects();
+  ['new-client-name','new-client-phone','new-client-pin'].forEach(id=>document.getElementById(id).value='');
+  renderClients(); populateSelects();
   showToast('✓ Cliente agregado');
 }
 
-// ========= WORKOUT VIEW =========
-function openClientWorkout(clientId) {
-  currentClientId = clientId;
-  const client = clients.find(c => c.id === clientId);
-  const myRoutines = sortByDay(routines.filter(r => String(r.clientId) === String(clientId)));
-
-  document.getElementById('client-select-view').style.display = 'none';
-  document.getElementById('workout-view').style.display = 'block';
-  document.getElementById('main-scroll').scrollTop = 0;
-  // Auto-select this client in progress view
-  const progSel = document.getElementById('progress-client-sel');
-  if (progSel) { progSel.value = clientId; }
-
-  if (myRoutines.length === 0) {
-    document.getElementById('workout-content').innerHTML = `
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:4px;">${client.name}</div>
-      <div style="font-size:12px;color:var(--gray2);margin-bottom:20px;">${client.goal}</div>
-      <div class="empty-state"><div class="ei">📋</div><p>No hay rutinas asignadas aún.</p></div>`;
-    return;
-  }
-
-  // Default to first day
-  currentDay = currentDay || myRoutines[0].day;
-  if (!myRoutines.find(r => r.day === currentDay)) currentDay = myRoutines[0].day;
-
-  renderWorkout(client, myRoutines);
+function openEditClient(id) {
+  const c=clients.find(c=>c.id===id); if(!c) return;
+  document.getElementById('edit-client-id').value=id;
+  document.getElementById('edit-client-name').value=c.name;
+  document.getElementById('edit-client-goal').value=c.goal;
+  document.getElementById('edit-client-phone').value=c.phone||'';
+  document.getElementById('edit-client-pin').value=c.pin||'';
+  openModal('modal-edit-client');
 }
 
-function renderWorkout(client, myRoutines) {
-  const todayKey = new Date().toISOString().split('T')[0];
-  const activeRoutine = myRoutines.find(r => r.day === currentDay) || myRoutines[0];
+async function saveEditClient() {
+  const id=parseInt(document.getElementById('edit-client-id').value);
+  const name=document.getElementById('edit-client-name').value.trim();
+  const pin=document.getElementById('edit-client-pin').value.trim();
+  if(!name||!pin){showToast('Completa todos los campos');return;}
+  if(clients.find(c=>c.pin===pin&&c.id!==id)){showToast('PIN ya en uso');return;}
+  const c=clients.find(c=>c.id===id);
+  const updated={...c,name,goal:document.getElementById('edit-client-goal').value,phone:document.getElementById('edit-client-phone').value.trim(),pin};
+  if(!await dbUpdate('training_clients',updated)) return;
+  clients[clients.findIndex(c=>c.id===id)]=updated;
+  closeModal('modal-edit-client');
+  renderClients(); populateSelects();
+  showToast('✓ Cliente actualizado');
+}
 
-  const completionKey = `${client.id}_${activeRoutine.id}_${todayKey}`;
-  const done = completions[completionKey] || [];
-  const total = activeRoutine.exercises.length;
-  const pct = total > 0 ? Math.round((done.length / total) * 100) : 0;
+async function deleteClient(id) {
+  const c=clients.find(c=>c.id===id);
+  if(!confirm(`¿Eliminar a ${c?.name}?`)) return;
+  await dbDelete('training_clients',id);
+  await sb.from('training_routines').delete().eq('clientId',id);
+  await sb.from('training_progress').delete().eq('clientId',id);
+  clients=clients.filter(c=>c.id!==id);
+  routines=routines.filter(r=>String(r.clientId)!==String(id));
+  progress=progress.filter(p=>String(p.clientId)!==String(id));
+  renderClients(); populateSelects();
+  showToast('🗑 Cliente eliminado');
+}
 
-  const dayTabs = myRoutines.map(r =>
-    `<div class="day-tab ${r.day === currentDay ? 'active' : ''}" onclick="switchDay('${r.day}', ${client.id})">${r.day}</div>`
-  ).join('');
+function openPhotoUpload(clientId) {
+  const input=document.createElement('input'); input.type='file'; input.accept='image/*';
+  input.onchange=async e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=async ev=>{
+      const c=clients.find(c=>c.id===clientId); if(!c) return;
+      c.photo=ev.target.result;
+      await dbUpdate('training_clients',c);
+      renderClients(); showToast('✓ Foto actualizada');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
 
-  const exercises = activeRoutine.exercises.map((ex, i) => {
-    const isDone = done.includes(i);
-    const videoId = ex.video ? getYoutubeId(ex.video) : null;
-    return `<div class="exercise-card ${isDone ? 'done' : ''}" id="ex-${activeRoutine.id}-${i}">
-      <div class="exercise-header" onclick="toggleExercise('ex-${activeRoutine.id}-${i}')">
-        <div class="ex-check" onclick="event.stopPropagation();toggleDone('${completionKey}', ${i}, ${activeRoutine.id}, ${client.id})">${isDone ? '✓' : ''}</div>
-        <div class="ex-info">
-          <div class="ex-name">${ex.name}</div>
-          <div class="ex-sets">${ex.sets}</div>
-        </div>
-        ${ex.video ? `<button class="ex-video-btn" onclick="event.stopPropagation();toggleVideo('vid-${activeRoutine.id}-${i}')">▶ Video</button>` : ''}
+// ─── WORKOUT ───
+function openClientWorkout(clientId) {
+  currentClientId=clientId;
+  const client=clients.find(c=>c.id===clientId);
+  const myRoutines=routines.filter(r=>String(r.clientId)===String(clientId));
+  document.getElementById('client-select-view').style.display='none';
+  document.getElementById('workout-view').style.display='block';
+  document.getElementById('main-scroll').scrollTop=0;
+  const rcs=document.getElementById('routine-client-sel');
+  if(rcs){rcs.value=clientId; rcs.disabled=true;}
+  const ps=document.getElementById('progress-client-sel');
+  if(ps) ps.value=clientId;
+  if(!myRoutines.length){
+    document.getElementById('workout-content').innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:20px;">${client.name}</div><div class="empty-state"><div class="ei">📋</div><p>Sin rutinas asignadas aún.</p></div>`;
+    return;
+  }
+  const weeks=[...new Set(myRoutines.map(r=>r.week||0))].sort((a,b)=>a-b);
+  const curW=getWeekNum();
+  currentWeek=weeks.includes(curW)?curW:weeks[weeks.length-1];
+  currentDay=null;
+  renderWorkout(client,myRoutines,currentWeek);
+}
+
+function renderWorkout(client,myRoutines,week) {
+  const weekRoutines=sortByDay(myRoutines.filter(r=>(r.week||0)===week));
+  if(!weekRoutines.length){
+    document.getElementById('workout-content').innerHTML=`
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:10px;">${client.name}</div>
+      <div class="empty-state"><div class="ei">📋</div><p>Sin rutinas para esta semana.</p></div>`;
+    return;
+  }
+  if(!currentDay||!weekRoutines.find(r=>r.day===currentDay)) currentDay=weekRoutines[0].day;
+  const activeRoutine=weekRoutines.find(r=>r.day===currentDay);
+  const todayStr=new Date().toISOString().split('T')[0];
+  const compKey=activeRoutine?`${client.id}_${activeRoutine.id}_${todayStr}`:'';
+  const done=completions[compKey]||[];
+  const total=activeRoutine?activeRoutine.exercises.length:0;
+  const pct=total>0?Math.round((done.length/total)*100):0;
+
+  const allWeeks=[...new Set(myRoutines.map(r=>r.week||0))].sort((a,b)=>a-b);
+  const curW=getWeekNum();
+  const weekTabs=allWeeks.map(w=>`<div class="week-tab ${w===week?'active':''} ${w===curW?'current':''}" onclick="switchWeek(${w},${client.id})">Sem ${w}${w===curW?' ★':''}</div>`).join('');
+  const dayTabs=weekRoutines.map(r=>`<div class="day-tab ${r.day===currentDay?'active':''}" onclick="switchDay('${r.day}',${client.id},${week})">${r.day}</div>`).join('');
+
+  // Motivation
+  const msg=messages.find(m=>String(m.clientId)===String(client.id)||!m.clientId);
+  const motBanner=msg?`<div class="motivation-banner"><div class="motivation-trainer">Tu entrenador dice:</div><div class="motivation-text">${msg.message}</div></div>`:'';
+
+  // Streak (only counts days with assigned routines)
+  const clientDays=myRoutines.map(r=>r.day);
+  let streak=0; const cd=new Date(); let maxD=60;
+  while(maxD-->0){
+    const dStr=cd.toISOString().split('T')[0];
+    const dn=DAY_NAMES_JS[cd.getDay()];
+    if(clientDays.includes(dn)){
+      const trained=Object.keys(completions).some(k=>{const p=k.split('_');return p[0]===String(client.id)&&p[2]===dStr&&completions[k].length>0;});
+      if(trained){streak++;cd.setDate(cd.getDate()-1);}
+      else if(dStr<todayStr){break;}
+      else{cd.setDate(cd.getDate()-1);}
+    } else {cd.setDate(cd.getDate()-1);}
+  }
+  const streakBadge=streak>0?`<div class="streak-badge">🔥 ${streak} día${streak>1?'s':''} de racha</div>`:'';
+
+  const exercises=activeRoutine?activeRoutine.exercises.map((ex,i)=>{
+    const isDone=done.includes(i);
+    return `<div class="exercise-card ${isDone?'done':''}" id="ex-card-${i}">
+      <div class="exercise-header">
+        <div class="ex-check" onclick="toggleDone('${compKey}',${i},${activeRoutine.id},${client.id})">${isDone?'✓':''}</div>
+        <div class="ex-info"><div class="ex-name">${ex.name}</div><div class="ex-sets">${ex.sets||''}</div></div>
+        ${ex.video?`<button class="ex-video-btn" onclick="toggleVideo('vid-${i}')">▶ Video</button>`:''}
       </div>
-      ${ex.notes ? `<div class="ex-notes" style="display:block;padding:0 14px 8px 54px;font-size:11px;color:var(--gray2);">💡 ${ex.notes}</div>` : ''}
-      ${ex.video ? `<div class="video-wrap" id="vid-${activeRoutine.id}-${i}">
-        <a href="${ex.video}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#ff0000;color:white;padding:14px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:1px;margin:0 14px 12px;">
-          ▶ &nbsp;Ver video en YouTube
-        </a>
-      </div>` : ''}
+      ${ex.notes?`<div style="padding:0 14px 8px 54px;font-size:11px;color:var(--gray2);">💡 ${ex.notes}</div>`:''}
+      ${ex.video?`<div class="video-wrap" id="vid-${i}"><a href="${ex.video}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#ff0000;color:white;padding:12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;margin:0 14px 12px;">▶ Ver en YouTube</a></div>`:''}
     </div>`;
-  }).join('');
+  }).join(''):'';
 
-  const progressBar = `<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>`;
-  const progressLabel = `<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray2);margin-bottom:16px;"><span>${done.length}/${total} ejercicios</span><span style="color:var(--gold);font-weight:700;">${pct}%</span></div>`;
-
-  const trainerBtns = isTrainer ? `
-    <div class="btn-row trainer-only" style="margin-top:16px;">
+  const trainerBtns=isTrainer?`
+    <div class="btn-row" style="margin-top:16px;">
       <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openLogProgress(${client.id})">📊 Medidas</button>
-      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openEditRoutine(${activeRoutine.id})">✏️ Editar</button>
-      <button class="btn btn-sm" style="flex:1;background:#25d366;color:white;border:none;border-radius:8px;font-family:Montserrat,sans-serif;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;" onclick="sendWA(${client.id})">💬 WA</button>
-    </div>` : `
-    <div class="btn-row client-only" style="margin-top:16px;">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openEditRoutine(${activeRoutine?.id})">✏️ Editar</button>
+      <button class="btn btn-green btn-sm" style="flex:1;" onclick="sendWA(${client.id})">💬 WA</button>
+    </div>`:`
+    <div class="btn-row" style="margin-top:16px;">
       <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openLogProgress(${client.id})">📊 Mis medidas</button>
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openPhotoUpload(${client.id})">📸 Mi foto</button>
     </div>`;
 
-  document.getElementById('workout-content').innerHTML = `
+  document.getElementById('workout-content').innerHTML=`
+    ${motBanner}
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:2px;">${client.name}</div>
-    <div style="font-size:11px;color:var(--gray2);margin-bottom:14px;">${client.goal}</div>
+    ${streakBadge}
+    <div style="font-size:11px;color:var(--gray2);margin-bottom:12px;">${client.goal}</div>
+    <div class="week-tabs">${weekTabs}</div>
     <div class="day-tabs">${dayTabs}</div>
     <div class="workout-header">
-      <div class="wh-left">
-        <div class="wh-day">${currentDay}</div>
-        <div class="wh-focus">${activeRoutine.focus}</div>
-      </div>
-      <div class="wh-right">
-        <div class="wh-count">${total}</div>
-        <div class="wh-label">Ejercicios</div>
-      </div>
+      <div class="wh-left"><div class="wh-day">${activeRoutine?.day||''}</div><div class="wh-focus">${activeRoutine?.focus||''}</div></div>
+      <div class="wh-right"><div class="wh-count">${total}</div><div class="wh-label">Ejercicios</div></div>
     </div>
-    ${progressBar}
-    ${progressLabel}
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray2);margin-bottom:16px;">
+      <span>${done.length}/${total} completados</span>
+      <span style="color:var(--gold);font-weight:700;">${pct}%</span>
+    </div>
     ${exercises}
-    ${trainerBtns}
-  `;
+    ${trainerBtns}`;
 }
 
-function switchDay(day, clientId) {
-  currentDay = day;
-  const client = clients.find(c => c.id === clientId);
-  const myRoutines = sortByDay(routines.filter(r => String(r.clientId) === String(clientId)));
-  renderWorkout(client, myRoutines);
-  document.getElementById('main-scroll').scrollTop = 0;
+function switchWeek(week,clientId){
+  currentWeek=week; currentDay=null;
+  const client=clients.find(c=>c.id===clientId);
+  renderWorkout(client,routines.filter(r=>String(r.clientId)===String(clientId)),week);
+  document.getElementById('main-scroll').scrollTop=0;
 }
 
-function backToClients() {
-  currentClientId = null;
-  currentDay = null;
-  document.getElementById('client-select-view').style.display = 'block';
-  document.getElementById('workout-view').style.display = 'none';
+function switchDay(day,clientId,week){
+  currentDay=day;
+  const client=clients.find(c=>c.id===clientId);
+  renderWorkout(client,routines.filter(r=>String(r.clientId)===String(clientId)),week);
 }
 
-function toggleExercise(id) {
-  const card = document.getElementById(id);
-  if (card) card.classList.toggle('expanded');
+function backToClients(){
+  currentClientId=null; currentDay=null;
+  document.getElementById('client-select-view').style.display='block';
+  document.getElementById('workout-view').style.display='none';
+  const rcs=document.getElementById('routine-client-sel');
+  if(rcs){rcs.disabled=false;}
+  renderClients();
 }
 
-function toggleVideo(id) {
-  const wrap = document.getElementById(id);
-  if (wrap) wrap.classList.toggle('visible');
-}
+function toggleVideo(id){const el=document.getElementById(id);if(el)el.classList.toggle('visible');}
 
-async function toggleDone(key, index, routineId, clientId) {
-  if (!completions[key]) completions[key] = [];
-  const arr = completions[key];
-  const i = arr.indexOf(index);
-  if (i === -1) { arr.push(index); showToast('✓ Ejercicio completado'); }
-  else { arr.splice(i, 1); }
+// ─── TOGGLE DONE ───
+async function toggleDone(key,index,routineId,clientId){
+  if(!completions[key]) completions[key]=[];
+  const arr=completions[key];
+  const i=arr.indexOf(index);
+  if(i===-1){arr.push(index);showToast('✓ Ejercicio completado');}
+  else{arr.splice(i,1);}
 
-  // Save to Supabase
-  const todayKey = new Date().toISOString().split('T')[0];
-  const existing = await sb.from('training_completions')
-    .select('id')
-    .eq('clientId', clientId)
-    .eq('routineId', routineId)
-    .eq('date', todayKey)
-    .single();
-
-  if (existing.data) {
-    await sb.from('training_completions')
-      .update({ exercises: completions[key] })
-      .eq('id', existing.data.id);
+  const todayStr=new Date().toISOString().split('T')[0];
+  const {data:existing}=await sb.from('training_completions').select('id').eq('clientId',clientId).eq('routineId',routineId).eq('date',todayStr).maybeSingle();
+  if(existing){
+    await sb.from('training_completions').update({exercises:completions[key]}).eq('id',existing.id);
   } else {
-    await sb.from('training_completions').insert([{
-      id: Date.now(),
-      clientId,
-      routineId,
-      date: todayKey,
-      exercises: completions[key]
-    }]);
+    await sb.from('training_completions').insert([{id:Date.now(),clientId,routineId,date:todayStr,exercises:completions[key]}]);
   }
 
-  // Re-render workout
-  const client = clients.find(c => c.id === clientId);
-  const myRoutines = routines.filter(r => String(r.clientId) === String(clientId));
-  renderWorkout(client, myRoutines);
-  document.getElementById('main-scroll').scrollTop = 200;
-}
+  const client=clients.find(c=>c.id===clientId);
+  renderWorkout(client,routines.filter(r=>String(r.clientId)===String(clientId)),currentWeek);
+  document.getElementById('main-scroll').scrollTop=200;
 
-function getYoutubeId(url) {
-  if (!url) return null;
-  const match = url.match(/(?:v=|youtu\.be\/|embed\/)([^&\n?#]+)/);
-  return match ? match[1] : null;
-}
-
-// ========= PROGRESS =========
-function openLogProgress(clientId) {
-  document.getElementById('prog-client-id').value = clientId;
-  document.getElementById('prog-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('prog-weight').value = '';
-  document.getElementById('prog-waist').value = '';
-  document.getElementById('prog-hip').value = '';
-  document.getElementById('prog-chest').value = '';
-  document.getElementById('prog-arm').value = '';
-  document.getElementById('prog-notes').value = '';
-  openModal('modal-log-progress');
-}
-
-async function saveProgress() {
-  const clientId = parseInt(document.getElementById('prog-client-id').value);
-  const entry = {
-    id: Date.now(),
-    clientId,
-    date: document.getElementById('prog-date').value,
-    weight: parseFloat(document.getElementById('prog-weight').value) || null,
-    waist: parseFloat(document.getElementById('prog-waist').value) || null,
-    hip: parseFloat(document.getElementById('prog-hip').value) || null,
-    chest: parseFloat(document.getElementById('prog-chest').value) || null,
-    arm: parseFloat(document.getElementById('prog-arm').value) || null,
-    notes: document.getElementById('prog-notes').value,
-  };
-  const ok = await dbInsert('training_progress', entry);
-  if (!ok) return;
-  progress.push(entry);
-  closeModal('modal-log-progress');
-  showToast('✓ Progreso guardado');
-  loadProgressView();
-}
-
-function loadProgressView() {
-  const sel = document.getElementById('progress-client-sel');
-  const clientId = parseInt(sel.value);
-  const content = document.getElementById('progress-content');
-  const showClientSel = document.getElementById('progress-client-select');
-
-  if (!isTrainer) {
-    // Client mode - show only their data (first client for demo)
-    showClientSel.style.display = 'none';
-    renderProgressForClient(clients[0]?.id);
-    return;
+  const routine=routines.find(r=>r.id===routineId);
+  if(routine&&completions[key].length===routine.exercises.length&&completions[key].length>0){
+    setTimeout(()=>openRatingPopup(routineId,clientId),700);
   }
-
-  showClientSel.style.display = 'block';
-  if (!clientId) { content.innerHTML = ''; return; }
-  renderProgressForClient(clientId);
 }
 
-function renderProgressForClient(clientId) {
-  if (!clientId) return;
-  const content = document.getElementById('progress-content');
-  const client = clients.find(c => c.id === clientId);
-  const entries = progress.filter(p => p.clientId === clientId).sort((a,b) => b.date.localeCompare(a.date));
-
-  if (entries.length === 0) {
-    content.innerHTML = `
-      <div class="empty-state"><div class="ei">📊</div><p>Sin registros de progreso aún.</p></div>
-      <button class="btn btn-gold" onclick="openLogProgress(${clientId})">+ Registrar Medidas</button>`;
-    return;
-  }
-
-  const latest = entries[0];
-  const prev = entries[1];
-  const weightChange = prev && latest.weight && prev.weight ? (latest.weight - prev.weight).toFixed(1) : null;
-  const changeColor = weightChange === null ? 'var(--gray2)' : parseFloat(weightChange) < 0 ? 'var(--success)' : parseFloat(weightChange) > 0 ? 'var(--danger)' : 'var(--gold)';
-  const changeSign = weightChange && parseFloat(weightChange) > 0 ? '+' : '';
-
-  content.innerHTML = `
-    ${client ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:12px;">${client.name}</div>` : ''}
-    <div class="stats-row" style="margin-bottom:16px;">
-      <div class="stat-box"><div class="sv">${latest.weight || '—'}</div><div class="sl">Peso kg</div></div>
-      <div class="stat-box"><div class="sv" style="color:${changeColor}">${weightChange !== null ? changeSign + weightChange : '—'}</div><div class="sl">Cambio kg</div></div>
-      <div class="stat-box"><div class="sv">${entries.length}</div><div class="sl">Registros</div></div>
-    </div>
-    <div class="btn-row" style="margin-bottom:16px;">
-      <button class="btn btn-gold" onclick="openLogProgress(${clientId})">+ Nuevas medidas</button>
-    </div>
-    <div class="section-title">📅 Historial</div>
-    ${entries.map(e => `
-      <div class="progress-entry">
-        <div class="pe-left">
-          <div class="pe-date">${formatDate(e.date)}</div>
-          <div class="pe-weight">${e.weight ? e.weight + ' kg' : '—'}</div>
-          ${e.notes ? `<div style="font-size:11px;color:var(--gray2);margin-top:4px;">${e.notes}</div>` : ''}
-        </div>
-        <div class="pe-right">
-          ${e.waist ? `<span>Cin: ${e.waist}cm</span>` : ''}
-          ${e.hip ? `<span>Cad: ${e.hip}cm</span>` : ''}
-          ${e.chest ? `<span>Pec: ${e.chest}cm</span>` : ''}
-          ${e.arm ? `<span>Bra: ${e.arm}cm</span>` : ''}
-        </div>
-      </div>`).join('')}
-  `;
+// ─── ROUTINES ───
+function populateWeekSelectors(){
+  const w=getWeekNum();
+  const weeks=[];
+  for(let i=Math.max(1,w-4);i<=w+12;i++) weeks.push(i);
+  const opts=weeks.map(n=>`<option value="${n}" ${n===w?'selected':''}>Sem ${n} (${getWeekRange(n)})</option>`).join('');
+  ['routine-week-sel','copy-from-week','copy-to-week'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+  refreshWeekFilter();
 }
 
-// ========= ROUTINES (TRAINER) =========
-function addExerciseRow() {
-  const container = document.getElementById('exercises-builder');
-  const id = exRowCount++;
-  const div = document.createElement('div');
-  div.id = `ex-row-${id}`;
-  div.style.cssText = 'background:var(--dark3);border-radius:10px;padding:12px;margin-bottom:8px;';
-  div.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <span style="font-size:11px;font-weight:700;color:var(--gold2);">EJERCICIO ${id+1}</span>
-      <button onclick="document.getElementById('ex-row-${id}').remove()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button>
-    </div>
-    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-name" type="text" placeholder="Nombre del ejercicio"></div>
-    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-sets" type="text" placeholder="Series y reps: ej. 3x12 reps"></div>
-    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-video" type="text" placeholder="Link de YouTube (opcional)"></div>
-    <div class="form-group" style="margin-bottom:0;"><input class="form-input ex-notes" type="text" placeholder="Notas (opcional)"></div>
-  `;
-  container.appendChild(div);
+function refreshWeekFilter(){
+  const el=document.getElementById('filter-routines-week'); if(!el) return;
+  const cv=el.value;
+  const allW=[...new Set(routines.map(r=>r.week||0))].sort((a,b)=>a-b);
+  el.innerHTML='<option value="">— Todas las semanas —</option>'+allW.map(n=>`<option value="${n}" ${String(n)===cv?'selected':''}>Semana ${n}</option>`).join('');
 }
 
-async function saveRoutine() {
-  const clientId = parseInt(document.getElementById('routine-client-sel').value);
-  const day = document.getElementById('routine-day-sel').value;
-  const focus = document.getElementById('routine-focus').value.trim();
-  const editingId = document.getElementById('editing-routine-id').value;
+async function saveRoutine(){
+  const clientId=parseInt(document.getElementById('routine-client-sel').value);
+  const week=parseInt(document.getElementById('routine-week-sel').value);
+  const day=document.getElementById('routine-day-sel').value;
+  const focus=document.getElementById('routine-focus').value.trim();
+  const editingId=document.getElementById('editing-routine-id').value;
 
-  const rows = document.getElementById('exercises-builder').querySelectorAll('[id^="ex-row-"]');
-  const exercises = [];
-  rows.forEach(row => {
-    const name = row.querySelector('.ex-name').value.trim();
-    if (!name) return;
-    exercises.push({
-      name,
-      sets: row.querySelector('.ex-sets').value.trim(),
-      video: row.querySelector('.ex-video').value.trim(),
-      notes: row.querySelector('.ex-notes').value.trim(),
-    });
+  const rows=document.getElementById('exercises-builder').querySelectorAll('[id^="ex-row-"]');
+  const exercises=[];
+  rows.forEach(row=>{
+    const name=row.querySelector('.ex-name-inp').value.trim();
+    if(!name) return;
+    exercises.push({name,sets:row.querySelector('.ex-sets-inp').value.trim(),video:row.querySelector('.ex-video-inp').value.trim(),notes:row.querySelector('.ex-notes-inp').value.trim()});
   });
 
-  if (!clientId) { showToast('Selecciona un cliente'); return; }
-  if (exercises.length === 0) { showToast('Agrega al menos un ejercicio'); return; }
+  if(!clientId){showToast('Selecciona un cliente');return;}
+  if(!exercises.length){showToast('Agrega al menos un ejercicio');return;}
 
-  if (editingId) {
-    // UPDATE — editing existing routine by ID
-    const existing = routines.find(r => String(r.id) === String(editingId));
-    if (existing) {
-      const updated = { ...existing, clientId, day, focus, exercises };
-      const ok = await dbUpdate('training_routines', updated);
-      if (!ok) return;
-      const idx = routines.findIndex(r => String(r.id) === String(editingId));
-      if (idx !== -1) routines[idx] = updated;
+  // Auto-add to library
+  for(const ex of exercises){
+    if(ex.name&&!exerciseLibrary.find(e=>e.name.toLowerCase()===ex.name.toLowerCase())){
+      const libEx={id:Date.now()+Math.random()*1000|0,name:ex.name,sets:ex.sets,video:ex.video,notes:ex.notes,muscleGroup:'General'};
+      await dbInsert('training_exercises',libEx);
+      exerciseLibrary.push(libEx);
     }
-  } else {
-    // Check if same client+day already exists (new routine, not editing)
-    const duplicate = routines.find(r => String(r.clientId) === String(clientId) && r.day === day);
-    if (duplicate) {
-      showToast('⚠️ Ya existe rutina para ese día. Usa ✏️ Editar.');
-      return;
-    }
-    // INSERT new
-    const newRoutine = { id: Date.now(), clientId, day, focus, exercises };
-    const ok = await dbInsert('training_routines', newRoutine);
-    if (!ok) return;
-    routines.push(newRoutine);
   }
 
-  // Clear form
-  document.getElementById('exercises-builder').innerHTML = '';
-  document.getElementById('routine-focus').value = '';
-  document.getElementById('editing-routine-id').value = '';
-  exRowCount = 0;
-  // Reset save button label
-  document.getElementById('save-routine-btn').textContent = '💾 GUARDAR RUTINA';
+  if(editingId){
+    const existing=routines.find(r=>String(r.id)===String(editingId));
+    if(existing){
+      const updated={...existing,clientId,week,day,focus,exercises};
+      if(!await dbUpdate('training_routines',updated)) return;
+      routines[routines.findIndex(r=>String(r.id)===String(editingId))]=updated;
+    }
+  } else {
+    const dup=routines.find(r=>String(r.clientId)===String(clientId)&&r.week===week&&r.day===day);
+    if(dup){showToast('⚠️ Ya existe rutina para ese día/semana. Usa ✏️ Editar.');return;}
+    const newR={id:Date.now(),clientId,week,day,focus,exercises};
+    if(!await dbInsert('training_routines',newR)) return;
+    routines.push(newR);
+  }
+
+  document.getElementById('exercises-builder').innerHTML='';
+  document.getElementById('routine-focus').value='';
+  document.getElementById('editing-routine-id').value='';
+  document.getElementById('save-routine-btn').textContent='💾 GUARDAR RUTINA';
+  document.getElementById('routine-form-title').textContent='CREAR RUTINA';
+  document.getElementById('cancel-edit-btn').style.display='none';
+  exRowCount=0;
+  refreshWeekFilter();
   renderSavedRoutines();
   showToast('✓ Rutina guardada');
 }
 
-function renderSavedRoutines() {
-  const list = document.getElementById('saved-routines-list');
-  // Populate filter dropdown
-  const filterSel = document.getElementById('filter-routines-client');
-  if (filterSel) {
-    const currentVal = filterSel.value;
-    filterSel.innerHTML = '<option value="">— Todos los clientes —</option>' +
-      clients.map(c => `<option value="${c.id}" ${String(c.id) === currentVal ? 'selected' : ''}>${c.name}</option>`).join('');
-  }
-  const filterId = filterSel ? filterSel.value : '';
-  const filtered = filterId ? routines.filter(r => String(r.clientId) === filterId) : routines;
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>Sin rutinas para este cliente.</p></div>';
-    return;
-  }
-  list.innerHTML = sortByDay(filtered).map(r => {
-    const client = clients.find(c => String(c.id) === String(r.clientId));
+function cancelEditRoutine(){
+  document.getElementById('exercises-builder').innerHTML='';
+  document.getElementById('routine-focus').value='';
+  document.getElementById('editing-routine-id').value='';
+  document.getElementById('save-routine-btn').textContent='💾 GUARDAR RUTINA';
+  document.getElementById('routine-form-title').textContent='CREAR RUTINA';
+  document.getElementById('cancel-edit-btn').style.display='none';
+  exRowCount=0;
+  updateAvailableDays();
+}
+
+function openEditRoutine(id){
+  if(!id) return;
+  const r=routines.find(r=>String(r.id)===String(id)); if(!r) return;
+  document.getElementById('editing-routine-id').value=id;
+  document.getElementById('routine-client-sel').value=r.clientId;
+  document.getElementById('routine-week-sel').value=r.week||0;
+  document.getElementById('routine-day-sel').value=r.day;
+  document.getElementById('routine-focus').value=r.focus||'';
+  const builder=document.getElementById('exercises-builder');
+  builder.innerHTML=''; exRowCount=0;
+  r.exercises.forEach(ex=>{
+    addExerciseRow();
+    const row=builder.lastElementChild;
+    row.querySelector('.ex-name-inp').value=ex.name||'';
+    row.querySelector('.ex-sets-inp').value=ex.sets||'';
+    row.querySelector('.ex-video-inp').value=ex.video||'';
+    row.querySelector('.ex-notes-inp').value=ex.notes||'';
+  });
+  document.getElementById('save-routine-btn').textContent='💾 ACTUALIZAR RUTINA';
+  document.getElementById('routine-form-title').textContent='EDITAR RUTINA';
+  document.getElementById('cancel-edit-btn').style.display='block';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-ajustes').classList.add('active');
+  document.querySelector('.nav-btn:last-child').classList.add('active');
+  switchGestionTab('rutinas');
+  document.getElementById('main-scroll').scrollTop=0;
+  showToast('✏️ Modifica y toca ACTUALIZAR');
+}
+
+function renderSavedRoutines(){
+  const list=document.getElementById('saved-routines-list');
+  const fc=document.getElementById('filter-routines-client')?.value||'';
+  const fw=document.getElementById('filter-routines-week')?.value;
+
+  const fcEl=document.getElementById('filter-routines-client');
+  if(fcEl){const cv=fcEl.value;fcEl.innerHTML='<option value="">— Todos —</option>'+clients.map(c=>`<option value="${c.id}" ${String(c.id)===cv?'selected':''}>${c.name}</option>`).join('');}
+
+  let filtered=routines;
+  if(fc) filtered=filtered.filter(r=>String(r.clientId)===fc);
+  if(fw) filtered=filtered.filter(r=>String(r.week||0)===fw);
+  if(currentClientId&&!fc) filtered=filtered.filter(r=>String(r.clientId)===String(currentClientId));
+
+  if(!filtered.length){list.innerHTML='<div class="empty-state"><div class="ei">📋</div><p>Sin rutinas.</p></div>';return;}
+  list.innerHTML=sortByDay(filtered).map(r=>{
+    const c=clients.find(c=>String(c.id)===String(r.clientId));
     return `<div class="card" style="padding:14px;">
-      <div style="margin-bottom:10px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--gold);">${r.day} — ${r.focus || 'Sin enfoque'}</div>
-        <div style="font-size:12px;color:var(--gray2);">${client?.name || 'Cliente eliminado'} · ${r.exercises.length} ejercicios</div>
+      <div style="margin-bottom:8px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--gold);">Sem ${r.week||0} · ${r.day} — ${r.focus||'Sin enfoque'}</div>
+        <div style="font-size:12px;color:var(--gray2);">${c?.name||'—'} · ${r.exercises.length} ejercicios</div>
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openEditRoutine(${r.id})">✏️ Editar</button>
@@ -1232,243 +974,411 @@ function renderSavedRoutines() {
   }).join('');
 }
 
-async function deleteRoutine(id) {
-  if (!confirm('¿Eliminar esta rutina?')) return;
-  const ok = await dbDelete('training_routines', id);
-  if (!ok) return;
-  routines = routines.filter(r => r.id !== id);
+async function deleteRoutine(id){
+  if(!confirm('¿Eliminar esta rutina?')) return;
+  if(!await dbDelete('training_routines',id)) return;
+  routines=routines.filter(r=>r.id!==id);
   renderSavedRoutines();
   showToast('🗑 Rutina eliminada');
 }
 
-// ========= WHATSAPP =========
-function sendWA(clientId) {
-  const client = clients.find(c => c.id === clientId);
-  if (!client?.phone) { showToast('Sin número registrado'); return; }
-  const appUrl = window.location.href.split('?')[0];
-  const msg = `Hola ${client.name.split(' ')[0]}! 💪 Aquí tu entrenador de Colorado's Boxing Club.\n\nTu acceso a la app de rutinas:\n🔗 ${appUrl}\n🔑 PIN: *${client.pin}*\n\n¡A entrenar!`;
-  const phone = client.phone.replace(/[\s\-\(\)]/g, '').replace('+', '');
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+function updateAvailableDays(){
+  const editingId=document.getElementById('editing-routine-id').value;
+  const daySel=document.getElementById('routine-day-sel');
+  const clientId=document.getElementById('routine-client-sel').value;
+  const week=parseInt(document.getElementById('routine-week-sel')?.value||0);
+  const usedDays=clientId&&!editingId
+    ?routines.filter(r=>String(r.clientId)===String(clientId)&&(r.week||0)===week).map(r=>r.day)
+    :[];
+  const currentD=daySel.value;
+  daySel.innerHTML=DAY_ORDER.map(d=>usedDays.includes(d)?'':`<option value="${d}" ${d===currentD?'selected':''}>${d}</option>`).join('');
+  const saveBtn=document.getElementById('save-routine-btn');
+  if(!daySel.options.length){
+    daySel.innerHTML='<option value="">— Todos los días tienen rutina —</option>';
+    saveBtn.disabled=true;saveBtn.style.opacity='0.5';
+  } else {saveBtn.disabled=false;saveBtn.style.opacity='1';}
 }
 
-// ========= DELETE CLIENT =========
-async function deleteClient(id) {
-  const client = clients.find(c => c.id === id);
-  if (!confirm(`¿Eliminar a ${client?.name}? Se borrarán también sus rutinas y progreso.`)) return;
-  await dbDelete('training_clients', id);
-  await sb.from('training_routines').delete().eq('clientId', id);
-  await sb.from('training_progress').delete().eq('clientId', id);
-  clients = clients.filter(c => c.id !== id);
-  routines = routines.filter(r => String(r.clientId) !== String(id));
-  progress = progress.filter(p => String(p.clientId) !== String(id));
-  renderClients();
-  populateSelects();
-  showToast('🗑 Cliente eliminado');
+function addExerciseRow(){
+  const container=document.getElementById('exercises-builder');
+  const id=exRowCount++;
+  const div=document.createElement('div');
+  div.id=`ex-row-${id}`;
+  div.style.cssText='background:var(--dark3);border-radius:10px;padding:12px;margin-bottom:8px;';
+  div.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:11px;font-weight:700;color:var(--gold2);">EJERCICIO ${id+1}</span>
+      <button onclick="document.getElementById('ex-row-${id}').remove()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-name-inp" type="text" placeholder="Nombre del ejercicio"></div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-sets-inp" type="text" placeholder="Series y reps: ej. 3x12"></div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-video-inp" type="text" placeholder="Link YouTube (opcional)"></div>
+    <div class="form-group" style="margin-bottom:0;"><input class="form-input ex-notes-inp" type="text" placeholder="Notas (opcional)"></div>`;
+  container.appendChild(div);
 }
 
-// ========= EDIT CLIENT =========
-function openEditClient(id) {
-  const client = clients.find(c => c.id === id);
-  if (!client) return;
-  document.getElementById('edit-client-id').value = id;
-  document.getElementById('edit-client-name').value = client.name;
-  document.getElementById('edit-client-goal').value = client.goal;
-  document.getElementById('edit-client-phone').value = client.phone || '';
-  document.getElementById('edit-client-pin').value = client.pin || '';
-  openModal('modal-edit-client');
+// ─── COPY WEEK ───
+function openCopyWeekModal(){
+  const sel=document.getElementById('copy-client-sel');
+  sel.innerHTML=clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  openModal('modal-copy-week');
 }
 
-async function saveEditClient() {
-  const id = parseInt(document.getElementById('edit-client-id').value);
-  const name = document.getElementById('edit-client-name').value.trim();
-  const pin = document.getElementById('edit-client-pin').value.trim();
-  if (!name) { showToast('Ingresa el nombre'); return; }
-  if (!pin) { showToast('Ingresa el PIN'); return; }
-  const pinExists = clients.find(c => c.pin === pin && c.id !== id);
-  if (pinExists) { showToast('Ese PIN ya está en uso'); return; }
-  const updated = {
-    id,
-    name,
-    goal: document.getElementById('edit-client-goal').value,
-    phone: document.getElementById('edit-client-phone').value.trim(),
-    pin
-  };
-  const ok = await dbUpdate('training_clients', updated);
-  if (!ok) return;
-  const idx = clients.findIndex(c => c.id === id);
-  if (idx !== -1) clients[idx] = updated;
-  closeModal('modal-edit-client');
-  renderClients();
-  populateSelects();
-  showToast('✓ Cliente actualizado');
+async function copyWeek(){
+  const clientId=parseInt(document.getElementById('copy-client-sel').value);
+  const fromWeek=parseInt(document.getElementById('copy-from-week').value);
+  const toWeek=parseInt(document.getElementById('copy-to-week').value);
+  if(fromWeek===toWeek){showToast('Elige semanas diferentes');return;}
+  const source=routines.filter(r=>String(r.clientId)===String(clientId)&&(r.week||0)===fromWeek);
+  if(!source.length){showToast('Sin rutinas en esa semana');return;}
+  let count=0;
+  for(const r of source){
+    if(routines.find(x=>String(x.clientId)===String(clientId)&&x.week===toWeek&&x.day===r.day)) continue;
+    const newR={...r,id:Date.now()+Math.random()*1000|0,week:toWeek};
+    if(await dbInsert('training_routines',newR)){routines.push(newR);count++;}
+  }
+  closeModal('modal-copy-week');
+  refreshWeekFilter();
+  renderSavedRoutines();
+  showToast(`✓ ${count} rutinas copiadas a Semana ${toWeek}`);
 }
 
-// ========= EDIT ROUTINE =========
-function openEditRoutine(id) {
-  const routine = routines.find(r => String(r.id) === String(id));
-  if (!routine) return;
-  // Store the id being edited
-  document.getElementById('editing-routine-id').value = id;
-  // Pre-fill form
-  document.getElementById('routine-client-sel').value = routine.clientId;
-  document.getElementById('routine-day-sel').value = routine.day;
-  document.getElementById('routine-focus').value = routine.focus || '';
-  // Clear and rebuild exercises
-  const builder = document.getElementById('exercises-builder');
-  builder.innerHTML = '';
-  exRowCount = 0;
-  routine.exercises.forEach(ex => {
-    addExerciseRow();
-    const row = builder.lastElementChild;
-    row.querySelector('.ex-name').value = ex.name || '';
-    row.querySelector('.ex-sets').value = ex.sets || '';
-    row.querySelector('.ex-video').value = ex.video || '';
-    row.querySelector('.ex-notes').value = ex.notes || '';
-  });
-  // Change button label to indicate editing
-  document.getElementById('save-routine-btn').textContent = '💾 ACTUALIZAR RUTINA';
-  // Go to gestión page
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-ajustes').classList.add('active');
-  document.querySelector('.nav-btn:last-child').classList.add('active');
-  document.getElementById('main-scroll').scrollTop = 0;
-  showToast('✏️ Modifica y toca ACTUALIZAR RUTINA');
+// ─── LIBRARY ───
+function renderLibrary(){
+  const list=document.getElementById('library-list'); if(!list) return;
+  if(!exerciseLibrary.length){list.innerHTML='<div class="empty-state"><div class="ei">📚</div><p>Biblioteca vacía.</p></div>';return;}
+  list.innerHTML=exerciseLibrary.map(ex=>`
+    <div class="ex-lib-item">
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;">${ex.name}</div>
+        <div style="font-size:11px;color:var(--gold2);">${ex.sets||''} ${ex.muscleGroup?'· '+ex.muscleGroup:''}</div>
+        ${ex.notes?`<div style="font-size:11px;color:var(--gray2);">${ex.notes}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;">
+        ${ex.video?`<a href="${ex.video}" target="_blank" style="background:#ff0000;color:white;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;">▶</a>`:''}
+        <button class="btn btn-danger btn-sm" onclick="deleteLibraryExercise(${ex.id})">🗑</button>
+      </div>
+    </div>`).join('');
 }
 
-// ========= DAY AVAILABILITY =========
-function updateAvailableDays() {
-  checkDayAvailable();
+async function saveLibraryExercise(){
+  const name=document.getElementById('lib-ex-name').value.trim();
+  if(!name){showToast('Ingresa el nombre');return;}
+  const ex={id:Date.now(),name,sets:document.getElementById('lib-ex-sets').value.trim(),video:document.getElementById('lib-ex-video').value.trim(),notes:document.getElementById('lib-ex-notes').value.trim(),muscleGroup:document.getElementById('lib-ex-muscle').value};
+  if(!await dbInsert('training_exercises',ex)) return;
+  exerciseLibrary.push(ex);
+  closeModal('modal-add-exercise');
+  ['lib-ex-name','lib-ex-sets','lib-ex-video','lib-ex-notes'].forEach(id=>document.getElementById(id).value='');
+  renderLibrary();
+  showToast('✓ Ejercicio guardado');
 }
 
-function checkDayAvailable() {
-  const editingId = document.getElementById('editing-routine-id').value;
-  if (editingId) {
-    // Editing existing — all days allowed
-    document.getElementById('day-warning').style.display = 'none';
+async function deleteLibraryExercise(id){
+  await dbDelete('training_exercises',id);
+  exerciseLibrary=exerciseLibrary.filter(e=>e.id!==id);
+  renderLibrary();
+  showToast('🗑 Eliminado');
+}
+
+function openLibraryPicker(){
+  document.getElementById('lib-search').value='';
+  renderLibraryPicker();
+  openModal('modal-library-picker');
+}
+
+function renderLibraryPicker(){
+  const q=document.getElementById('lib-search').value.toLowerCase();
+  const filtered=exerciseLibrary.filter(e=>e.name.toLowerCase().includes(q));
+  const list=document.getElementById('library-picker-list');
+  if(!filtered.length){list.innerHTML='<div class="empty-state"><div class="ei">📚</div><p>Sin coincidencias.</p></div>';return;}
+  list.innerHTML=filtered.map(ex=>`
+    <div class="ex-lib-item" onclick="addExFromLib(${ex.id})" style="cursor:pointer;">
+      <div>
+        <div style="font-weight:700;font-size:13px;">${ex.name}</div>
+        <div style="font-size:11px;color:var(--gold2);">${ex.sets||''} ${ex.muscleGroup?'· '+ex.muscleGroup:''}</div>
+      </div>
+      <div style="color:var(--gold);font-size:20px;">+</div>
+    </div>`).join('');
+}
+
+function addExFromLib(id){
+  const ex=exerciseLibrary.find(e=>e.id===id); if(!ex) return;
+  addExerciseRow();
+  const row=document.getElementById('exercises-builder').lastElementChild;
+  row.querySelector('.ex-name-inp').value=ex.name;
+  row.querySelector('.ex-sets-inp').value=ex.sets||'';
+  row.querySelector('.ex-video-inp').value=ex.video||'';
+  row.querySelector('.ex-notes-inp').value=ex.notes||'';
+  closeModal('modal-library-picker');
+  showToast(`✓ ${ex.name} agregado`);
+}
+
+// ─── TEMPLATES ───
+async function saveTemplate(){
+  const name=document.getElementById('tmpl-name').value.trim();
+  if(!name){showToast('Ingresa el nombre');return;}
+  const t={id:Date.now(),name,description:document.getElementById('tmpl-desc').value.trim(),weeks:4,createdAt:new Date().toISOString().split('T')[0]};
+  if(!await dbInsert('training_templates',t)) return;
+  templates.push(t);
+  closeModal('modal-create-template');
+  document.getElementById('tmpl-name').value='';
+  document.getElementById('tmpl-desc').value='';
+  renderTemplates();
+  showToast('✓ Plantilla creada');
+}
+
+function renderTemplates(){
+  const list=document.getElementById('templates-list'); if(!list) return;
+  if(!templates.length){list.innerHTML='<div class="empty-state"><div class="ei">🗂</div><p>Sin plantillas aún.</p></div>';return;}
+  list.innerHTML=templates.map(t=>`
+    <div class="template-card">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;">${t.name}</div>
+      ${t.description?`<div style="font-size:12px;color:var(--gray2);margin-bottom:10px;">${t.description}</div>`:''}
+      <div style="font-size:11px;color:var(--gold2);margin-bottom:12px;">📅 ${t.weeks} semanas · ${t.createdAt||''}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="assignTemplate(${t.id})">👤 Asignar a cliente</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTemplate(${t.id})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function assignTemplate(templateId){
+  if(!clients.length){showToast('No hay clientes');return;}
+  const opts=clients.map((c,i)=>`${i+1}. ${c.name}`).join('\n');
+  const choice=prompt('¿A qué cliente asignar?\n'+opts+'\n\nEscribe el número:');
+  const idx=parseInt(choice)-1;
+  if(isNaN(idx)||!clients[idx]){showToast('Cliente no válido');return;}
+  const client=clients[idx];
+  const startWeek=getWeekNum();
+  const tmplRs=templateRoutines.filter(r=>String(r.templateId)===String(templateId));
+  if(!tmplRs.length){showToast('Plantilla sin rutinas. Agrega rutinas desde Semana 1 en Gestión → Rutinas usando el mismo ID de plantilla.');return;}
+  let count=0;
+  for(const tr of tmplRs){
+    const newR={id:Date.now()+Math.random()*1000|0,clientId:client.id,week:startWeek+(tr.week-1),day:tr.day,focus:tr.focus,exercises:tr.exercises};
+    if(await dbInsert('training_routines',newR)){routines.push(newR);count++;}
+  }
+  showToast(`✓ ${count} rutinas asignadas a ${client.name}`);
+  renderSavedRoutines();
+}
+
+async function deleteTemplate(id){
+  if(!confirm('¿Eliminar esta plantilla?')) return;
+  await dbDelete('training_templates',id);
+  templates=templates.filter(t=>t.id!==id);
+  renderTemplates();
+  showToast('🗑 Eliminada');
+}
+
+// ─── PROGRESS ───
+function openLogProgress(clientId){
+  document.getElementById('prog-client-id').value=clientId;
+  document.getElementById('prog-date').value=new Date().toISOString().split('T')[0];
+  ['prog-weight','prog-waist','prog-hip','prog-chest','prog-arm','prog-notes'].forEach(id=>document.getElementById(id).value='');
+  openModal('modal-log-progress');
+}
+
+async function saveProgress(){
+  const clientId=parseInt(document.getElementById('prog-client-id').value);
+  const entry={id:Date.now(),clientId,date:document.getElementById('prog-date').value,weight:parseFloat(document.getElementById('prog-weight').value)||null,waist:parseFloat(document.getElementById('prog-waist').value)||null,hip:parseFloat(document.getElementById('prog-hip').value)||null,chest:parseFloat(document.getElementById('prog-chest').value)||null,arm:parseFloat(document.getElementById('prog-arm').value)||null,notes:document.getElementById('prog-notes').value};
+  if(!await dbInsert('training_progress',entry)) return;
+  progress.push(entry);
+  closeModal('modal-log-progress');
+  showToast('✓ Progreso guardado');
+  loadProgressView();
+}
+
+function loadProgressView(){
+  const sel=document.getElementById('progress-client-sel');
+  const clientId=isTrainer?parseInt(sel?.value):parseInt(localStorage.getItem('cbc_client_id'));
+  const content=document.getElementById('progress-content');
+  if(!clientId){content.innerHTML='';return;}
+  const client=clients.find(c=>c.id===clientId);
+  const entries=progress.filter(p=>p.clientId===clientId).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!entries.length){
+    content.innerHTML=`<div class="empty-state"><div class="ei">📈</div><p>Sin registros aún.</p></div><button class="btn btn-gold" onclick="openLogProgress(${clientId})">+ Registrar medidas</button>`;
     return;
   }
-  const clientId = document.getElementById('routine-client-sel').value;
-  const day = document.getElementById('routine-day-sel').value;
-  if (!clientId || !day) return;
-  const used = routines.find(r => String(r.clientId) === String(clientId) && r.day === day);
-  const warning = document.getElementById('day-warning');
-  const saveBtn = document.getElementById('save-routine-btn');
-  if (used) {
-    warning.style.display = 'block';
-    saveBtn.disabled = true;
-    saveBtn.style.opacity = '0.5';
-  } else {
-    warning.style.display = 'none';
-    saveBtn.disabled = false;
-    saveBtn.style.opacity = '1';
+  const latest=entries[0],prev=entries[1];
+  const wc=prev&&latest.weight&&prev.weight?((latest.weight-prev.weight).toFixed(1)):null;
+  const cc=wc===null?'var(--gray2)':parseFloat(wc)<0?'var(--success)':parseFloat(wc)>0?'var(--danger)':'var(--gold)';
+  content.innerHTML=`
+    ${client?`<div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:12px;">${client.name}</div>`:''}
+    <div class="stats-row">
+      <div class="stat-box"><div class="sv">${latest.weight||'—'}</div><div class="sl">Peso kg</div></div>
+      <div class="stat-box"><div class="sv" style="color:${cc}">${wc!==null?(parseFloat(wc)>0?'+':'')+wc:'—'}</div><div class="sl">Cambio</div></div>
+      <div class="stat-box"><div class="sv">${entries.length}</div><div class="sl">Registros</div></div>
+    </div>
+    <button class="btn btn-gold" style="margin-bottom:16px;" onclick="openLogProgress(${clientId})">+ Nuevas medidas</button>
+    <div class="section-title">📅 Historial</div>
+    ${entries.map(e=>`<div class="progress-entry">
+      <div><div style="font-size:11px;color:var(--gray2);margin-bottom:4px;">${e.date}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1;">${e.weight?e.weight+' kg':'—'}</div>
+      ${e.notes?`<div style="font-size:11px;color:var(--gray2);margin-top:4px;">${e.notes}</div>`:''}</div>
+      <div style="text-align:right;font-size:11px;color:var(--gray2);">
+        ${e.waist?`<span style="display:block">Cin: ${e.waist}cm</span>`:''}
+        ${e.hip?`<span style="display:block">Cad: ${e.hip}cm</span>`:''}
+        ${e.chest?`<span style="display:block">Pec: ${e.chest}cm</span>`:''}
+        ${e.arm?`<span style="display:block">Bra: ${e.arm}cm</span>`:''}
+      </div>
+    </div>`).join('')}`;
+}
+
+// ─── DASHBOARD ───
+function renderDashboard(){
+  const content=document.getElementById('dashboard-content'); if(!content) return;
+  const today=new Date().toISOString().split('T')[0];
+  const todayDayName=DAY_NAMES_JS[new Date().getDay()];
+  const curW=getWeekNum();
+
+  const clientStats=clients.map(c=>{
+    const todayR=routines.find(r=>String(r.clientId)===String(c.id)&&r.day===todayDayName&&(r.week||0)===curW);
+    const key=todayR?`${c.id}_${todayR.id}_${today}`:null;
+    const done=key&&completions[key]?completions[key].length:0;
+    const total=todayR?todayR.exercises.length:0;
+    const trained=done>0&&done===total;
+    const recentR=ratings.filter(r=>String(r.clientId)===String(c.id)).sort((a,b)=>b.date.localeCompare(a.date))[0];
+    return {c,hasRoutine:!!todayR,trained,done,total,recentR};
+  });
+
+  const trainedToday=clientStats.filter(s=>s.trained).length;
+  const withRoutine=clientStats.filter(s=>s.hasRoutine).length;
+  const avgR=ratings.length?(ratings.reduce((a,r)=>a+r.rating,0)/ratings.length).toFixed(1):'—';
+
+  content.innerHTML=`
+    <div class="stats-row">
+      <div class="stat-box"><div class="sv">${trainedToday}/${withRoutine}</div><div class="sl">Hoy</div></div>
+      <div class="stat-box"><div class="sv">${clients.length}</div><div class="sl">Clientes</div></div>
+      <div class="stat-box"><div class="sv">${avgR}⭐</div><div class="sl">Calif.</div></div>
+    </div>
+    <div class="section-title">👥 Estado de hoy — Sem ${curW}</div>
+    ${clientStats.map(({c,hasRoutine,trained,done,total,recentR})=>{
+      const sc=!hasRoutine?'dc-rest':trained?'dc-trained':'dc-missed';
+      const st=!hasRoutine?'Descanso':trained?'✓ Completado':`${done}/${total} ejercicios`;
+      return `<div class="dashboard-client">
+        <div class="dc-status ${sc}"></div>
+        <div style="flex:1;cursor:pointer;" onclick="goToClient(${c.id})">
+          <div style="font-weight:700;font-size:13px;">${c.name}</div>
+          <div style="font-size:11px;color:var(--gray2);">${st}${recentR?` · ⭐${recentR.rating}/5`:''}</div>
+        </div>
+        <button class="btn btn-green btn-sm" onclick="sendWA(${c.id})">💬</button>
+      </div>`;
+    }).join('')}
+    ${ratings.length?`<div class="section-title" style="margin-top:16px;">⭐ Últimas calificaciones</div>
+    ${ratings.slice(-5).reverse().map(r=>{
+      const c=clients.find(c=>c.id===r.clientId);
+      return `<div class="msg-card"><div>
+        <div style="font-weight:700;font-size:13px;">${c?.name||'—'} · ${'⭐'.repeat(r.rating)}</div>
+        ${r.comment?`<div style="font-size:12px;color:var(--gray2);">${r.comment}</div>`:''}
+        <div style="font-size:10px;color:var(--gray2);">${r.date}</div>
+      </div></div>`;
+    }).join('')}`:''}`;
+}
+
+function goToClient(id){
+  showPage('rutinas', document.querySelector('.nav-btn.active'));
+  document.querySelector('.nav-btn').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{if(i===0)b.classList.add('active'); else b.classList.remove('active');});
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-rutinas').classList.add('active');
+  openClientWorkout(id);
+}
+
+// ─── RATING ───
+function openRatingPopup(routineId,clientId){
+  currentRating={routineId,clientId,stars:0};
+  document.getElementById('rating-comment').value='';
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));
+  document.getElementById('rating-popup').classList.add('open');
+}
+
+function selectStar(n){
+  currentRating.stars=n;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<n));
+}
+
+async function submitRating(sendToTrainer){
+  if(!currentRating.stars){showToast('Selecciona una calificación ⭐');return;}
+  const comment=document.getElementById('rating-comment').value.trim();
+  const entry={id:Date.now(),clientId:currentRating.clientId,routineId:currentRating.routineId,date:new Date().toISOString().split('T')[0],rating:currentRating.stars,comment};
+  await dbInsert('training_ratings',entry);
+  ratings.push(entry);
+  document.getElementById('rating-popup').classList.remove('open');
+  showToast('⭐ Calificación guardada');
+  if(sendToTrainer){
+    const client=clients.find(c=>c.id===currentRating.clientId);
+    const routine=routines.find(r=>r.id===currentRating.routineId);
+    const stars='⭐'.repeat(currentRating.stars);
+    const msg=`💪 *Reporte de entrenamiento*\n\n👤 ${client?.name||'Cliente'}\n📅 ${entry.date}\n🏋️ ${routine?.day||''} - ${routine?.focus||''}\n${stars} (${currentRating.stars}/5)${comment?'\n\n💬 '+comment:''}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
   }
 }
 
-// ========= UTILS =========
-function populateSelects() {
-  const opts = clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-  ['routine-client-sel', 'progress-client-sel', 'filter-routines-client'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const needsBlank = id === 'progress-client-sel' || id === 'filter-routines-client';
-    const blank = id === 'progress-client-sel' ? '<option value="">-- Selecciona --</option>' : '<option value="">— Todos los clientes —</option>';
-    el.innerHTML = (needsBlank ? blank : '') + opts;
+// ─── MESSAGES ───
+async function sendMessage(){
+  const text=document.getElementById('msg-text').value.trim();
+  if(!text){showToast('Escribe un mensaje');return;}
+  const cv=document.getElementById('msg-client-sel').value;
+  const entry={id:Date.now(),trainerId:'trainer',message:text,clientId:cv?parseInt(cv):null,date:new Date().toISOString().split('T')[0],type:document.getElementById('msg-type').value};
+  if(!await dbInsert('training_messages',entry)) return;
+  messages.unshift(entry);
+  closeModal('modal-send-message');
+  document.getElementById('msg-text').value='';
+  showToast('✓ Mensaje publicado');
+  renderMessagesList();
+}
+
+function renderMessagesList(){
+  const list=document.getElementById('messages-list'); if(!list) return;
+  if(!messages.length){list.innerHTML='<div class="empty-state"><div class="ei">💬</div><p>Sin mensajes aún.</p></div>';return;}
+  list.innerHTML=messages.slice(0,15).map(m=>{
+    const target=m.clientId?(clients.find(c=>c.id===m.clientId)?.name||'Cliente'):'Todos';
+    const emoji={motivacion:'💪',recordatorio:'⏰',felicitacion:'🏆',info:'📋'}[m.type]||'💬';
+    return `<div class="msg-card">
+      <div style="flex:1;"><div style="font-size:13px;line-height:1.5;">${emoji} ${m.message}</div>
+      <div style="font-size:10px;color:var(--gray2);margin-top:4px;">Para: ${target} · ${m.date}</div></div>
+      <button onclick="deleteMessage(${m.id})" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer;">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function deleteMessage(id){
+  await dbDelete('training_messages',id);
+  messages=messages.filter(m=>m.id!==id);
+  renderMessagesList();
+  showToast('🗑 Eliminado');
+}
+
+// ─── WHATSAPP ───
+function sendWA(clientId){
+  const c=clients.find(c=>c.id===clientId);
+  if(!c?.phone){showToast('Sin número registrado');return;}
+  const url=window.location.href.split('?')[0];
+  const msg=`Hola ${c.name.split(' ')[0]}! 💪 Aquí tu entrenador de Colorado's Boxing Club.\n\n🔗 ${url}\n🔑 PIN: *${c.pin}*\n\n¡A entrenar! 🥊`;
+  const phone=c.phone.replace(/[\s\-\(\)]/g,'').replace('+','');
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// ─── UTILS ───
+function populateSelects(){
+  const opts=clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  [{id:'routine-client-sel',blank:''},{id:'progress-client-sel',blank:'<option value="">-- Selecciona --</option>'},{id:'filter-routines-client',blank:'<option value="">— Todos —</option>'},{id:'msg-client-sel',blank:'<option value="">— Todos los clientes —</option>'},{id:'copy-client-sel',blank:''}].forEach(({id,blank})=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.innerHTML=blank+opts;
   });
 }
 
-function formatDate(d) {
-  if (!d) return '—';
-  const [y,m,day] = d.split('-');
-  return `${day}/${m}/${y}`;
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.opacity = '1';
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.opacity='1';
   clearTimeout(t._t);
-  t._t = setTimeout(() => t.style.opacity = '0', 2000);
+  t._t=setTimeout(()=>t.style.opacity='0',2500);
 }
 
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-window.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
-});
-
-// ========= PIN LOGIN =========
-const TRAINER_PIN = '1234'; // Cambia este PIN — es el tuyo como entrenador
-
-async function doLogin() {
-  const pin = document.getElementById('pin-input').value.trim();
-  const err = document.getElementById('login-error');
-  const btn = document.querySelector('#login-screen button');
-  if (btn) { btn.textContent = 'VERIFICANDO...'; btn.disabled = true; }
-
-  if (pin === TRAINER_PIN) {
-    isTrainer = true;
-    localStorage.setItem('cbc_t_mode', 'trainer');
-    localStorage.setItem('cbc_t_pin', pin);
-    await hideLogin();
-    return;
-  }
-
-  // Need to load clients from Supabase first to check PINs
-  try {
-    const { data } = await sb.from('training_clients').select('*');
-    clients = data || [];
-  } catch(e) { clients = []; }
-
-  const client = clients.find(c => c.pin === pin);
-  if (client) {
-    isTrainer = false;
-    localStorage.setItem('cbc_t_mode', 'client');
-    localStorage.setItem('cbc_t_pin', pin);
-    localStorage.setItem('cbc_t_client_id', String(client.id));
-    await hideLogin();
-    return;
-  }
-
-  if (btn) { btn.textContent = 'ENTRAR'; btn.disabled = false; }
-  err.style.display = 'block';
-  document.getElementById('pin-input').value = '';
-  setTimeout(() => err.style.display = 'none', 3000);
-}
-
-async function hideLogin() {
-  document.getElementById('login-screen').style.display = 'none';
-  showToast('⏳ Cargando datos...');
-  await loadAllData();
-  applyMode();
-  populateSelects();
-
-  if (!isTrainer) {
-    const clientId = localStorage.getItem('cbc_t_client_id');
-    const client = clients.find(c => String(c.id) === clientId);
-    if (client) {
-      renderClients();
-      openClientWorkout(client.id);
-      showToast('✓ Bienvenido ' + client.name.split(' ')[0]);
-      return;
-    }
-  }
-  renderClients();
-  showToast('✓ Bienvenido');
-}
-
-function logout() {
-  localStorage.clear();
-  location.reload();
-}
-
-// Allow enter key
-document.getElementById('pin-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-// Always show login screen on load - never auto-login
-document.getElementById('login-screen').style.display = 'flex';
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay'))e.target.classList.remove('open');});
+document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('login-screen').style.display='flex';
 </script>
 </body>
 </html>
