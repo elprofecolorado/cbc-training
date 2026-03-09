@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Colorado's Boxing — Entrenamiento</title>
+<link rel="apple-touch-icon" href="logo-trainer.png">
+<link rel="icon" type="image/png" href="logo-trainer.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CBC Training">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #c9952a;
+  --gold2: #e8b84b;
+  --gold-dim: rgba(201,149,42,0.15);
+  --black: #0a0a0a;
+  --dark: #111;
+  --dark2: #1a1a1a;
+  --dark3: #222;
+  --dark4: #2a2a2a;
+  --white: #f0ede8;
+  --gray: #666;
+  --gray2: #999;
+  --success: #2ecc71;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+body { font-family:'Montserrat',sans-serif; background:var(--black); color:var(--white); display:flex; flex-direction:column; }
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1200 100%);
+  border-bottom: 1px solid rgba(201,149,42,0.3);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: relative;
+}
+.header::after {
+  content:'';
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.header-logo { display:flex; align-items:center; gap:10px; }
+.header-logo img { width:42px; height:42px; object-fit:contain; filter:drop-shadow(0 0 8px rgba(201,149,42,0.5)); }
+.header-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:3px; color:var(--gold); line-height:1; }
+.header-sub { font-size:9px; letter-spacing:2px; color:var(--gray2); text-transform:uppercase; }
+.header-right { display:flex; align-items:center; gap:8px; }
+.mode-badge {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:11px;
+  letter-spacing:2px;
+  padding:4px 10px;
+  border-radius:20px;
+  border:1px solid var(--gold);
+  color:var(--gold);
+  cursor:pointer;
+  transition: all 0.2s;
+}
+.mode-badge.trainer { background:var(--gold); color:var(--black); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  background: var(--dark);
+  border-top: 1px solid #222;
+  display: flex;
+  flex-shrink: 0;
+  position: relative;
+}
+.bottom-nav::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.nav-btn {
+  flex:1;
+  padding:10px 4px 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  cursor:pointer;
+  transition: all 0.2s;
+  border:none;
+  background:none;
+  color:var(--gray);
+}
+.nav-btn .nav-icon { font-size:20px; }
+.nav-btn .nav-label { font-size:9px; letter-spacing:1px; text-transform:uppercase; font-weight:600; }
+.nav-btn.active { color:var(--gold); }
+.nav-btn.active .nav-label { color:var(--gold); }
+
+/* ── MAIN SCROLL ── */
+.main { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
+
+/* ── PAGES ── */
+.page { display:none; padding:16px; min-height:100%; }
+.page.active { display:block; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:18px;
+  letter-spacing:3px;
+  color:var(--gold);
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.section-title::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background: linear-gradient(90deg, rgba(201,149,42,0.4), transparent);
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--dark2);
+  border:1px solid #2a2a2a;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+}
+.card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0;
+  width:3px; height:100%;
+  background: var(--gold);
+}
+
+/* ── CLIENT CARD ── */
+.client-card {
+  background: var(--dark2);
+  border:1px solid #252525;
+  border-radius:12px;
+  padding:14px 16px;
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+  transition: all 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.client-card:active { transform:scale(0.98); }
+.client-card .cc-left { display:flex; align-items:center; gap:12px; }
+.client-avatar {
+  width:44px; height:44px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--gold), #8a6009);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:18px;
+  color:var(--black);
+  flex-shrink:0;
+}
+.client-name { font-weight:700; font-size:14px; margin-bottom:2px; }
+.client-meta { font-size:11px; color:var(--gray2); }
+.client-arrow { color:var(--gold); font-size:18px; }
+
+/* ── EXERCISE CARD ── */
+.exercise-card {
+  background: var(--dark2);
+  border:1px solid #252525;
+  border-radius:10px;
+  margin-bottom:8px;
+  overflow:hidden;
+  transition: all 0.3s;
+}
+.exercise-card.done { opacity:0.5; }
+.exercise-header {
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  cursor:pointer;
+}
+.ex-check {
+  width:28px; height:28px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition: all 0.2s;
+  font-size:14px;
+}
+.exercise-card.done .ex-check { background:var(--success); border-color:var(--success); }
+.ex-info { flex:1; }
+.ex-name { font-weight:700; font-size:13px; margin-bottom:2px; }
+.ex-sets { font-size:11px; color:var(--gold2); font-weight:600; }
+.ex-video-btn {
+  background: rgba(201,149,42,0.15);
+  border:1px solid rgba(201,149,42,0.3);
+  border-radius:6px;
+  padding:5px 10px;
+  font-size:11px;
+  color:var(--gold);
+  cursor:pointer;
+  font-family:'Montserrat',sans-serif;
+  font-weight:600;
+  transition: all 0.2s;
+  flex-shrink:0;
+}
+.ex-video-btn:active { background:rgba(201,149,42,0.3); }
+.ex-notes { padding:0 14px 12px 54px; font-size:11px; color:var(--gray2); display:none; }
+.exercise-card.expanded .ex-notes { display:block; }
+
+/* ── VIDEO EMBED ── */
+.video-wrap {
+  padding:0 14px 12px;
+  display:none;
+}
+.exercise-card.expanded .video-wrap { display:block; }
+.video-wrap iframe {
+  width:100%;
+  height:180px;
+  border-radius:8px;
+  border:none;
+}
+
+/* ── PROGRESS ── */
+.progress-bar-wrap { background:#222; border-radius:20px; height:6px; overflow:hidden; margin:8px 0; }
+.progress-bar-fill { height:100%; background:linear-gradient(90deg, var(--gold), var(--gold2)); border-radius:20px; transition:width 0.5s; }
+
+/* ── STATS ROW ── */
+.stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
+.stat-box {
+  background:var(--dark2);
+  border:1px solid #252525;
+  border-radius:10px;
+  padding:12px 10px;
+  text-align:center;
+}
+.stat-box .sv { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); line-height:1; }
+.stat-box .sl { font-size:9px; letter-spacing:1px; color:var(--gray2); text-transform:uppercase; margin-top:2px; }
+
+/* ── FORM ── */
+.form-group { margin-bottom:14px; }
+.form-label { font-size:10px; letter-spacing:2px; color:var(--gray2); text-transform:uppercase; margin-bottom:6px; display:block; font-weight:600; }
+.form-input {
+  width:100%;
+  background:var(--dark3);
+  border:1px solid #333;
+  border-radius:8px;
+  padding:11px 14px;
+  color:var(--white);
+  font-family:'Montserrat',sans-serif;
+  font-size:14px;
+  outline:none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color:var(--gold); }
+select.form-input option { background:var(--dark3); }
+textarea.form-input { resize:vertical; min-height:80px; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding:12px 20px;
+  border-radius:8px;
+  font-family:'Montserrat',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1px;
+  cursor:pointer;
+  border:none;
+  transition: all 0.2s;
+  text-transform:uppercase;
+  width:100%;
+}
+.btn-gold { background:linear-gradient(135deg, var(--gold), #a07010); color:var(--black); }
+.btn-gold:active { transform:scale(0.98); }
+.btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold); }
+.btn-danger { background:var(--danger); color:white; }
+.btn-sm { padding:7px 14px; font-size:11px; width:auto; }
+.btn-row { display:flex; gap:8px; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.9);
+  z-index:1000;
+  align-items:flex-end;
+  justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--dark2);
+  border:1px solid #333;
+  border-radius:20px 20px 0 0;
+  width:100%;
+  max-width:600px;
+  max-height:90vh;
+  overflow-y:auto;
+  animation:slideUp 0.3s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-header {
+  padding:20px 20px 14px;
+  border-bottom:1px solid #2a2a2a;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  background:var(--dark2);
+  z-index:10;
+}
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px; color:var(--gold); }
+.modal-close { background:none; border:none; color:var(--gray2); font-size:22px; cursor:pointer; padding:4px; }
+.modal-body { padding:20px; }
+.modal-footer { padding:0 20px 24px; }
+
+/* ── DAY TABS ── */
+.day-tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:16px; scrollbar-width:none; }
+.day-tabs::-webkit-scrollbar { display:none; }
+.day-tab {
+  flex-shrink:0;
+  padding:7px 14px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  cursor:pointer;
+  border:1px solid #333;
+  color:var(--gray2);
+  transition: all 0.2s;
+  text-transform:uppercase;
+  background:var(--dark2);
+}
+.day-tab.active { background:var(--gold); color:var(--black); border-color:var(--gold); }
+
+/* ── PROGRESS LOG ── */
+.progress-entry {
+  background:var(--dark2);
+  border:1px solid #252525;
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.pe-left .pe-date { font-size:11px; color:var(--gray2); margin-bottom:4px; }
+.pe-left .pe-weight { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); line-height:1; }
+.pe-right { text-align:right; font-size:11px; color:var(--gray2); }
+.pe-right span { display:block; margin-bottom:2px; }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--dark3);
+  border:1px solid var(--gold);
+  color:var(--white);
+  padding:10px 20px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+  z-index:9999;
+  opacity:0;
+  transition:opacity 0.3s;
+  pointer-events:none;
+  white-space:nowrap;
+}
+
+/* ── TRAINER BADGE ── */
+.trainer-only { display:none; }
+body.trainer-mode .trainer-only { display:block; }
+body.trainer-mode .client-only { display:none; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align:center;
+  padding:40px 20px;
+  color:var(--gray);
+}
+.empty-state .ei { font-size:48px; margin-bottom:12px; }
+.empty-state p { font-size:13px; line-height:1.6; }
+
+/* ── WORKOUT HEADER ── */
+.workout-header {
+  background: linear-gradient(135deg, #1a1200, #0a0a0a);
+  border:1px solid rgba(201,149,42,0.2);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.wh-left .wh-day { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--gold); letter-spacing:2px; line-height:1; }
+.wh-left .wh-focus { font-size:11px; color:var(--gray2); margin-top:2px; }
+.wh-right { text-align:right; }
+.wh-right .wh-count { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--white); line-height:1; }
+.wh-right .wh-label { font-size:9px; color:var(--gray2); letter-spacing:1px; text-transform:uppercase; }
+
+/* ── BACK BTN ── */
+.back-btn {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--gold);
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  margin-bottom:14px;
+  background:none;
+  border:none;
+  padding:0;
+}
+
+/* ── SELECT CLIENT VIEW ── */
+#client-select-view { display:block; }
+#workout-view { display:none; }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="
+  position:fixed;inset:0;background:linear-gradient(135deg,#0a0a0a 0%,#1a1200 50%,#0a0a0a 100%);
+  z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;
+">
+  <img src="logo-trainer.png" style="width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(201,149,42,0.6));margin-bottom:16px;">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:#c9952a;margin-bottom:4px;">CBC TRAINING</div>
+  <div style="font-size:11px;letter-spacing:3px;color:#666;margin-bottom:40px;text-transform:uppercase;">Colorado's Boxing Club</div>
+
+  <div style="width:100%;max-width:340px;">
+    <div style="font-size:11px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:8px;font-weight:600;">Tu PIN de acceso</div>
+    <input id="pin-input" type="number" inputmode="numeric" pattern="[0-9]*"
+      style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:16px;
+             color:#f0ede8;font-family:'Montserrat',sans-serif;font-size:28px;text-align:center;
+             letter-spacing:8px;outline:none;margin-bottom:16px;"
+      placeholder="••••" maxlength="6"
+      oninput="if(this.value.length>6)this.value=this.value.slice(0,6)">
+    <button onclick="doLogin()"
+      style="width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);
+             color:#0a0a0a;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;
+             letter-spacing:2px;border:none;cursor:pointer;text-transform:uppercase;">
+      ENTRAR
+    </button>
+    <div id="login-error" style="text-align:center;color:#e74c3c;font-size:12px;margin-top:12px;display:none;">
+      PIN incorrecto. Intenta de nuevo.
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <img src="logo-trainer.png" alt="CBC">
+    <div>
+      <div class="header-title">CBC Training</div>
+      <div class="header-sub">Colorado's Boxing Club</div>
+    </div>
+  </div>
+  <div class="header-right" style="display:flex;gap:8px;align-items:center;">
+    <div class="mode-badge trainer" id="mode-toggle">ENTRENADOR</div>
+    <div onclick="logout()" style="cursor:pointer;font-size:18px;" title="Cerrar sesión">🚪</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main-scroll">
+
+  <!-- PAGE: RUTINAS -->
+  <div class="page active" id="page-rutinas">
+
+    <!-- CLIENT SELECT VIEW -->
+    <div id="client-select-view">
+      <div class="section-title trainer-only">🥊 Mis Clientes</div>
+      <div class="section-title client-only">🥊 Mi Entrenamiento</div>
+      <div id="clients-list"></div>
+      <div class="trainer-only" style="margin-top:8px;">
+        <button class="btn btn-gold" onclick="openModal('modal-add-client')">+ Agregar Cliente</button>
+      </div>
+    </div>
+
+    <!-- WORKOUT VIEW -->
+    <div id="workout-view">
+      <button class="back-btn" onclick="backToClients()">← Regresar</button>
+      <div id="workout-content"></div>
+    </div>
+
+  </div>
+
+  <!-- PAGE: PROGRESO -->
+  <div class="page" id="page-progreso">
+    <div class="section-title">📊 Progreso</div>
+    <div id="progress-client-select" style="margin-bottom:16px;">
+      <div class="form-group">
+        <label class="form-label">Seleccionar Cliente</label>
+        <select class="form-input" id="progress-client-sel" onchange="loadProgressView()">
+          <option value="">-- Selecciona --</option>
+        </select>
+      </div>
+    </div>
+    <div id="progress-content"></div>
+  </div>
+
+  <!-- PAGE: AJUSTES (TRAINER) -->
+  <div class="page trainer-only" id="page-ajustes">
+    <div class="section-title">⚙️ Gestión</div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:12px;">CREAR RUTINA</div>
+      <div class="form-group">
+        <label class="form-label">Cliente</label>
+        <select class="form-input" id="routine-client-sel"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Día</label>
+        <select class="form-input" id="routine-day-sel">
+          <option>Lunes</option><option>Martes</option><option>Miércoles</option>
+          <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Enfoque del día</label>
+        <input class="form-input" type="text" id="routine-focus" placeholder="ej: Pecho y Triceps, Cardio, Full Body...">
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--gold2);margin-bottom:10px;margin-top:4px;">EJERCICIOS</div>
+      <div id="exercises-builder"></div>
+      <button class="btn btn-outline" style="margin-bottom:10px;" onclick="addExerciseRow()">+ Agregar Ejercicio</button>
+      <button class="btn btn-gold" onclick="saveRoutine()">💾 Guardar Rutina</button>
+    </div>
+
+    <div class="section-title">📋 Rutinas Guardadas</div>
+    <div id="saved-routines-list"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('rutinas', this)">
+    <span class="nav-icon">🥊</span>
+    <span class="nav-label">Rutinas</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('progreso', this)">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Progreso</span>
+  </button>
+  <button class="nav-btn trainer-only" onclick="showPage('ajustes', this)">
+    <span class="nav-icon">⚙️</span>
+    <span class="nav-label">Gestión</span>
+  </button>
+</div>
+
+<!-- MODAL: ADD CLIENT -->
+<div class="modal-overlay" id="modal-add-client">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">NUEVO CLIENTE</div>
+      <button class="modal-close" onclick="closeModal('modal-add-client')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input class="form-input" type="text" id="new-client-name" placeholder="Juan García">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Objetivo</label>
+        <select class="form-input" id="new-client-goal">
+          <option>Perder peso</option>
+          <option>Ganar músculo</option>
+          <option>Rendimiento deportivo</option>
+          <option>Tonificar</option>
+          <option>Salud general</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teléfono (WhatsApp)</label>
+        <input class="form-input" type="text" id="new-client-phone" placeholder="52 33 1234 5678">
+      </div>
+      <div class="form-group">
+        <label class="form-label">PIN del cliente (4-6 dígitos)</label>
+        <input class="form-input" type="number" id="new-client-pin" placeholder="ej: 4521" inputmode="numeric">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gold" onclick="addClient()">Guardar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: LOG PROGRESS -->
+<div class="modal-overlay" id="modal-log-progress">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">REGISTRAR PROGRESO</div>
+      <button class="modal-close" onclick="closeModal('modal-log-progress')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="prog-client-id">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Peso (kg)</label>
+          <input class="form-input" type="number" id="prog-weight" placeholder="75">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha</label>
+          <input class="form-input" type="date" id="prog-date">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Cintura (cm)</label>
+          <input class="form-input" type="number" id="prog-waist" placeholder="80">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cadera (cm)</label>
+          <input class="form-input" type="number" id="prog-hip" placeholder="95">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Pecho (cm)</label>
+          <input class="form-input" type="number" id="prog-chest" placeholder="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Brazo (cm)</label>
+          <input class="form-input" type="number" id="prog-arm" placeholder="35">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas</label>
+        <textarea class="form-input" id="prog-notes" placeholder="Observaciones..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gold" onclick="saveProgress()">Guardar Progreso</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========= SUPABASE =========
+const sb = supabase.createClient('https://btdtpruxntodjuzomdcq.supabase.co', 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4');
+
+let clients = [];
+let routines = [];
+let progress = [];
+let completions = JSON.parse(localStorage.getItem('cbc_t_completions') || '{}');
+let isTrainer = localStorage.getItem('cbc_t_mode') !== 'client';
+let currentClientId = null;
+let currentDay = null;
+let exRowCount = 0;
+
+function saveAll() {
+  localStorage.setItem('cbc_t_completions', JSON.stringify(completions));
+}
+
+async function loadAllData() {
+  showToast('⏳ Cargando...');
+  try {
+    const [cr, rr, pr] = await Promise.all([
+      sb.from('training_clients').select('*'),
+      sb.from('training_routines').select('*'),
+      sb.from('training_progress').select('*'),
+    ]);
+    clients = cr.data || [];
+    routines = rr.data || [];
+    progress = pr.data || [];
+  } catch(e) {
+    showToast('✗ Error de conexión');
+    console.error(e);
+  }
+}
+
+async function dbInsert(table, row) {
+  const { error } = await sb.from(table).insert([row]);
+  if (error) { showToast('✗ Error al guardar'); console.error(error); return false; }
+  return true;
+}
+
+async function dbUpdate(table, row) {
+  const { error } = await sb.from(table).update(row).eq('id', row.id);
+  if (error) { showToast('✗ Error al actualizar'); console.error(error); return false; }
+  return true;
+}
+
+async function dbDelete(table, id) {
+  const { error } = await sb.from(table).delete().eq('id', id);
+  if (error) { showToast('✗ Error al eliminar'); console.error(error); return false; }
+  return true;
+}
+
+// ========= MODE =========
+function toggleMode() {
+  isTrainer = !isTrainer;
+  localStorage.setItem('cbc_t_mode', isTrainer ? 'trainer' : 'client');
+  applyMode();
+}
+
+function applyMode() {
+  const badge = document.getElementById('mode-toggle');
+  if (isTrainer) {
+    document.body.classList.add('trainer-mode');
+    badge.textContent = 'ENTRENADOR';
+    badge.classList.add('trainer');
+  } else {
+    document.body.classList.remove('trainer-mode');
+    badge.textContent = 'CLIENTE';
+    badge.classList.remove('trainer');
+  }
+  renderClients();
+  populateSelects();
+}
+
+// ========= NAVIGATION =========
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('main-scroll').scrollTop = 0;
+  if (page === 'ajustes') renderSavedRoutines();
+  if (page === 'progreso') loadProgressView();
+}
+
+// ========= CLIENTS =========
+function renderClients() {
+  const list = document.getElementById('clients-list');
+  if (clients.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="ei">🥊</div><p>No hay clientes aún.<br>Agrega tu primer cliente.</p></div>`;
+    return;
+  }
+  list.innerHTML = clients.map(c => {
+    const myRoutines = routines.filter(r => r.clientId === c.id);
+    const initials = c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="client-card" onclick="openClientWorkout(${c.id})">
+      <div class="cc-left">
+        <div class="client-avatar">${initials}</div>
+        <div>
+          <div class="client-name">${c.name}</div>
+          <div class="client-meta">${c.goal} · ${myRoutines.length} días de rutina ${isTrainer && c.pin ? '· PIN: <strong style="color:var(--gold)">' + c.pin + '</strong>' : ''}</div>
+        </div>
+      </div>
+      <div class="client-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+async function addClient() {
+  const name = document.getElementById('new-client-name').value.trim();
+  if (!name) { showToast('Ingresa el nombre'); return; }
+  const pin = document.getElementById('new-client-pin').value.trim();
+  if (!pin) { showToast('Ingresa un PIN para el cliente'); return; }
+  if (clients.find(c => c.pin === pin)) { showToast('Ese PIN ya está en uso'); return; }
+  const client = {
+    id: Date.now(),
+    name,
+    goal: document.getElementById('new-client-goal').value,
+    phone: document.getElementById('new-client-phone').value.trim(),
+    pin
+  };
+  const ok = await dbInsert('training_clients', client);
+  if (!ok) return;
+  clients.push(client);
+  closeModal('modal-add-client');
+  document.getElementById('new-client-name').value = '';
+  document.getElementById('new-client-phone').value = '';
+  document.getElementById('new-client-pin').value = '';
+  renderClients();
+  populateSelects();
+  showToast('✓ Cliente agregado');
+}
+
+// ========= WORKOUT VIEW =========
+function openClientWorkout(clientId) {
+  currentClientId = clientId;
+  const client = clients.find(c => c.id === clientId);
+  const myRoutines = routines.filter(r => r.clientId === clientId);
+
+  document.getElementById('client-select-view').style.display = 'none';
+  document.getElementById('workout-view').style.display = 'block';
+  document.getElementById('main-scroll').scrollTop = 0;
+
+  if (myRoutines.length === 0) {
+    document.getElementById('workout-content').innerHTML = `
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:4px;">${client.name}</div>
+      <div style="font-size:12px;color:var(--gray2);margin-bottom:20px;">${client.goal}</div>
+      <div class="empty-state"><div class="ei">📋</div><p>No hay rutinas asignadas aún.</p></div>`;
+    return;
+  }
+
+  // Default to first day
+  currentDay = currentDay || myRoutines[0].day;
+  if (!myRoutines.find(r => r.day === currentDay)) currentDay = myRoutines[0].day;
+
+  renderWorkout(client, myRoutines);
+}
+
+function renderWorkout(client, myRoutines) {
+  const todayKey = new Date().toISOString().split('T')[0];
+  const activeRoutine = myRoutines.find(r => r.day === currentDay) || myRoutines[0];
+
+  const completionKey = `${client.id}_${activeRoutine.id}_${todayKey}`;
+  const done = completions[completionKey] || [];
+  const total = activeRoutine.exercises.length;
+  const pct = total > 0 ? Math.round((done.length / total) * 100) : 0;
+
+  const dayTabs = myRoutines.map(r =>
+    `<div class="day-tab ${r.day === currentDay ? 'active' : ''}" onclick="switchDay('${r.day}', ${client.id})">${r.day}</div>`
+  ).join('');
+
+  const exercises = activeRoutine.exercises.map((ex, i) => {
+    const isDone = done.includes(i);
+    const videoId = ex.video ? getYoutubeId(ex.video) : null;
+    return `<div class="exercise-card ${isDone ? 'done' : ''}" id="ex-${activeRoutine.id}-${i}">
+      <div class="exercise-header" onclick="toggleExercise('ex-${activeRoutine.id}-${i}')">
+        <div class="ex-check" onclick="event.stopPropagation();toggleDone('${completionKey}', ${i}, ${activeRoutine.id}, ${client.id})">${isDone ? '✓' : ''}</div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-sets">${ex.sets}</div>
+        </div>
+        ${ex.video ? `<button class="ex-video-btn" onclick="event.stopPropagation();toggleExercise('ex-${activeRoutine.id}-${i}')">▶ Video</button>` : ''}
+      </div>
+      ${ex.notes ? `<div class="ex-notes">💡 ${ex.notes}</div>` : ''}
+      ${videoId ? `<div class="video-wrap"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen loading="lazy"></iframe></div>` : ''}
+    </div>`;
+  }).join('');
+
+  const progressBar = `<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>`;
+  const progressLabel = `<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray2);margin-bottom:16px;"><span>${done.length}/${total} ejercicios</span><span style="color:var(--gold);font-weight:700;">${pct}%</span></div>`;
+
+  const trainerBtns = isTrainer ? `
+    <div class="btn-row trainer-only" style="margin-top:16px;">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openLogProgress(${client.id})">📊 Registrar medidas</button>
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="sendWA(${client.id})">💬 WhatsApp</button>
+    </div>` : `
+    <div class="btn-row client-only" style="margin-top:16px;">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openLogProgress(${client.id})">📊 Mis medidas</button>
+    </div>`;
+
+  document.getElementById('workout-content').innerHTML = `
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:2px;">${client.name}</div>
+    <div style="font-size:11px;color:var(--gray2);margin-bottom:14px;">${client.goal}</div>
+    <div class="day-tabs">${dayTabs}</div>
+    <div class="workout-header">
+      <div class="wh-left">
+        <div class="wh-day">${currentDay}</div>
+        <div class="wh-focus">${activeRoutine.focus}</div>
+      </div>
+      <div class="wh-right">
+        <div class="wh-count">${total}</div>
+        <div class="wh-label">Ejercicios</div>
+      </div>
+    </div>
+    ${progressBar}
+    ${progressLabel}
+    ${exercises}
+    ${trainerBtns}
+  `;
+}
+
+function switchDay(day, clientId) {
+  currentDay = day;
+  const client = clients.find(c => c.id === clientId);
+  const myRoutines = routines.filter(r => r.clientId === clientId);
+  renderWorkout(client, myRoutines);
+  document.getElementById('main-scroll').scrollTop = 0;
+}
+
+function backToClients() {
+  currentClientId = null;
+  currentDay = null;
+  document.getElementById('client-select-view').style.display = 'block';
+  document.getElementById('workout-view').style.display = 'none';
+}
+
+function toggleExercise(id) {
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle('expanded');
+}
+
+function toggleDone(key, index, routineId, clientId) {
+  if (!completions[key]) completions[key] = [];
+  const arr = completions[key];
+  const i = arr.indexOf(index);
+  if (i === -1) { arr.push(index); showToast('✓ Ejercicio completado'); }
+  else { arr.splice(i, 1); }
+  saveAll();
+  // Re-render workout
+  const client = clients.find(c => c.id === clientId);
+  const myRoutines = routines.filter(r => r.clientId === clientId);
+  renderWorkout(client, myRoutines);
+  document.getElementById('main-scroll').scrollTop = 200;
+}
+
+function getYoutubeId(url) {
+  if (!url) return null;
+  const match = url.match(/(?:v=|youtu\.be\/|embed\/)([^&\n?#]+)/);
+  return match ? match[1] : null;
+}
+
+// ========= PROGRESS =========
+function openLogProgress(clientId) {
+  document.getElementById('prog-client-id').value = clientId;
+  document.getElementById('prog-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('prog-weight').value = '';
+  document.getElementById('prog-waist').value = '';
+  document.getElementById('prog-hip').value = '';
+  document.getElementById('prog-chest').value = '';
+  document.getElementById('prog-arm').value = '';
+  document.getElementById('prog-notes').value = '';
+  openModal('modal-log-progress');
+}
+
+async function saveProgress() {
+  const clientId = parseInt(document.getElementById('prog-client-id').value);
+  const entry = {
+    id: Date.now(),
+    clientId,
+    date: document.getElementById('prog-date').value,
+    weight: parseFloat(document.getElementById('prog-weight').value) || null,
+    waist: parseFloat(document.getElementById('prog-waist').value) || null,
+    hip: parseFloat(document.getElementById('prog-hip').value) || null,
+    chest: parseFloat(document.getElementById('prog-chest').value) || null,
+    arm: parseFloat(document.getElementById('prog-arm').value) || null,
+    notes: document.getElementById('prog-notes').value,
+  };
+  const ok = await dbInsert('training_progress', entry);
+  if (!ok) return;
+  progress.push(entry);
+  closeModal('modal-log-progress');
+  showToast('✓ Progreso guardado');
+  loadProgressView();
+}
+
+function loadProgressView() {
+  const sel = document.getElementById('progress-client-sel');
+  const clientId = parseInt(sel.value);
+  const content = document.getElementById('progress-content');
+  const showClientSel = document.getElementById('progress-client-select');
+
+  if (!isTrainer) {
+    // Client mode - show only their data (first client for demo)
+    showClientSel.style.display = 'none';
+    renderProgressForClient(clients[0]?.id);
+    return;
+  }
+
+  showClientSel.style.display = 'block';
+  if (!clientId) { content.innerHTML = ''; return; }
+  renderProgressForClient(clientId);
+}
+
+function renderProgressForClient(clientId) {
+  if (!clientId) return;
+  const content = document.getElementById('progress-content');
+  const client = clients.find(c => c.id === clientId);
+  const entries = progress.filter(p => p.clientId === clientId).sort((a,b) => b.date.localeCompare(a.date));
+
+  if (entries.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state"><div class="ei">📊</div><p>Sin registros de progreso aún.</p></div>
+      <button class="btn btn-gold" onclick="openLogProgress(${clientId})">+ Registrar Medidas</button>`;
+    return;
+  }
+
+  const latest = entries[0];
+  const prev = entries[1];
+  const weightChange = prev && latest.weight && prev.weight ? (latest.weight - prev.weight).toFixed(1) : null;
+  const changeColor = weightChange === null ? 'var(--gray2)' : parseFloat(weightChange) < 0 ? 'var(--success)' : parseFloat(weightChange) > 0 ? 'var(--danger)' : 'var(--gold)';
+  const changeSign = weightChange && parseFloat(weightChange) > 0 ? '+' : '';
+
+  content.innerHTML = `
+    ${client ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:12px;">${client.name}</div>` : ''}
+    <div class="stats-row" style="margin-bottom:16px;">
+      <div class="stat-box"><div class="sv">${latest.weight || '—'}</div><div class="sl">Peso kg</div></div>
+      <div class="stat-box"><div class="sv" style="color:${changeColor}">${weightChange !== null ? changeSign + weightChange : '—'}</div><div class="sl">Cambio kg</div></div>
+      <div class="stat-box"><div class="sv">${entries.length}</div><div class="sl">Registros</div></div>
+    </div>
+    <div class="btn-row" style="margin-bottom:16px;">
+      <button class="btn btn-gold" onclick="openLogProgress(${clientId})">+ Nuevas medidas</button>
+    </div>
+    <div class="section-title">📅 Historial</div>
+    ${entries.map(e => `
+      <div class="progress-entry">
+        <div class="pe-left">
+          <div class="pe-date">${formatDate(e.date)}</div>
+          <div class="pe-weight">${e.weight ? e.weight + ' kg' : '—'}</div>
+          ${e.notes ? `<div style="font-size:11px;color:var(--gray2);margin-top:4px;">${e.notes}</div>` : ''}
+        </div>
+        <div class="pe-right">
+          ${e.waist ? `<span>Cin: ${e.waist}cm</span>` : ''}
+          ${e.hip ? `<span>Cad: ${e.hip}cm</span>` : ''}
+          ${e.chest ? `<span>Pec: ${e.chest}cm</span>` : ''}
+          ${e.arm ? `<span>Bra: ${e.arm}cm</span>` : ''}
+        </div>
+      </div>`).join('')}
+  `;
+}
+
+// ========= ROUTINES (TRAINER) =========
+function addExerciseRow() {
+  const container = document.getElementById('exercises-builder');
+  const id = exRowCount++;
+  const div = document.createElement('div');
+  div.id = `ex-row-${id}`;
+  div.style.cssText = 'background:var(--dark3);border-radius:10px;padding:12px;margin-bottom:8px;';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:11px;font-weight:700;color:var(--gold2);">EJERCICIO ${id+1}</span>
+      <button onclick="document.getElementById('ex-row-${id}').remove()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-name" type="text" placeholder="Nombre del ejercicio"></div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-sets" type="text" placeholder="Series y reps: ej. 3x12 reps"></div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-video" type="text" placeholder="Link de YouTube (opcional)"></div>
+    <div class="form-group" style="margin-bottom:0;"><input class="form-input ex-notes" type="text" placeholder="Notas (opcional)"></div>
+  `;
+  container.appendChild(div);
+}
+
+async function saveRoutine() {
+  const clientId = parseInt(document.getElementById('routine-client-sel').value);
+  const day = document.getElementById('routine-day-sel').value;
+  const focus = document.getElementById('routine-focus').value.trim();
+
+  const rows = document.getElementById('exercises-builder').querySelectorAll('[id^="ex-row-"]');
+  const exercises = [];
+  rows.forEach(row => {
+    const name = row.querySelector('.ex-name').value.trim();
+    if (!name) return;
+    exercises.push({
+      name,
+      sets: row.querySelector('.ex-sets').value.trim(),
+      video: row.querySelector('.ex-video').value.trim(),
+      notes: row.querySelector('.ex-notes').value.trim(),
+    });
+  });
+
+  if (!clientId) { showToast('Selecciona un cliente'); return; }
+  if (exercises.length === 0) { showToast('Agrega al menos un ejercicio'); return; }
+
+  // Remove existing routine for same client+day
+  const existing = routines.find(r => r.clientId === clientId && r.day === day);
+  if (existing) {
+    await dbDelete('training_routines', existing.id);
+    routines = routines.filter(r => !(r.clientId === clientId && r.day === day));
+  }
+  const newRoutine = { id: Date.now(), clientId, day, focus, exercises };
+  const ok = await dbInsert('training_routines', newRoutine);
+  if (!ok) return;
+  routines.push(newRoutine);
+  document.getElementById('exercises-builder').innerHTML = '';
+  document.getElementById('routine-focus').value = '';
+  renderSavedRoutines();
+  showToast('✓ Rutina guardada');
+}
+
+function renderSavedRoutines() {
+  const list = document.getElementById('saved-routines-list');
+  if (routines.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>Sin rutinas aún.</p></div>';
+    return;
+  }
+  list.innerHTML = routines.map(r => {
+    const client = clients.find(c => c.id === r.clientId);
+    return `<div class="card" style="padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--gold);">${r.day} — ${r.focus || 'Sin enfoque'}</div>
+          <div style="font-size:12px;color:var(--gray2);">${client?.name || 'Cliente eliminado'} · ${r.exercises.length} ejercicios</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deleteRoutine(${r.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteRoutine(id) {
+  if (!confirm('¿Eliminar esta rutina?')) return;
+  const ok = await dbDelete('training_routines', id);
+  if (!ok) return;
+  routines = routines.filter(r => r.id !== id);
+  renderSavedRoutines();
+  showToast('🗑 Rutina eliminada');
+}
+
+// ========= WHATSAPP =========
+function sendWA(clientId) {
+  const client = clients.find(c => c.id === clientId);
+  if (!client?.phone) { showToast('Sin número registrado'); return; }
+  const appUrl = window.location.href.split('?')[0];
+  const msg = `Hola ${client.name.split(' ')[0]}! 💪 Aquí tu entrenador de Colorado's Boxing Club.\n\nTu acceso a la app de rutinas:\n🔗 ${appUrl}\n🔑 PIN: *${client.pin}*\n\n¡A entrenar!`;
+  const phone = client.phone.replace(/[\s\-\(\)]/g, '').replace('+', '');
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ========= UTILS =========
+function populateSelects() {
+  const opts = clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  ['routine-client-sel', 'progress-client-sel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = (id === 'progress-client-sel' ? '<option value="">-- Selecciona --</option>' : '') + opts;
+  });
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.style.opacity = '0', 2000);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+window.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+// ========= PIN LOGIN =========
+const TRAINER_PIN = '1234'; // Cambia este PIN — es el tuyo como entrenador
+
+function doLogin() {
+  const pin = document.getElementById('pin-input').value.trim();
+  const err = document.getElementById('login-error');
+
+  if (pin === TRAINER_PIN) {
+    isTrainer = true;
+    localStorage.setItem('cbc_t_mode', 'trainer');
+    localStorage.setItem('cbc_t_pin', pin);
+    hideLogin();
+    return;
+  }
+
+  // Check client PINs
+  const client = clients.find(c => c.pin === pin);
+  if (client) {
+    isTrainer = false;
+    localStorage.setItem('cbc_t_mode', 'client');
+    localStorage.setItem('cbc_t_pin', pin);
+    localStorage.setItem('cbc_t_client_id', client.id);
+    hideLogin();
+    return;
+  }
+
+  err.style.display = 'block';
+  document.getElementById('pin-input').value = '';
+  setTimeout(() => err.style.display = 'none', 3000);
+}
+
+async function hideLogin() {
+  document.getElementById('login-screen').style.display = 'none';
+  await loadAllData();
+  applyMode();
+  populateSelects();
+
+  // If client, go directly to their workout
+  if (!isTrainer) {
+    const clientId = parseInt(localStorage.getItem('cbc_t_client_id'));
+    if (clientId) {
+      renderClients();
+      openClientWorkout(clientId);
+      return;
+    }
+  }
+  renderClients();
+  showToast('✓ Datos cargados');
+}
+
+function logout() {
+  localStorage.removeItem('cbc_t_pin');
+  localStorage.removeItem('cbc_t_client_id');
+  localStorage.removeItem('cbc_t_mode');
+  location.reload();
+}
+
+// Check if already logged in
+const savedPin = localStorage.getItem('cbc_t_pin');
+if (savedPin) {
+  document.getElementById('pin-input').value = savedPin;
+  doLogin();
+} else {
+  // Allow enter key
+  document.getElementById('pin-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+}
+
+// ========= INIT =========
+// (handled by hideLogin after PIN)
+</script>
+</body>
+</html>
