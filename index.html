@@ -498,30 +498,50 @@ async function doLogin() {
   const pin = document.getElementById('pin-input').value.trim();
   const btn = document.getElementById('login-btn');
   const err = document.getElementById('login-error');
+
+  if (!pin) { showToast('Ingresa tu PIN'); return; }
   btn.textContent='VERIFICANDO...'; btn.disabled=true;
 
-  if (pin===TRAINER_PIN) {
-    isTrainer=true;
-    localStorage.setItem('cbc_mode','trainer');
-    localStorage.setItem('cbc_pin',pin);
-    await afterLogin(); return;
-  }
+  try {
+    if (pin === TRAINER_PIN) {
+      isTrainer=true;
+      localStorage.setItem('cbc_mode','trainer');
+      localStorage.setItem('cbc_pin',pin);
+      await afterLogin(); return;
+    }
 
-  const {data} = await sb.from('training_clients').select('*').catch(()=>({data:[]}));
-  clients = data||[];
-  const client = clients.find(c=>c.pin===pin);
-  if (client) {
-    isTrainer=false;
-    localStorage.setItem('cbc_mode','client');
-    localStorage.setItem('cbc_pin',pin);
-    localStorage.setItem('cbc_client_id',String(client.id));
-    await afterLogin(); return;
+    // Fetch clients with 8s timeout
+    let result = await Promise.race([
+      sb.from('training_clients').select('id,name,pin,goal,phone,photo'),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))
+    ]).catch(e=>null);
+
+    if (!result || result.error || !result.data) {
+      showToast('Sin conexion. Intenta de nuevo.');
+      btn.textContent='ENTRAR'; btn.disabled=false;
+      return;
+    }
+
+    clients = result.data;
+    const client = clients.find(c=>String(c.pin)===String(pin));
+    if (client) {
+      isTrainer=false;
+      localStorage.setItem('cbc_mode','client');
+      localStorage.setItem('cbc_pin',pin);
+      localStorage.setItem('cbc_client_id',String(client.id));
+      await afterLogin(); return;
+    }
+
+    err.style.display='block';
+    document.getElementById('pin-input').value='';
+    setTimeout(()=>err.style.display='none',3000);
+
+  } catch(e) {
+    console.error('Login error:',e);
+    showToast('Error. Intenta de nuevo.');
   }
 
   btn.textContent='ENTRAR'; btn.disabled=false;
-  err.style.display='block';
-  document.getElementById('pin-input').value='';
-  setTimeout(()=>err.style.display='none',3000);
 }
 
 async function afterLogin() {
