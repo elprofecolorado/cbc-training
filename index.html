@@ -470,16 +470,58 @@ function getWeekRange(week) {
 
 function sortByDay(arr) { return [...arr].sort((a,b)=>DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day)); }
 
-async function dbInsert(t,r) { const {error}=await sb.from(t).insert([r]); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
-async function dbUpdate(t,r) { const {error}=await sb.from(t).update(r).eq('id',r.id); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
-async function dbDelete(t,id) { const {error}=await sb.from(t).delete().eq('id',id); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
+async function dbInsert(t,r) {
+  const ok = await xhrPost(SB_URL+'/'+t, r, 'POST');
+  if(!ok){showToast('✗ Error guardando');return false;} return true;
+}
+async function dbUpdate(t,r) {
+  const ok = await xhrPost(SB_URL+'/'+t+'?id=eq.'+r.id, r, 'PATCH');
+  if(!ok){showToast('✗ Error actualizando');return false;} return true;
+}
+async function dbDelete(t,id) {
+  const ok = await xhrPost(SB_URL+'/'+t+'?id=eq.'+id, null, 'DELETE');
+  if(!ok){showToast('✗ Error eliminando');return false;} return true;
+}
 
+
+function xhrGet(url) {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('apikey', SB_KEY);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + SB_KEY);
+    xhr.timeout = 12000;
+    xhr.onload = () => {
+      try { resolve(JSON.parse(xhr.responseText)); }
+      catch(e) { resolve([]); }
+    };
+    xhr.onerror = () => resolve([]);
+    xhr.ontimeout = () => resolve([]);
+    xhr.send();
+  });
+}
+
+function xhrPost(url, body, method) {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method||'POST', url, true);
+    xhr.setRequestHeader('apikey', SB_KEY);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + SB_KEY);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('Prefer', 'return=minimal');
+    xhr.timeout = 12000;
+    xhr.onload = () => resolve(xhr.status < 300);
+    xhr.onerror = () => resolve(false);
+    xhr.ontimeout = () => resolve(false);
+    xhr.send(body ? JSON.stringify(body) : null);
+  });
+}
 
 async function sbGet(table, opts={}) {
-  let q = sb.from(table).select(opts.select||'*');
-  if (opts.order) q = q.order(opts.order, {ascending:false});
-  const race = Promise.race([q, new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),10000))]);
-  try { const res = await race; return res.data||[]; } catch(e) { console.error(table,e); return []; }
+  let url = SB_URL + '/' + table + '?select=' + (opts.select||'*');
+  if (opts.order) url += '&order=id.desc';
+  try { const d = await xhrGet(url); return Array.isArray(d) ? d : []; }
+  catch(e) { console.error(table,e); return []; }
 }
 
 async function loadAllData() {
@@ -534,11 +576,9 @@ async function doLogin() {
 
   if (!allClients.length) {
     try {
-      const sdkPromise = sb.from('training_clients').select('id,name,pin,goal,phone,photo');
-      const timeout = new Promise((_,rej) => setTimeout(()=>rej(new Error('timeout')), 8000));
-      const {data, error} = await Promise.race([sdkPromise, timeout]);
-      if (!error && data && data.length) allClients = data;
-    } catch(e) { console.error('SDK fetch error:',e); }
+      const data = await xhrGet(SB_URL+'/training_clients?select=id,name,pin,goal,phone,photo');
+      if (data && data.length) allClients = data;
+    } catch(e) { console.error('XHR fetch error:',e); }
   }
 
   if (!allClients.length) {
@@ -706,8 +746,8 @@ async function deleteClient(id) {
   const c=clients.find(c=>c.id===id);
   if(!confirm(`¿Eliminar a ${c?.name}?`)) return;
   await dbDelete('training_clients',id);
-  await sb.from('training_routines').delete().eq('clientId',id);
-  await sb.from('training_progress').delete().eq('clientId',id);
+  await xhrPost(SB_URL+'/training_routines?clientId=eq.'+id, null, 'DELETE');
+  await xhrPost(SB_URL+'/training_progress?clientId=eq.'+id, null, 'DELETE');
   clients=clients.filter(c=>c.id!==id);
   routines=routines.filter(r=>String(r.clientId)!==String(id));
   progress=progress.filter(p=>String(p.clientId)!==String(id));
@@ -871,11 +911,11 @@ async function toggleDone(key,index,routineId,clientId){
   else{arr.splice(i,1);}
 
   const todayStr=new Date().toISOString().split('T')[0];
-  const {data:existing}=await sb.from('training_completions').select('id').eq('clientId',clientId).eq('routineId',routineId).eq('date',todayStr).maybeSingle();
-  if(existing){
-    await sb.from('training_completions').update({exercises:completions[key]}).eq('id',existing.id);
+  const exData = await xhrGet(SB_URL+'/training_completions?select=id&clientId=eq.'+clientId+'&routineId=eq.'+routineId+'&date=eq.'+todayStr+'&limit=1');
+  if(exData && exData.length){
+    await xhrPost(SB_URL+'/training_completions?id=eq.'+exData[0].id, {exercises:completions[key]}, 'PATCH');
   } else {
-    await sb.from('training_completions').insert([{id:Date.now(),clientId,routineId,date:todayStr,exercises:completions[key]}]);
+    await xhrPost(SB_URL+'/training_completions', {id:Date.now(),clientId,routineId,date:todayStr,exercises:completions[key]}, 'POST');
   }
 
   const client=clients.find(c=>c.id===clientId);
@@ -1436,13 +1476,12 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('login-screen').style.display='flex';
 
-// Pre-load clients using Supabase SDK
+// Pre-load clients using XHR
 (async () => {
   const status = document.getElementById('login-status');
   if (status) status.textContent = 'Conectando...';
   try {
-    const {data, error} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
-    if (error) throw error;
+    const data = await xhrGet(SB_URL+'/training_clients?select=id,name,pin,goal,phone,photo');
     if (data && data.length) {
       clients = data;
       localStorage.setItem('cbc_cached_clients', JSON.stringify(
@@ -1450,7 +1489,7 @@ document.getElementById('login-screen').style.display='flex';
       ));
       if (status) status.textContent = '✓ Listo';
       setTimeout(()=>{ if(status) status.textContent=''; }, 2000);
-    }
+    } else { throw new Error('no data'); }
   } catch(e) {
     console.error('Preload error:', e);
     const cached = localStorage.getItem('cbc_cached_clients');
