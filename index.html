@@ -475,28 +475,33 @@ async function dbUpdate(t,r) { const {error}=await sb.from(t).update(r).eq('id',
 async function dbDelete(t,id) { const {error}=await sb.from(t).delete().eq('id',id); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
 
 
+async function sbGet(table, opts={}) {
+  let q = sb.from(table).select(opts.select||'*');
+  if (opts.order) q = q.order(opts.order, {ascending:false});
+  const race = Promise.race([q, new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),10000))]);
+  try { const res = await race; return res.data||[]; } catch(e) { console.error(table,e); return []; }
+}
+
 async function loadAllData() {
-  try {
-    const [cr,rr,pr,compr,mr,rr2,libr,tmplr,tmplrr] = await Promise.all([
-      sb.from('training_clients').select('*'),
-      sb.from('training_routines').select('*'),
-      sb.from('training_progress').select('*'),
-      sb.from('training_completions').select('*'),
-      sb.from('training_messages').select('*').order('id',{ascending:false}),
-      sb.from('training_ratings').select('*'),
-      sb.from('training_exercises').select('*'),
-      sb.from('training_templates').select('*'),
-      sb.from('training_template_routines').select('*'),
-    ]);
-    clients=cr.data||[]; routines=rr.data||[]; progress=pr.data||[];
-    messages=mr.data||[]; ratings=rr2.data||[]; exerciseLibrary=libr.data||[];
-    templates=tmplr.data||[]; templateRoutines=tmplrr.data||[];
-    completions={};
-    (compr.data||[]).forEach(row=>{
-      const key=`${row.clientId}_${row.routineId}_${row.date}`;
-      completions[key]=row.exercises||[];
-    });
-  } catch(e) { showToast('✗ Error de conexión'); console.error('loadAllData:',e); }
+  const [cr,rr,pr,compr,mr,rr2,libr,tmplr,tmplrr] = await Promise.all([
+    sbGet('training_clients'),
+    sbGet('training_routines'),
+    sbGet('training_progress'),
+    sbGet('training_completions'),
+    sbGet('training_messages',{order:'id'}),
+    sbGet('training_ratings'),
+    sbGet('training_exercises'),
+    sbGet('training_templates'),
+    sbGet('training_template_routines'),
+  ]);
+  clients=cr; routines=rr; progress=pr;
+  messages=mr; ratings=rr2; exerciseLibrary=libr;
+  templates=tmplr; templateRoutines=tmplrr;
+  completions={};
+  compr.forEach(row=>{
+    const key=`${row.clientId}_${row.routineId}_${row.date}`;
+    completions[key]=row.exercises||[];
+  });
 }
 
 // ─── LOGIN ───
@@ -529,7 +534,9 @@ async function doLogin() {
 
   if (!allClients.length) {
     try {
-      const {data, error} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
+      const sdkPromise = sb.from('training_clients').select('id,name,pin,goal,phone,photo');
+      const timeout = new Promise((_,rej) => setTimeout(()=>rej(new Error('timeout')), 8000));
+      const {data, error} = await Promise.race([sdkPromise, timeout]);
       if (!error && data && data.length) allClients = data;
     } catch(e) { console.error('SDK fetch error:',e); }
   }
