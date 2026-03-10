@@ -125,6 +125,47 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .trainer-only{display:none;}
 body.trainer-mode .trainer-only{display:block;}
 body.trainer-mode .client-only{display:none;}
+
+/* ═══ RETO 21 DÍAS ═══ */
+.reto-hero{background:linear-gradient(135deg,#1a0a00,#2d1500);border:1px solid rgba(201,149,42,0.4);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;}
+.reto-hero::before{content:'🔥';position:absolute;font-size:80px;opacity:0.06;top:-10px;right:-10px;}
+.reto-day-big{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--gold);line-height:1;}
+.reto-day-label{font-size:11px;letter-spacing:3px;color:var(--gray2);text-transform:uppercase;margin-bottom:8px;}
+.reto-progress-bar{background:#1a1a1a;border-radius:20px;height:10px;margin:12px 0 6px;overflow:hidden;}
+.reto-progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--gold),#ff6b00);transition:width 0.5s ease;}
+.reto-progress-text{font-size:11px;color:var(--gray2);}
+.reto-streak{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.3);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;color:#ff6b00;margin-top:8px;}
+.reto-badges{display:flex;gap:8px;justify-content:center;margin:12px 0;}
+.reto-badge{width:54px;height:54px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px;border:2px solid #333;}
+.reto-badge.earned{border-color:var(--gold);background:rgba(201,149,42,0.2);}
+.reto-badge.locked{opacity:0.3;filter:grayscale(1);}
+.reto-day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
+.reto-day-dot{aspect-ratio:1;border-radius:6px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--gray);font-weight:700;}
+.reto-day-dot.done{background:linear-gradient(135deg,var(--gold),#ff6b00);color:#000;}
+.reto-day-dot.today{border:2px solid var(--gold);color:var(--white);}
+.reto-complete-btn{width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#0a0a0a;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;border:none;cursor:pointer;margin-top:12px;}
+.reto-complete-btn:disabled{opacity:0.4;}
+.reto-ex-card{background:var(--dark2);border:1px solid #2a2a2a;border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.reto-ex-card.done{opacity:0.6;}
+.reto-ex-header{padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.reto-ex-check{width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;flex-shrink:0;transition:all 0.2s;}
+.reto-ex-check.done{background:var(--success);border-color:var(--success);}
+.reto-msg-card{background:linear-gradient(135deg,#0d1a0d,#1a2d1a);border:1px solid rgba(46,204,113,0.3);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.reto-msg-text{font-size:13px;color:#a8e6c0;line-height:1.6;font-style:italic;}
+.ranking-card{background:var(--dark2);border:1px solid #2a2a2a;border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.ranking-pos{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gray);width:32px;text-align:center;}
+.ranking-pos.gold{color:#FFD700;}.ranking-pos.silver{color:#C0C0C0;}.ranking-pos.bronze{color:#CD7F32;}
+.ranking-me{border-color:var(--gold)!important;background:rgba(201,149,42,0.08)!important;}
+.reto-participant-card{background:var(--dark2);border:1px solid #252525;border-radius:12px;padding:14px;margin-bottom:8px;}
+.reto-p-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.reto-p-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff6b00,#c9952a);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#000;flex-shrink:0;}
+.reto-p-stats{display:flex;gap:8px;}
+.reto-p-stat{background:#1a1a1a;border-radius:8px;padding:6px 10px;flex:1;text-align:center;}
+.reto-p-stat-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);}
+.reto-p-stat-label{font-size:9px;color:var(--gray);letter-spacing:1px;}
+.reto-routine-card{background:var(--dark2);border:1px solid #2a2a2a;border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.reto-tab-btn{flex:1;padding:8px;border:1px solid #333;background:transparent;color:var(--gray);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.reto-tab-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
 </style>
 </head>
 <body>
@@ -272,14 +313,73 @@ body.trainer-mode .client-only{display:none;}
     </div>
   </div>
 
+
+<!-- ═══ RETO PAGES (inside main-scroll) ═══ -->
+<div class="page" id="page-reto">
+  <div class="reto-hero" id="reto-hero">
+    <div class="reto-day-label">DÍA DEL RETO</div>
+    <div class="reto-day-big" id="reto-day-num">–</div>
+    <div style="font-size:12px;color:var(--gray2);">DE 21 🔥</div>
+    <div class="reto-progress-bar"><div class="reto-progress-fill" id="reto-prog-fill" style="width:0%"></div></div>
+    <div class="reto-progress-text" id="reto-prog-text"></div>
+    <div class="reto-streak" id="reto-streak">🔥 0 días seguidos</div>
+  </div>
+  <div id="reto-msg-container"></div>
+  <div style="margin-bottom:12px;">
+    <div class="section-title">🏆 Insignias</div>
+    <div class="reto-badges" id="reto-badges"></div>
+  </div>
+  <div style="margin-bottom:16px;">
+    <div class="section-title">📅 Progreso</div>
+    <div class="reto-day-grid" id="reto-day-grid"></div>
+  </div>
+  <div>
+    <div class="section-title">💪 Rutina de Hoy</div>
+    <div id="reto-ejercicios-list"></div>
+    <button class="reto-complete-btn" id="reto-complete-btn" onclick="retoCompleteDay()" disabled>MARCAR DÍA COMPLETO</button>
+  </div>
+</div>
+
+<div class="page" id="page-reto-ranking">
+  <div class="section-title">🏆 Ranking</div>
+  <div style="background:rgba(201,149,42,0.08);border:1px solid rgba(201,149,42,0.2);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--gray2);text-align:center;">
+    Los participantes aparecen con su PIN para mantener privacidad
+  </div>
+  <div id="reto-ranking-list"></div>
+</div>
+
+<div class="page" id="page-reto-admin">
+  <div style="display:flex;gap:6px;margin-bottom:16px;">
+    <button class="reto-tab-btn active" id="rtab-participantes" onclick="retoAdminTab('participantes')">👥 Participantes</button>
+    <button class="reto-tab-btn" id="rtab-rutinas" onclick="retoAdminTab('rutinas')">📋 Rutinas</button>
+    <button class="reto-tab-btn" id="rtab-mensaje" onclick="retoAdminTab('mensaje')">💬 Mensajes</button>
+  </div>
+  <div id="reto-admin-participantes">
+    <button onclick="openRetoAddClient()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border:none;cursor:pointer;margin-bottom:14px;">+ AGREGAR PARTICIPANTE</button>
+    <div id="reto-participants-list"></div>
+  </div>
+  <div id="reto-admin-rutinas" style="display:none;">
+    <div style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Configura las rutinas para los 21 días del reto.</div>
+    <div id="reto-routines-list"></div>
+  </div>
+  <div id="reto-admin-mensaje" style="display:none;">
+    <div style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Agrega un mensaje motivacional para cada día.</div>
+    <div id="reto-messages-admin-list"></div>
+  </div>
+</div>
+
 </div>
 
 <!-- NAV -->
-<div class="bottom-nav">
+<div class="bottom-nav" id="main-nav">
   <button class="nav-btn active" onclick="showPage('rutinas',this)"><span class="nav-icon">🥊</span><span class="nav-label">Rutinas</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
-  <button class="nav-btn" onclick="showPage('progreso',this)"><span class="nav-icon">📈</span><span class="nav-label">Progreso</span></button>
+  <button class="nav-btn trainer-only" onclick="showPage('reto-admin',this)"><span class="nav-icon">🔥</span><span class="nav-label">Reto 21</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
+</div>
+<div class="bottom-nav" id="reto-nav" style="display:none;">
+  <button class="nav-btn active" onclick="showPage('reto',this)"><span class="nav-icon">🔥</span><span class="nav-label">Mi Reto</span></button>
+  <button class="nav-btn" onclick="showPage('reto-ranking',this)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
 </div>
 
 <!-- RATING POPUP -->
@@ -456,6 +556,7 @@ const DAY_NAMES_JS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes'
 
 let clients=[], routines=[], progress=[], completions={}, messages=[], ratings=[];
 let exerciseLibrary=[], templates=[], templateRoutines=[];
+let isReto=false, retoClient=null, retoClients=[], retoRoutines=[], retoCompletions=[], retoMessages=[];
 let isTrainer=true, currentClientId=null, currentDay=null, currentWeek=getWeekNum(), exRowCount=0;
 let currentRating={routineId:null,clientId:null,stars:0};
 
@@ -608,6 +709,25 @@ async function doLogin() {
     return;
   }
 
+  // Check reto clients
+  try {
+    const rurl = SB_URL+'/reto_clients?select=id,name,pin,phone,start_date&apikey='+SB_KEY;
+    const rres = await fetch(rurl);
+    if (rres.ok) {
+      const rdata = await rres.json();
+      if (Array.isArray(rdata)) {
+        const rmatch = rdata.find(c=>String(c.pin)===String(pin));
+        if (rmatch) {
+          isTrainer=false; isReto=true; retoClient=rmatch;
+          localStorage.setItem('cbc_mode','reto');
+          localStorage.setItem('cbc_reto_id', String(rmatch.id));
+          await afterLoginReto();
+          return;
+        }
+      }
+    }
+  } catch(e) {}
+
   // PIN not found
   btn.textContent='ENTRAR'; btn.disabled=false;
   err.style.display='block';
@@ -617,6 +737,7 @@ async function doLogin() {
 
 async function afterLogin() {
   showToast('⏳ Cargando...');
+  const rn=document.getElementById('reto-nav'); if(rn) rn.style.display='none';
   try {
     await loadAllData();
     if (clients.length) {
@@ -662,8 +783,11 @@ function applyMode() {
 function showPage(page, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
+  const _pg = document.getElementById('page-'+page);
+  if (_pg) { _pg.classList.add('active'); _pg.style.display='block'; }
   if(btn) btn.classList.add('active');
+  if (page==='reto-admin') setTimeout(renderRetoAdmin, 50);
+  if (page==='reto-ranking') setTimeout(renderRetoRanking, 50);
   document.getElementById('main-scroll').scrollTop=0;
   if(page==='ajustes'){renderSavedRoutines();renderMessagesList();renderLibrary();renderTemplates();}
   if(page==='progreso'){
@@ -1506,6 +1630,340 @@ document.getElementById('login-screen').style.display='flex';
     if (cached) { try { clients = JSON.parse(cached); } catch(e2){} }
   }
 })();
+
+// ══════════════════════════════════════
+// RETO 21 DÍAS
+// ══════════════════════════════════════
+async function afterLoginReto() {
+  showToast('⏳ Cargando reto...');
+  try {
+    const rid = retoClient.id;
+    const [r1,r2,r3] = await Promise.all([
+      fetch(SB_URL+'/reto_routines?select=*&order=day_num.asc&apikey='+SB_KEY),
+      fetch(SB_URL+'/reto_completions?select=*&reto_client_id=eq.'+rid+'&apikey='+SB_KEY),
+      fetch(SB_URL+'/reto_messages?select=*&apikey='+SB_KEY)
+    ]);
+    retoRoutines = r1.ok?(await r1.json()):[];
+    retoCompletions = r2.ok?(await r2.json()):[];
+    retoMessages = r3.ok?(await r3.json()):[];
+    if(!Array.isArray(retoRoutines)) retoRoutines=[];
+    if(!Array.isArray(retoCompletions)) retoCompletions=[];
+    if(!Array.isArray(retoMessages)) retoMessages=[];
+  } catch(e){}
+  document.getElementById('login-screen').style.display='none';
+  const mn=document.getElementById('main-nav'); if(mn) mn.style.display='none';
+  const rn=document.getElementById('reto-nav'); if(rn) rn.style.display='flex';
+  document.querySelector('.mode-badge').textContent='RETO 21';
+  showPage('reto', document.querySelector('#reto-nav .nav-btn'));
+  renderRetoClient();
+  showToast('🔥 Bienvenido '+retoClient.name.split(' ')[0]);
+}
+
+function getRetoDay() {
+  if (!retoClient||!retoClient.start_date) return 1;
+  const s=new Date(retoClient.start_date); s.setHours(0,0,0,0);
+  const t=new Date(); t.setHours(0,0,0,0);
+  return Math.max(1,Math.min(21,Math.floor((t-s)/86400000)+1));
+}
+function getRetoStreak() {
+  const today=new Date(); today.setHours(0,0,0,0);
+  let streak=0;
+  for(let i=0;i<21;i++){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    if(retoCompletions.find(c=>c.date===ds)) streak++; else if(i>0) break;
+  }
+  return streak;
+}
+function renderRetoClient() {
+  const day=getRetoDay(), streak=getRetoStreak();
+  const pct=Math.round((retoCompletions.length/21)*100);
+  document.getElementById('reto-day-num').textContent=day;
+  document.getElementById('reto-prog-fill').style.width=pct+'%';
+  document.getElementById('reto-prog-text').textContent=retoCompletions.length+' de 21 días completados';
+  document.getElementById('reto-streak').innerHTML='🔥 '+streak+' día'+(streak!==1?'s':'')+' seguido'+(streak!==1?'s':'');
+  const earned=[retoCompletions.length>=7,retoCompletions.length>=14,retoCompletions.length>=21];
+  document.getElementById('reto-badges').innerHTML=['🥊','💪','🏆'].map((e,i)=>
+    `<div class="reto-badge ${earned[i]?'earned':'locked'}">${e}</div>`).join('');
+  const grid=document.getElementById('reto-day-grid'); grid.innerHTML='';
+  for(let i=1;i<=21;i++){
+    const done=retoCompletions.find(c=>c.day_num===i);
+    grid.innerHTML+=`<div class="reto-day-dot ${done?'done':''} ${i===day?'today':''}">${i}</div>`;
+  }
+  const msg=retoMessages.find(m=>m.day_num===day);
+  document.getElementById('reto-msg-container').innerHTML=msg?`<div class="reto-msg-card"><div class="reto-msg-text">"${msg.message}"</div><div style="font-size:10px;color:var(--gray);margin-top:6px;">— Mensaje del día ${day}</div></div>`:'';
+  const routine=retoRoutines.find(r=>r.day_num===day);
+  const exList=document.getElementById('reto-ejercicios-list');
+  const todayStr=new Date().toISOString().split('T')[0];
+  const alreadyDone=retoCompletions.find(c=>c.day_num===day||c.date===todayStr);
+  if(!routine){
+    exList.innerHTML='<div style="text-align:center;color:var(--gray);padding:30px;font-size:13px;">⏳ Rutina del día '+day+' próximamente</div>';
+    document.getElementById('reto-complete-btn').disabled=true; return;
+  }
+  let exs=[];
+  try{ exs=Array.isArray(routine.exercises)?routine.exercises:JSON.parse(routine.exercises||'[]'); }catch(e){}
+  exList.innerHTML=`<div style="background:rgba(201,149,42,0.1);border:1px solid rgba(201,149,42,0.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;"><div style="font-size:11px;color:var(--gray2);letter-spacing:1px;">${routine.focus||'ENTRENAMIENTO'}</div>${routine.description?'<div style="font-size:12px;color:var(--gray);margin-top:2px;">'+routine.description+'</div>':''}</div>`+
+    exs.map((ex,i)=>`<div class="reto-ex-card ${alreadyDone?'done':''}" id="rex-${i}"><div class="reto-ex-header"><div class="reto-ex-check ${alreadyDone?'done':''}" onclick="toggleRetoEx(${i})" id="rck-${i}">${alreadyDone?'✓':''}</div><div style="flex:1"><div class="reto-ex-name">${ex.name||ex}</div><div class="reto-ex-sets" style="font-size:11px;color:var(--gray2)">${ex.sets||''} ${ex.notes||''}</div></div>${ex.video?`<a href="${ex.video}" target="_blank" style="font-size:20px;text-decoration:none">▶️</a>`:''}</div></div>`).join('');
+  const btn=document.getElementById('reto-complete-btn');
+  if(alreadyDone){btn.textContent='✅ DÍA COMPLETADO';btn.disabled=true;btn.style.background='var(--success)';}
+  else{btn.textContent='MARCAR DÍA COMPLETO';btn.disabled=false;btn.style.background='';window._rexDone={};}
+}
+function toggleRetoEx(i){
+  if(!window._rexDone) window._rexDone={};
+  window._rexDone[i]=!window._rexDone[i];
+  const ck=document.getElementById('rck-'+i), cd=document.getElementById('rex-'+i);
+  if(window._rexDone[i]){ck.classList.add('done');ck.textContent='✓';cd.classList.add('done');}
+  else{ck.classList.remove('done');ck.textContent='';cd.classList.remove('done');}
+}
+async function retoCompleteDay(){
+  const day=getRetoDay(), todayStr=new Date().toISOString().split('T')[0];
+  const btn=document.getElementById('reto-complete-btn');
+  btn.disabled=true; btn.textContent='GUARDANDO...';
+  const payload={id:Date.now(),reto_client_id:retoClient.id,day_num:day,date:todayStr};
+  try{
+    const res=await fetch(SB_URL+'/reto_completions?apikey='+SB_KEY,{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    if(res.ok||res.status===409){
+      retoCompletions.push(payload);
+      renderRetoClient();
+      showToast('🔥 ¡Día '+day+' completado!');
+      if(retoCompletions.length===7) setTimeout(()=>showToast('🥊 ¡Insignia Semana 1!'),1500);
+      if(retoCompletions.length===14) setTimeout(()=>showToast('💪 ¡Insignia Semana 2!'),1500);
+      if(retoCompletions.length===21) setTimeout(()=>showToast('🏆 ¡RETO COMPLETADO!'),1500);
+    }
+  }catch(e){btn.disabled=false;btn.textContent='MARCAR DÍA COMPLETO';showToast('Error al guardar');}
+}
+async function renderRetoRanking(){
+  const list=document.getElementById('reto-ranking-list');
+  list.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray);">Cargando...</div>';
+  try{
+    const [cr,compr]=await Promise.all([
+      fetch(SB_URL+'/reto_clients?select=id,pin,start_date&apikey='+SB_KEY),
+      fetch(SB_URL+'/reto_completions?select=reto_client_id,day_num,date&apikey='+SB_KEY)
+    ]);
+    const ac=cr.ok?await cr.json():[], ac2=compr.ok?await compr.json():[];
+    const ranked=ac.map(c=>{
+      const mc=ac2.filter(x=>x.reto_client_id===c.id);
+      const sorted=mc.map(x=>x.date).sort().reverse();
+      const today=new Date();today.setHours(0,0,0,0);
+      let streak=0;
+      for(let i=0;i<sorted.length;i++){const d=new Date(sorted[i]);d.setHours(0,0,0,0);if(Math.floor((today-d)/86400000)===i)streak++;else break;}
+      return{...c,days:mc.length,streak};
+    }).sort((a,b)=>b.days-a.days||b.streak-a.streak);
+    const medals=['🥇','🥈','🥉'];
+    list.innerHTML=ranked.map((p,i)=>{
+      const isMe=retoClient&&p.id===retoClient.id;
+      const pc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+      return `<div class="ranking-card ${isMe?'ranking-me':''}"><div class="ranking-pos ${pc}">${medals[i]||i+1}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;">${p.pin}${isMe?' <span style="color:var(--gold);font-size:10px;">← Tú</span>':''}</div><div style="font-size:11px;color:var(--gray2)">${p.days} días completados</div></div><div style="font-size:13px">🔥${p.streak}</div></div>`;
+    }).join('')||'<div style="text-align:center;padding:30px;color:var(--gray)">Aún no hay participantes</div>';
+  }catch(e){list.innerHTML='<div style="color:var(--danger);text-align:center;padding:20px;">Error al cargar</div>';}
+}
+async function renderRetoAdmin(){
+  try{
+    const [r1,r2,r3,r4]=await Promise.all([
+      fetch(SB_URL+'/reto_clients?select=*&apikey='+SB_KEY),
+      fetch(SB_URL+'/reto_routines?select=*&order=day_num.asc&apikey='+SB_KEY),
+      fetch(SB_URL+'/reto_completions?select=*&apikey='+SB_KEY),
+      fetch(SB_URL+'/reto_messages?select=*&apikey='+SB_KEY)
+    ]);
+    retoClients=r1.ok?await r1.json():[];
+    retoRoutines=r2.ok?await r2.json():[];
+    retoCompletions=r3.ok?await r3.json():[];
+    retoMessages=r4.ok?await r4.json():[];
+    if(!Array.isArray(retoClients))retoClients=[];
+    if(!Array.isArray(retoRoutines))retoRoutines=[];
+    if(!Array.isArray(retoCompletions))retoCompletions=[];
+    if(!Array.isArray(retoMessages))retoMessages=[];
+  }catch(e){}
+  renderRetoParticipants();
+}
+function retoAdminTab(tab){
+  ['participantes','rutinas','mensaje'].forEach(t=>{
+    document.getElementById('reto-admin-'+t).style.display=t===tab?'block':'none';
+    document.getElementById('rtab-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='rutinas') renderRetoRoutinesList();
+  if(tab==='mensaje') renderRetoMessagesList();
+  if(tab==='participantes') renderRetoParticipants();
+}
+function renderRetoParticipants(){
+  const list=document.getElementById('reto-participants-list');
+  if(!retoClients.length){list.innerHTML='<div style="text-align:center;color:var(--gray);padding:20px;font-size:13px;">Sin participantes. Agrega el primero.</div>';return;}
+  const today=new Date().toISOString().split('T')[0];
+  list.innerHTML=retoClients.map(c=>{
+    const mc=retoCompletions.filter(x=>x.reto_client_id===c.id);
+    const doneToday=mc.find(x=>x.date===today);
+    const s=c.start_date?new Date(c.start_date):null;
+    const dn=s?Math.max(1,Math.min(21,Math.floor((new Date()-s)/86400000)+1)):'?';
+    return `<div class="reto-participant-card"><div class="reto-p-header"><div class="reto-p-avatar">${c.name[0]}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;">${c.name}</div><div style="font-size:11px;color:var(--gray2)">PIN: ${c.pin}${c.phone?' · '+c.phone:''}</div></div><button onclick="editRetoClient(${c.id})" style="background:#222;border:1px solid #333;color:var(--gold);padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px;">✏️</button><button onclick="deleteRetoClient(${c.id})" style="background:#2a0a0a;border:1px solid #5a1a1a;color:var(--danger);padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;">🗑</button></div><div class="reto-p-stats"><div class="reto-p-stat"><div class="reto-p-stat-val">${dn}</div><div class="reto-p-stat-label">DÍA</div></div><div class="reto-p-stat"><div class="reto-p-stat-val">${mc.length}</div><div class="reto-p-stat-label">HECHOS</div></div><div class="reto-p-stat"><div class="reto-p-stat-val" style="color:${doneToday?'var(--success)':'var(--danger)'}">${doneToday?'✓':'✗'}</div><div class="reto-p-stat-label">HOY</div></div></div></div>`;
+  }).join('');
+}
+function renderRetoRoutinesList(){
+  const list=document.getElementById('reto-routines-list'); list.innerHTML='';
+  for(let i=1;i<=21;i++){
+    const r=retoRoutines.find(x=>x.day_num===i);
+    let exs=[];try{exs=r?(Array.isArray(r.exercises)?r.exercises:JSON.parse(r.exercises||'[]')):[]}catch(e){}
+    list.innerHTML+=`<div class="reto-routine-card"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1">${i}</div><div style="font-size:9px;color:var(--gray);letter-spacing:1px">DÍA</div></div><div style="flex:1"><div style="font-weight:700;font-size:13px">${r?(r.focus||'Sin título'):'Sin rutina'}</div><div style="font-size:11px;color:var(--gray2)">${r?exs.length+' ejercicio'+(exs.length!==1?'s':''):'Toca para agregar'}</div></div><button onclick="openRetoRoutineEdit(${i})" style="background:${r?'rgba(201,149,42,0.15)':'#222'};border:1px solid ${r?'var(--gold)':'#333'};color:${r?'var(--gold)':'var(--gray)'};padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">${r?'✏️ EDITAR':'+ CREAR'}</button></div>`;
+  }
+}
+function renderRetoMessagesList(){
+  const list=document.getElementById('reto-messages-admin-list'); list.innerHTML='';
+  for(let i=1;i<=21;i++){
+    const m=retoMessages.find(x=>x.day_num===i);
+    list.innerHTML+=`<div style="background:var(--dark2);border:1px solid #2a2a2a;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);width:30px">D${i}</div><div style="flex:1;font-size:12px;color:${m?'var(--white)':'var(--gray)'};font-style:${m?'normal':'italic'}">${m?m.message:'Sin mensaje'}</div><button onclick="openRetoMsgEdit(${i})" style="background:#222;border:1px solid #333;color:var(--gold);padding:6px 10px;border-radius:6px;font-size:11px;cursor:pointer">${m?'✏️':'+'}</button></div>`;
+  }
+}
+function openRetoAddClient(){
+  document.getElementById('reto-client-edit-id').value='';
+  document.getElementById('reto-client-name').value='';
+  document.getElementById('reto-client-pin').value='';
+  document.getElementById('reto-client-phone').value='';
+  document.getElementById('reto-client-start').value=new Date().toISOString().split('T')[0];
+  document.getElementById('reto-client-modal-title').textContent='AGREGAR PARTICIPANTE';
+  openModal('modal-reto-client');
+}
+function editRetoClient(id){
+  const c=retoClients.find(x=>x.id===id); if(!c) return;
+  document.getElementById('reto-client-edit-id').value=id;
+  document.getElementById('reto-client-name').value=c.name||'';
+  document.getElementById('reto-client-pin').value=c.pin||'';
+  document.getElementById('reto-client-phone').value=c.phone||'';
+  document.getElementById('reto-client-start').value=c.start_date||'';
+  document.getElementById('reto-client-modal-title').textContent='EDITAR PARTICIPANTE';
+  openModal('modal-reto-client');
+}
+async function saveRetoClient(){
+  const eid=document.getElementById('reto-client-edit-id').value;
+  const name=document.getElementById('reto-client-name').value.trim();
+  const pin=document.getElementById('reto-client-pin').value.trim();
+  const phone=document.getElementById('reto-client-phone').value.trim();
+  const start=document.getElementById('reto-client-start').value;
+  if(!name||!pin){showToast('Nombre y PIN requeridos');return;}
+  const payload={name,pin,phone,start_date:start};
+  let ok;
+  if(eid){
+    const r=await fetch(SB_URL+'/reto_clients?id=eq.'+eid+'&apikey='+SB_KEY,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    ok=r.ok; if(ok){const i=retoClients.findIndex(x=>x.id==eid);if(i>=0)retoClients[i]={...retoClients[i],...payload};}
+  }else{
+    payload.id=Date.now();
+    const r=await fetch(SB_URL+'/reto_clients?apikey='+SB_KEY,{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    ok=r.ok; if(ok)retoClients.push(payload);
+  }
+  if(ok){closeModal('modal-reto-client');renderRetoParticipants();showToast(eid?'✓ Actualizado':'✓ Participante agregado');}
+  else showToast('Error al guardar');
+}
+async function deleteRetoClient(id){
+  if(!confirm('¿Borrar participante?'))return;
+  const r=await fetch(SB_URL+'/reto_clients?id=eq.'+id+'&apikey='+SB_KEY,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+  if(r.ok){retoClients=retoClients.filter(x=>x.id!==id);renderRetoParticipants();showToast('✓ Eliminado');}
+}
+function openRetoRoutineEdit(day){
+  const r=retoRoutines.find(x=>x.day_num===day);
+  document.getElementById('reto-routine-edit-day').value=day;
+  document.getElementById('reto-routine-day-title').textContent=day;
+  document.getElementById('reto-routine-focus').value=r?r.focus||'':'';
+  document.getElementById('reto-routine-desc').value=r?r.description||'':'';
+  let exs=[]; try{exs=r?(Array.isArray(r.exercises)?r.exercises:JSON.parse(r.exercises||'[]')):[]}catch(e){}
+  const c=document.getElementById('reto-routine-exs'); c.innerHTML='';
+  exs.forEach(ex=>addRetoExRow(ex));
+  if(!exs.length)addRetoExRow();
+  openModal('modal-reto-routine');
+}
+function addRetoExRow(ex={}){
+  const c=document.getElementById('reto-routine-exs');
+  const d=document.createElement('div');
+  d.style.cssText='display:flex;gap:6px;margin-bottom:6px;align-items:center';
+  d.innerHTML=`<input class="form-input reto-ex-name-inp" style="flex:2" placeholder="Ejercicio" value="${ex.name||ex||''}"><input class="form-input reto-ex-sets-inp" style="flex:1" placeholder="Series" value="${ex.sets||''}"><input class="form-input reto-ex-video-inp" style="flex:1" placeholder="Video URL" value="${ex.video||''}"><button onclick="this.parentElement.remove()" style="background:#2a0a0a;border:1px solid #5a1a1a;color:var(--danger);padding:8px;border-radius:6px;cursor:pointer">✕</button>`;
+  c.appendChild(d);
+}
+async function saveRetoRoutine(){
+  const day=parseInt(document.getElementById('reto-routine-edit-day').value);
+  const focus=document.getElementById('reto-routine-focus').value.trim();
+  const desc=document.getElementById('reto-routine-desc').value.trim();
+  const rows=document.getElementById('reto-routine-exs').querySelectorAll('div');
+  const exs=[]; rows.forEach(r=>{const n=r.querySelector('.reto-ex-name-inp')?.value.trim();if(n)exs.push({name:n,sets:r.querySelector('.reto-ex-sets-inp')?.value.trim()||'',video:r.querySelector('.reto-ex-video-inp')?.value.trim()||''});});
+  const existing=retoRoutines.find(x=>x.day_num===day);
+  const payload={day_num:day,focus,description:desc,exercises:JSON.stringify(exs)};
+  let ok;
+  if(existing){
+    const r=await fetch(SB_URL+'/reto_routines?day_num=eq.'+day+'&apikey='+SB_KEY,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    ok=r.ok; if(ok){const i=retoRoutines.findIndex(x=>x.day_num===day);if(i>=0)retoRoutines[i]={...retoRoutines[i],...payload,exercises:exs};}
+  }else{
+    payload.id=Date.now();
+    const r=await fetch(SB_URL+'/reto_routines?apikey='+SB_KEY,{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    ok=r.ok; if(ok)retoRoutines.push({...payload,exercises:exs});
+  }
+  if(ok){closeModal('modal-reto-routine');renderRetoRoutinesList();showToast('✓ Rutina día '+day+' guardada');}
+  else showToast('Error al guardar');
+}
+function openRetoMsgEdit(day){
+  const m=retoMessages.find(x=>x.day_num===day);
+  document.getElementById('reto-msg-edit-day').value=day;
+  document.getElementById('reto-msg-day-title').textContent=day;
+  document.getElementById('reto-msg-text').value=m?m.message||'':'';
+  openModal('modal-reto-msg');
+}
+async function saveRetoMsg(){
+  const day=parseInt(document.getElementById('reto-msg-edit-day').value);
+  const message=document.getElementById('reto-msg-text').value.trim();
+  if(!message){showToast('Escribe un mensaje');return;}
+  const existing=retoMessages.find(x=>x.day_num===day);
+  const payload={day_num:day,message};
+  let ok;
+  if(existing){
+    const r=await fetch(SB_URL+'/reto_messages?day_num=eq.'+day+'&apikey='+SB_KEY,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    ok=r.ok; if(ok){const i=retoMessages.findIndex(x=>x.day_num===day);if(i>=0)retoMessages[i]={...retoMessages[i],...payload};}
+  }else{
+    payload.id=Date.now();
+    const r=await fetch(SB_URL+'/reto_messages?apikey='+SB_KEY,{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    ok=r.ok; if(ok)retoMessages.push(payload);
+  }
+  if(ok){closeModal('modal-reto-msg');renderRetoMessagesList();showToast('✓ Mensaje día '+day+' guardado');}
+  else showToast('Error al guardar');
+}
+
 </script>
+
+<!-- RETO MODALS -->
+<div class="modal-overlay" id="modal-reto-client">
+  <div class="modal-box">
+    <div class="modal-title" id="reto-client-modal-title">AGREGAR PARTICIPANTE</div>
+    <input type="hidden" id="reto-client-edit-id">
+    <div class="form-group"><label class="form-label">NOMBRE</label><input class="form-input" id="reto-client-name" placeholder="Nombre completo"></div>
+    <div class="form-group"><label class="form-label">PIN (4 dígitos)</label><input class="form-input" id="reto-client-pin" type="number" placeholder="ej: 5678"></div>
+    <div class="form-group"><label class="form-label">TELÉFONO (opcional)</label><input class="form-input" id="reto-client-phone" placeholder="+52..."></div>
+    <div class="form-group"><label class="form-label">FECHA INICIO</label><input class="form-input" id="reto-client-start" type="date"></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button onclick="closeModal('modal-reto-client')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
+      <button onclick="saveRetoClient()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-reto-routine">
+  <div class="modal-box" style="max-height:85vh;overflow-y:auto;">
+    <div class="modal-title">DÍA <span id="reto-routine-day-title"></span> — RUTINA</div>
+    <input type="hidden" id="reto-routine-edit-day">
+    <div class="form-group"><label class="form-label">ENFOQUE</label><input class="form-input" id="reto-routine-focus" placeholder="ej: Piernas y glúteos"></div>
+    <div class="form-group"><label class="form-label">DESCRIPCIÓN (opcional)</label><input class="form-input" id="reto-routine-desc" placeholder="ej: Circuito de 3 rondas"></div>
+    <div style="margin-bottom:8px;"><label class="form-label">EJERCICIOS</label></div>
+    <div id="reto-routine-exs"></div>
+    <button onclick="addRetoExRow()" style="width:100%;padding:10px;border-radius:8px;background:#222;border:1px solid #333;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;">+ EJERCICIO</button>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeModal('modal-reto-routine')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
+      <button onclick="saveRetoRoutine()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-reto-msg">
+  <div class="modal-box">
+    <div class="modal-title">MENSAJE DÍA <span id="reto-msg-day-title"></span></div>
+    <input type="hidden" id="reto-msg-edit-day">
+    <div class="form-group"><label class="form-label">MENSAJE MOTIVACIONAL</label><textarea class="form-input" id="reto-msg-text" rows="4" placeholder="ej: ¡Vas increíble! Ya llevas una semana..."></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="closeModal('modal-reto-msg')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
+      <button onclick="saveRetoMsg()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
