@@ -483,41 +483,41 @@ async function dbDelete(t,id) {
 }
 
 
-function xhrGet(url) {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.setRequestHeader('apikey', SB_KEY);
-    xhr.setRequestHeader('Authorization', 'Bearer ' + SB_KEY);
-    xhr.setRequestHeader('Accept', 'application/json');
-    xhr.timeout = 15000;
-    xhr.onload = () => {
-      console.log('[XHR]', xhr.status, url.split('?')[0].split('/').pop(), xhr.responseText.substring(0,200));
-      try {
-        const parsed = JSON.parse(xhr.responseText);
-        resolve(Array.isArray(parsed) ? parsed : []);
-      } catch(e) { resolve([]); }
-    };
-    xhr.onerror = (e) => { console.error('[XHR ERROR]', url, e); resolve(null); };
-    xhr.ontimeout = () => { console.error('[XHR TIMEOUT]', url); resolve(null); };
-    xhr.send();
-  });
+async function xhrGet(url) {
+  const sep = url.includes('?') ? '&' : '?';
+  const fullUrl = url + sep + 'apikey=' + SB_KEY;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 15000);
+    const res = await fetch(fullUrl, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    clearTimeout(timer);
+    console.log('[FETCH GET]', res.status, url.split('/').pop().split('?')[0]);
+    if (!res.ok) return null;
+    const parsed = await res.json();
+    return Array.isArray(parsed) ? parsed : [];
+  } catch(e) {
+    console.error('[FETCH FAIL]', e.message);
+    return null;
+  }
 }
 
-function xhrPost(url, body, method) {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(method||'POST', url, true);
-    xhr.setRequestHeader('apikey', SB_KEY);
-    xhr.setRequestHeader('Authorization', 'Bearer ' + SB_KEY);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('Prefer', 'return=minimal');
-    xhr.timeout = 12000;
-    xhr.onload = () => resolve(xhr.status < 300);
-    xhr.onerror = () => resolve(false);
-    xhr.ontimeout = () => resolve(false);
-    xhr.send(body ? JSON.stringify(body) : null);
-  });
+async function xhrPost(url, body, method) {
+  const sep = url.includes('?') ? '&' : '?';
+  const fullUrl = url + sep + 'apikey=' + SB_KEY;
+  try {
+    const res = await fetch(fullUrl, {
+      method: method || 'POST',
+      headers: { 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    return res.status < 300;
+  } catch(e) {
+    console.error('[FETCH POST FAIL]', e.message);
+    return false;
+  }
 }
 
 async function sbGet(table, opts={}) {
