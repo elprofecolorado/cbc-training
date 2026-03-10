@@ -138,6 +138,7 @@ body.trainer-mode .client-only{display:none;}
     <div style="font-size:11px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:8px;font-weight:600;">Tu PIN de acceso</div>
     <input id="pin-input" type="tel" inputmode="numeric" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:16px;color:#f0ede8;font-family:'Montserrat',sans-serif;font-size:28px;text-align:center;letter-spacing:8px;outline:none;margin-bottom:16px;" placeholder="••••" maxlength="6">
     <button onclick="doLogin()" style="width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#0a0a0a;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;border:none;cursor:pointer;text-transform:uppercase;" id="login-btn">ENTRAR</button>
+    <div id="login-status" style="text-align:center;color:#666;font-size:11px;margin-top:10px;letter-spacing:1px;"></div>
     <div id="login-error" style="text-align:center;color:#e74c3c;font-size:12px;margin-top:12px;display:none;">PIN incorrecto. Intenta de nuevo.</div>
   </div>
 </div>
@@ -1426,8 +1427,10 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('login-screen').style.display='flex';
 
-// Pre-load clients using direct fetch (more reliable than SDK)
+// Pre-load clients using direct fetch
 (async () => {
+  const status = document.getElementById('login-status');
+  if (status) status.textContent = 'Conectando...';
   try {
     const res = await fetch(
       'https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_clients?select=id,name,pin,goal,phone,photo',
@@ -1443,12 +1446,21 @@ document.getElementById('login-screen').style.display='flex';
         localStorage.setItem('cbc_cached_clients', JSON.stringify(
           data.map(c=>({id:c.id,name:c.name,pin:String(c.pin),goal:c.goal,phone:c.phone}))
         ));
+        if (status) status.textContent = '✓ Listo';
+        setTimeout(()=>{ if(status) status.textContent=''; }, 2000);
       }
+    } else {
+      throw new Error('Response not ok: ' + res.status);
     }
   } catch(e) {
-    // Use cached version on error
+    console.error('Preload error:', e);
     const cached = localStorage.getItem('cbc_cached_clients');
-    if (cached) try { clients = JSON.parse(cached); } catch(e2){}
+    if (cached) {
+      try { clients = JSON.parse(cached); } catch(e2){}
+      if (status) status.textContent = '⚠️ Modo sin conexión';
+    } else {
+      if (status) status.textContent = '⚠️ Sin conexión';
+    }
   }
 })();
 </script>
