@@ -788,7 +788,7 @@ function applyMode() {
 
 // ─── NAVIGATION ───
 function showPage(page, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>{ p.classList.remove('active'); p.style.display='none'; });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const _pg = document.getElementById('page-'+page);
   if (_pg) { _pg.classList.add('active'); _pg.style.display='block'; }
