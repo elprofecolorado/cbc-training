@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CBC Training">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; connect-src *;">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Supabase SDK removed: using direct XHR/fetch instead -->
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#c9952a;--gold2:#e8b84b;--black:#0a0a0a;--dark:#111;--dark2:#1a1a1a;--dark3:#222;--dark4:#2a2a2a;--white:#f0ede8;--gray:#666;--gray2:#999;--success:#2ecc71;--danger:#e74c3c;--warning:#f39c12;}
@@ -440,7 +440,6 @@ body.trainer-mode .client-only{display:none;}
 </div>
 
 <script>
-const sb = supabase.createClient(SB_URL.replace('/rest/v1',''), SB_KEY);
 const TRAINER_PIN = '1234';
 const SB_URL = 'https://btdtpruxntodjuzomdcq.supabase.co/rest/v1';
 const SB_KEY = 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4';
@@ -490,13 +489,17 @@ function xhrGet(url) {
     xhr.open('GET', url, true);
     xhr.setRequestHeader('apikey', SB_KEY);
     xhr.setRequestHeader('Authorization', 'Bearer ' + SB_KEY);
-    xhr.timeout = 12000;
+    xhr.setRequestHeader('Accept', 'application/json');
+    xhr.timeout = 15000;
     xhr.onload = () => {
-      try { resolve(JSON.parse(xhr.responseText)); }
-      catch(e) { resolve([]); }
+      console.log('[XHR]', xhr.status, url.split('?')[0].split('/').pop(), xhr.responseText.substring(0,200));
+      try {
+        const parsed = JSON.parse(xhr.responseText);
+        resolve(Array.isArray(parsed) ? parsed : []);
+      } catch(e) { resolve([]); }
     };
-    xhr.onerror = () => resolve([]);
-    xhr.ontimeout = () => resolve([]);
+    xhr.onerror = (e) => { console.error('[XHR ERROR]', url, e); resolve(null); };
+    xhr.ontimeout = () => { console.error('[XHR TIMEOUT]', url); resolve(null); };
     xhr.send();
   });
 }
@@ -577,12 +580,22 @@ async function doLogin() {
   if (!allClients.length) {
     try {
       const data = await xhrGet(SB_URL+'/training_clients?select=id,name,pin,goal,phone,photo');
-      if (data && data.length) allClients = data;
+      console.log('[LOGIN] fetch result:', data);
+      if (data === null) {
+        // Network error
+        showToast('⚠️ Sin conexión. Verifica tu internet.');
+        btn.textContent='ENTRAR'; btn.disabled=false;
+        return;
+      }
+      if (data && data.length) {
+        allClients = data;
+        localStorage.setItem('cbc_cached_clients', JSON.stringify(data));
+      }
     } catch(e) { console.error('XHR fetch error:',e); }
   }
 
   if (!allClients.length) {
-    showToast('⚠️ Sin conexión. Intenta de nuevo.');
+    showToast('⚠️ No se pudieron cargar los clientes. Intenta de nuevo.');
     btn.textContent='ENTRAR'; btn.disabled=false;
     return;
   }
