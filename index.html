@@ -440,8 +440,7 @@ body.trainer-mode .client-only{display:none;}
 </div>
 
 <script>
-// supabase client kept for compatibility but all calls use direct fetch
-const sb = null;
+const sb = supabase.createClient(SB_URL.replace('/rest/v1',''), SB_KEY);
 const TRAINER_PIN = '1234';
 const SB_URL = 'https://btdtpruxntodjuzomdcq.supabase.co/rest/v1';
 const SB_KEY = 'sb_publishable_NA4niv3lN1R5OUkwJH8ihA_d547f1h4';
@@ -471,64 +470,29 @@ function getWeekRange(week) {
 
 function sortByDay(arr) { return [...arr].sort((a,b)=>DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day)); }
 
-async function dbInsert(t,r) {
-  try {
-    const res = await fetch(`https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/${t}`,{
-      method:'POST',
-      headers:{...SB_HDR,'Prefer':'return=minimal'},
-      body:JSON.stringify(r)
-    });
-    if(!res.ok){const e=await res.text();showToast('✗ Error');console.error(e);return false;}
-    return true;
-  } catch(e){showToast('✗ Error');console.error(e);return false;}
-}
-async function dbUpdate(t,r) {
-  try {
-    const res = await fetch(`https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/${t}?id=eq.${r.id}`,{
-      method:'PATCH',
-      headers:{...SB_HDR,'Prefer':'return=minimal'},
-      body:JSON.stringify(r)
-    });
-    if(!res.ok){const e=await res.text();showToast('✗ Error');console.error(e);return false;}
-    return true;
-  } catch(e){showToast('✗ Error');console.error(e);return false;}
-}
-async function dbDelete(t,id) {
-  try {
-    const res = await fetch(`https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/${t}?id=eq.${id}`,{
-      method:'DELETE',
-      headers:{...SB_HDR,'Prefer':'return=minimal'}
-    });
-    if(!res.ok){const e=await res.text();showToast('✗ Error');console.error(e);return false;}
-    return true;
-  } catch(e){showToast('✗ Error');console.error(e);return false;}
-}
+async function dbInsert(t,r) { const {error}=await sb.from(t).insert([r]); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
+async function dbUpdate(t,r) { const {error}=await sb.from(t).update(r).eq('id',r.id); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
+async function dbDelete(t,id) { const {error}=await sb.from(t).delete().eq('id',id); if(error){showToast('✗ Error');console.error(error);return false;} return true; }
 
-
-async function sbFetch(table, params='') {
-  const r = await fetch(`${SB_URL}/${table}?${params}`,{mode:'cors',cache:'no-store',headers:SB_HDR});
-  if (!r.ok) throw new Error(`${table} ${r.status}`);
-  return r.json();
-}
 
 async function loadAllData() {
   try {
     const [cr,rr,pr,compr,mr,rr2,libr,tmplr,tmplrr] = await Promise.all([
-      sbFetch('training_clients','select=*'),
-      sbFetch('training_routines','select=*'),
-      sbFetch('training_progress','select=*'),
-      sbFetch('training_completions','select=*'),
-      sbFetch('training_messages','select=*&order=id.desc'),
-      sbFetch('training_ratings','select=*'),
-      sbFetch('training_exercises','select=*'),
-      sbFetch('training_templates','select=*'),
-      sbFetch('training_template_routines','select=*'),
+      sb.from('training_clients').select('*'),
+      sb.from('training_routines').select('*'),
+      sb.from('training_progress').select('*'),
+      sb.from('training_completions').select('*'),
+      sb.from('training_messages').select('*').order('id',{ascending:false}),
+      sb.from('training_ratings').select('*'),
+      sb.from('training_exercises').select('*'),
+      sb.from('training_templates').select('*'),
+      sb.from('training_template_routines').select('*'),
     ]);
-    clients=cr||[]; routines=rr||[]; progress=pr||[];
-    messages=mr||[]; ratings=rr2||[]; exerciseLibrary=libr||[];
-    templates=tmplr||[]; templateRoutines=tmplrr||[];
+    clients=cr.data||[]; routines=rr.data||[]; progress=pr.data||[];
+    messages=mr.data||[]; ratings=rr2.data||[]; exerciseLibrary=libr.data||[];
+    templates=tmplr.data||[]; templateRoutines=tmplrr.data||[];
     completions={};
-    (compr||[]).forEach(row=>{
+    (compr.data||[]).forEach(row=>{
       const key=`${row.clientId}_${row.routineId}_${row.date}`;
       completions[key]=row.exercises||[];
     });
@@ -555,7 +519,7 @@ async function doLogin() {
     return;
   }
 
-  // ── CLIENT ── use preloaded, or cache, or fetch
+  // ── CLIENT ── use preloaded, or cache, or SDK
   let allClients = clients.length ? clients : [];
 
   if (!allClients.length) {
@@ -565,12 +529,9 @@ async function doLogin() {
 
   if (!allClients.length) {
     try {
-      const res = await fetch(
-        'https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_clients?select=id,name,pin,goal,phone,photo',
-        {headers:{...SB_HDR}}
-      );
-      if (res.ok) { const d=await res.json(); if(d&&d.length) allClients=d; }
-    } catch(e) { console.error('Fetch error:',e); }
+      const {data, error} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
+      if (!error && data && data.length) allClients = data;
+    } catch(e) { console.error('SDK fetch error:',e); }
   }
 
   if (!allClients.length) {
@@ -738,8 +699,8 @@ async function deleteClient(id) {
   const c=clients.find(c=>c.id===id);
   if(!confirm(`¿Eliminar a ${c?.name}?`)) return;
   await dbDelete('training_clients',id);
-  await fetch(`https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_routines?clientId=eq.${id}`,{method:'DELETE',headers:{...SB_HDR}});
-  await fetch(`https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_progress?clientId=eq.${id}`,{method:'DELETE',headers:{...SB_HDR}});
+  await sb.from('training_routines').delete().eq('clientId',id);
+  await sb.from('training_progress').delete().eq('clientId',id);
   clients=clients.filter(c=>c.id!==id);
   routines=routines.filter(r=>String(r.clientId)!==String(id));
   progress=progress.filter(p=>String(p.clientId)!==String(id));
@@ -903,15 +864,12 @@ async function toggleDone(key,index,routineId,clientId){
   else{arr.splice(i,1);}
 
   const todayStr=new Date().toISOString().split('T')[0];
-  try {
-    const exRes = await fetch(`https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_completions?select=id&clientId=eq.${clientId}&routineId=eq.${routineId}&date=eq.${todayStr}&limit=1`,{headers:{...SB_HDR}});
-    const exData = exRes.ok ? await exRes.json() : [];
-    if(exData && exData.length){
-      await fetch(`https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_completions?id=eq.${exData[0].id}`,{method:'PATCH',headers:{...SB_HDR,'Prefer':'return=minimal'},body:JSON.stringify({exercises:completions[key]})});
-    } else {
-      await fetch('https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_completions',{method:'POST',headers:{...SB_HDR,'Prefer':'return=minimal'},body:JSON.stringify({id:Date.now(),clientId,routineId,date:todayStr,exercises:completions[key]})});
-    }
-  } catch(e){ console.error('completion save:',e); }
+  const {data:existing}=await sb.from('training_completions').select('id').eq('clientId',clientId).eq('routineId',routineId).eq('date',todayStr).maybeSingle();
+  if(existing){
+    await sb.from('training_completions').update({exercises:completions[key]}).eq('id',existing.id);
+  } else {
+    await sb.from('training_completions').insert([{id:Date.now(),clientId,routineId,date:todayStr,exercises:completions[key]}]);
+  }
 
   const client=clients.find(c=>c.id===clientId);
   renderWorkout(client,routines.filter(r=>String(r.clientId)===String(clientId)),currentWeek);
@@ -1471,27 +1429,20 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('login-screen').style.display='flex';
 
-// Pre-load clients using direct fetch
+// Pre-load clients using Supabase SDK
 (async () => {
   const status = document.getElementById('login-status');
   if (status) status.textContent = 'Conectando...';
   try {
-    const res = await fetch(
-      'https://btdtpruxntodjuzomdcq.supabase.co/rest/v1/training_clients?select=id,name,pin,goal,phone,photo',
-      { mode:'cors', cache:'no-store', headers: SB_HDR }
-    );
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.length) {
-        clients = data;
-        localStorage.setItem('cbc_cached_clients', JSON.stringify(
-          data.map(c=>({id:c.id,name:c.name,pin:String(c.pin),goal:c.goal,phone:c.phone}))
-        ));
-        if (status) status.textContent = '✓ Listo';
-        setTimeout(()=>{ if(status) status.textContent=''; }, 2000);
-      }
-    } else {
-      throw new Error('Response not ok: ' + res.status);
+    const {data, error} = await sb.from('training_clients').select('id,name,pin,goal,phone,photo');
+    if (error) throw error;
+    if (data && data.length) {
+      clients = data;
+      localStorage.setItem('cbc_cached_clients', JSON.stringify(
+        data.map(c=>({id:c.id,name:c.name,pin:String(c.pin),goal:c.goal,phone:c.phone}))
+      ));
+      if (status) status.textContent = '✓ Listo';
+      setTimeout(()=>{ if(status) status.textContent=''; }, 2000);
     }
   } catch(e) {
     console.error('Preload error:', e);
