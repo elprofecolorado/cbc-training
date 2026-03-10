@@ -125,6 +125,61 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .trainer-only{display:none;}
 body.trainer-mode .trainer-only{display:block;}
 body.trainer-mode .client-only{display:none;}
+
+/* ═══ RETO 21 DÍAS ═══ */
+.reto-hero{background:linear-gradient(135deg,#1a0a00,#2d1500);border:1px solid rgba(201,149,42,0.4);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;}
+.reto-hero::before{content:'🔥';position:absolute;font-size:80px;opacity:0.06;top:-10px;right:-10px;}
+.reto-day-big{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--gold);line-height:1;}
+.reto-day-label{font-size:11px;letter-spacing:3px;color:var(--gray2);text-transform:uppercase;margin-bottom:8px;}
+.reto-progress-bar{background:#1a1a1a;border-radius:20px;height:10px;margin:12px 0 6px;overflow:hidden;}
+.reto-progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--gold),#ff6b00);transition:width 0.5s ease;}
+.reto-progress-text{font-size:11px;color:var(--gray2);}
+.reto-streak{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.3);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;color:#ff6b00;margin-top:8px;}
+.reto-badges{display:flex;gap:8px;justify-content:center;margin:12px 0;}
+.reto-badge{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #333;}
+.reto-badge.earned{border-color:var(--gold);background:rgba(201,149,42,0.2);}
+.reto-badge.locked{opacity:0.3;filter:grayscale(1);}
+.reto-ex-card{background:var(--dark2);border:1px solid #2a2a2a;border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.reto-ex-header{padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.reto-ex-check{width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;flex-shrink:0;transition:all 0.2s;}
+.reto-ex-check.done{background:var(--success);border-color:var(--success);}
+.reto-ex-info{flex:1;}
+.reto-ex-name{font-weight:700;font-size:13px;}
+.reto-ex-sets{font-size:11px;color:var(--gray2);margin-top:2px;}
+.reto-complete-btn{width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#0a0a0a;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;border:none;cursor:pointer;margin-top:12px;}
+.reto-complete-btn:disabled{opacity:0.4;}
+.ranking-card{background:var(--dark2);border:1px solid #2a2a2a;border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.ranking-pos{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gray);width:32px;text-align:center;}
+.ranking-pos.gold{color:#FFD700;}
+.ranking-pos.silver{color:#C0C0C0;}
+.ranking-pos.bronze{color:#CD7F32;}
+.ranking-me{border-color:var(--gold)!important;background:rgba(201,149,42,0.08)!important;}
+.ranking-info{flex:1;}
+.ranking-pin{font-weight:700;font-size:14px;}
+.ranking-days{font-size:11px;color:var(--gray2);}
+.ranking-streak{font-size:13px;}
+.reto-msg-card{background:linear-gradient(135deg,#0d1a0d,#1a2d1a);border:1px solid rgba(46,204,113,0.3);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.reto-msg-text{font-size:13px;color:#a8e6c0;line-height:1.6;font-style:italic;}
+.reto-msg-day{font-size:10px;color:var(--gray);margin-top:6px;letter-spacing:1px;}
+/* trainer reto */
+.reto-participant-card{background:var(--dark2);border:1px solid #252525;border-radius:12px;padding:14px;margin-bottom:8px;}
+.reto-p-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.reto-p-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff6b00,#c9952a);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#000;flex-shrink:0;}
+.reto-p-name{font-weight:700;font-size:14px;}
+.reto-p-pin{font-size:11px;color:var(--gray2);}
+.reto-p-stats{display:flex;gap:8px;}
+.reto-p-stat{background:#1a1a1a;border-radius:8px;padding:6px 10px;flex:1;text-align:center;}
+.reto-p-stat-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);}
+.reto-p-stat-label{font-size:9px;color:var(--gray);letter-spacing:1px;}
+.reto-day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
+.reto-day-dot{aspect-ratio:1;border-radius:6px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--gray);font-weight:700;}
+.reto-day-dot.done{background:linear-gradient(135deg,var(--gold),#ff6b00);color:#000;}
+.reto-day-dot.today{border:2px solid var(--gold);}
+.reto-routine-card{background:var(--dark2);border:1px solid #2a2a2a;border-radius:12px;padding:14px;margin-bottom:8px;}
+.reto-routine-day-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1;}
+.reto-routine-focus{font-size:12px;color:var(--gray2);letter-spacing:1px;text-transform:uppercase;}
+.reto-tab-btn{flex:1;padding:8px;border:1px solid #333;background:transparent;color:var(--gray);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.reto-tab-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
 </style>
 </head>
 <body>
@@ -274,12 +329,100 @@ body.trainer-mode .client-only{display:none;}
 
 </div>
 
+
+
+<!-- ═══ RETO PAGES ═══ -->
+<!-- CLIENT RETO VIEW -->
+<div class="page" id="page-reto">
+  <div class="reto-hero" id="reto-hero">
+    <div class="reto-day-label">DÍA DEL RETO</div>
+    <div class="reto-day-big" id="reto-day-num">–</div>
+    <div style="font-size:12px;color:var(--gray2);">DE 21 🔥</div>
+    <div class="reto-progress-bar"><div class="reto-progress-fill" id="reto-prog-fill" style="width:0%"></div></div>
+    <div class="reto-progress-text" id="reto-prog-text"></div>
+    <div class="reto-streak" id="reto-streak">🔥 0 días seguidos</div>
+  </div>
+
+  <!-- Mensaje motivacional del día -->
+  <div id="reto-msg-container"></div>
+
+  <!-- Insignias -->
+  <div style="margin-bottom:12px;">
+    <div class="section-title">🏆 Insignias</div>
+    <div class="reto-badges" id="reto-badges">
+      <div class="reto-badge locked" title="Semana 1">🥊</div>
+      <div class="reto-badge locked" title="Semana 2">💪</div>
+      <div class="reto-badge locked" title="Semana 3">🏆</div>
+    </div>
+  </div>
+
+  <!-- Grid de días -->
+  <div style="margin-bottom:16px;">
+    <div class="section-title">📅 Progreso</div>
+    <div class="reto-day-grid" id="reto-day-grid"></div>
+  </div>
+
+  <!-- Rutina del día -->
+  <div id="reto-rutina-container">
+    <div class="section-title">💪 Rutina de Hoy</div>
+    <div id="reto-ejercicios-list"></div>
+    <button class="reto-complete-btn" id="reto-complete-btn" onclick="retoCompleteDay()" disabled>MARCAR DÍA COMPLETO</button>
+  </div>
+</div>
+
+<!-- RANKING PAGE -->
+<div class="page" id="page-reto-ranking">
+  <div class="section-title">🏆 Ranking</div>
+  <div style="background:rgba(201,149,42,0.08);border:1px solid rgba(201,149,42,0.2);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--gray2);text-align:center;">
+    Los participantes aparecen con su PIN para mantener privacidad
+  </div>
+  <div id="reto-ranking-list"></div>
+</div>
+
+<!-- TRAINER RETO MANAGEMENT -->
+<div class="page trainer-only" id="page-reto-admin">
+  <div style="display:flex;gap:6px;margin-bottom:16px;">
+    <button class="reto-tab-btn active" id="rtab-participantes" onclick="retoAdminTab('participantes')">👥 Participantes</button>
+    <button class="reto-tab-btn" id="rtab-rutinas" onclick="retoAdminTab('rutinas')">📋 Rutinas</button>
+    <button class="reto-tab-btn" id="rtab-mensaje" onclick="retoAdminTab('mensaje')">💬 Mensajes</button>
+  </div>
+
+  <!-- Participantes -->
+  <div id="reto-admin-participantes">
+    <button onclick="openRetoAddClient()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border:none;cursor:pointer;margin-bottom:14px;">+ AGREGAR PARTICIPANTE</button>
+    <div id="reto-participants-list"></div>
+  </div>
+
+  <!-- Rutinas del reto -->
+  <div id="reto-admin-rutinas" style="display:none;">
+    <div style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Configura las rutinas para los 21 días del reto.</div>
+    <div id="reto-routines-list"></div>
+  </div>
+
+  <!-- Mensajes por día -->
+  <div id="reto-admin-mensaje" style="display:none;">
+    <div style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Agrega un mensaje motivacional para cada día. Los participantes lo ven al entrar.</div>
+    <div id="reto-messages-admin-list"></div>
+  </div>
+</div>
+
 <!-- NAV -->
-<div class="bottom-nav">
+<div class="bottom-nav" id="main-nav">
   <button class="nav-btn active" onclick="showPage('rutinas',this)"><span class="nav-icon">🥊</span><span class="nav-label">Rutinas</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
   <button class="nav-btn" onclick="showPage('progreso',this)"><span class="nav-icon">📈</span><span class="nav-label">Progreso</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
+</div>
+<!-- RETO NAV (shown only for reto mode) -->
+<div class="bottom-nav" id="reto-nav" style="display:none;">
+  <button class="nav-btn active" onclick="showRetoPage('reto',this)"><span class="nav-icon">🔥</span><span class="nav-label">Mi Reto</span></button>
+  <button class="nav-btn" onclick="showRetoPage('reto-ranking',this)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
+</div>
+<!-- TRAINER RETO NAV -->
+<div class="bottom-nav" id="reto-trainer-nav" style="display:none;">
+  <button class="nav-btn" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
+  <button class="nav-btn active" onclick="showRetoPage('reto-admin',this)"><span class="nav-icon">🔥</span><span class="nav-label">Reto 21</span></button>
+  <button class="nav-btn" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
 </div>
 
 <!-- RATING POPUP -->
@@ -457,6 +600,9 @@ const DAY_NAMES_JS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes'
 let clients=[], routines=[], progress=[], completions={}, messages=[], ratings=[];
 let exerciseLibrary=[], templates=[], templateRoutines=[];
 let isTrainer=true, currentClientId=null, currentDay=null, currentWeek=getWeekNum(), exRowCount=0;
+// ── RETO ──
+let isReto=false, retoClient=null;
+let retoClients=[], retoRoutines=[], retoCompletions=[], retoMessages=[];
 let currentRating={routineId:null,clientId:null,stars:0};
 
 function getWeekNum(date) {
@@ -601,12 +747,34 @@ async function doLogin() {
   const client = clients.find(c => String(c.pin) === String(pin));
 
   if (client) {
-    isTrainer=false;
+    isTrainer=false; isReto=false;
     localStorage.setItem('cbc_mode','client');
     localStorage.setItem('cbc_client_id', String(client.id));
+    localStorage.removeItem('cbc_reto_id');
     await afterLogin();
     return;
   }
+
+  // Check reto clients
+  try {
+    const retoUrl = SB_URL + '/reto_clients?select=id,name,pin,phone,start_date&apikey=' + SB_KEY;
+    const retoRes = await fetch(retoUrl);
+    if (retoRes.ok) {
+      const retoData = await retoRes.json();
+      if (Array.isArray(retoData)) {
+        const retoMatch = retoData.find(c => String(c.pin) === String(pin));
+        if (retoMatch) {
+          isTrainer=false; isReto=true;
+          retoClient = retoMatch;
+          localStorage.setItem('cbc_mode','reto');
+          localStorage.setItem('cbc_reto_id', String(retoMatch.id));
+          localStorage.removeItem('cbc_client_id');
+          await afterLoginReto();
+          return;
+        }
+      }
+    }
+  } catch(e) {}
 
   // PIN not found
   btn.textContent='ENTRAR'; btn.disabled=false;
@@ -617,6 +785,10 @@ async function doLogin() {
 
 async function afterLogin() {
   showToast('⏳ Cargando...');
+  // Show correct nav
+  document.getElementById('main-nav').style.display='flex';
+  document.getElementById('reto-nav').style.display='none';
+  document.getElementById('reto-trainer-nav').style.display='none';
   try {
     await loadAllData();
     if (clients.length) {
@@ -1507,5 +1679,52 @@ document.getElementById('login-screen').style.display='flex';
   }
 })();
 </script>
+
+<!-- RETO ADD/EDIT CLIENT MODAL -->
+<div class="modal-overlay" id="modal-reto-client">
+  <div class="modal-box">
+    <div class="modal-title" id="reto-client-modal-title">AGREGAR PARTICIPANTE</div>
+    <input type="hidden" id="reto-client-edit-id">
+    <div class="form-group"><label class="form-label">NOMBRE</label><input class="form-input" id="reto-client-name" placeholder="Nombre completo"></div>
+    <div class="form-group"><label class="form-label">PIN (4 dígitos)</label><input class="form-input" id="reto-client-pin" type="number" placeholder="ej: 5678" maxlength="4"></div>
+    <div class="form-group"><label class="form-label">TELÉFONO (opcional)</label><input class="form-input" id="reto-client-phone" placeholder="+52..."></div>
+    <div class="form-group"><label class="form-label">FECHA INICIO RETO</label><input class="form-input" id="reto-client-start" type="date"></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button onclick="closeModal('modal-reto-client')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
+      <button onclick="saveRetoClient()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- RETO EDIT ROUTINE MODAL -->
+<div class="modal-overlay" id="modal-reto-routine">
+  <div class="modal-box" style="max-height:85vh;overflow-y:auto;">
+    <div class="modal-title">DÍA <span id="reto-routine-day-title"></span> — RUTINA</div>
+    <input type="hidden" id="reto-routine-edit-day">
+    <div class="form-group"><label class="form-label">ENFOQUE / TÍTULO</label><input class="form-input" id="reto-routine-focus" placeholder="ej: Piernas y glúteos"></div>
+    <div class="form-group"><label class="form-label">DESCRIPCIÓN (opcional)</label><input class="form-input" id="reto-routine-desc" placeholder="ej: Circuito de 3 rondas"></div>
+    <div style="margin-bottom:8px;"><label class="form-label">EJERCICIOS</label></div>
+    <div id="reto-routine-exs"></div>
+    <button onclick="addRetoExRow()" style="width:100%;padding:10px;border-radius:8px;background:#222;border:1px solid #333;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;">+ EJERCICIO</button>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeModal('modal-reto-routine')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
+      <button onclick="saveRetoRoutine()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- RETO MESSAGE MODAL -->
+<div class="modal-overlay" id="modal-reto-msg">
+  <div class="modal-box">
+    <div class="modal-title">MENSAJE DÍA <span id="reto-msg-day-title"></span></div>
+    <input type="hidden" id="reto-msg-edit-day">
+    <div class="form-group"><label class="form-label">MENSAJE MOTIVACIONAL</label><textarea class="form-input" id="reto-msg-text" rows="4" placeholder="ej: ¡Vas increíble! Ya llevas una semana, no pares ahora..."></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="closeModal('modal-reto-msg')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
+      <button onclick="saveRetoMsg()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
