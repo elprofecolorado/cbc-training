@@ -997,10 +997,12 @@ async function openClientWorkout(clientId) {
     document.getElementById('workout-content').innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:20px;">${client.name}</div><div class="empty-state"><div class="ei">📋</div><p>Sin rutinas asignadas aún.</p></div>`;
     return;
   }
-  // Refresh today's completions fresh from DB
+  // Refresh completions from DB (last 30 days)
   const todayStr=new Date().toISOString().split('T')[0];
+  const d30=new Date(); d30.setDate(d30.getDate()-30);
+  const from30=d30.toISOString().split('T')[0];
   try {
-    const fresh=await xhrGet(SB_URL+'/training_completions?clientId=eq.'+clientId+'&date=eq.'+todayStr+'&apikey='+SB_KEY);
+    const fresh=await xhrGet(SB_URL+'/training_completions?clientId=eq.'+clientId+'&date=gte.'+from30+'&apikey='+SB_KEY);
     if(Array.isArray(fresh)){
       fresh.forEach(row=>{
         const key=row.clientId+'_'+row.routineId+'_'+row.date;
@@ -1086,8 +1088,11 @@ function renderWorkout(client,myRoutines,week) {
       <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openPhotoUpload(${client.id})">📸 Mi foto</button>
     </div>`;
 
+  const weekIdx = allWeeks.indexOf(week);
+  const weekLabel = weekIdx >= 0 ? 'SEMANA ' + (weekIdx + 1) : '';
   document.getElementById('workout-content').innerHTML=`
     ${motBanner}
+    ${weekLabel ? `<div style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gray2);margin-bottom:2px;">${weekLabel}</div>` : ''}
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);margin-bottom:2px;">${client.name}</div>
     ${streakBadge}
     <div style="font-size:11px;color:var(--gray2);margin-bottom:12px;">${client.goal}</div>
@@ -1644,7 +1649,7 @@ async function submitRating(sendToTrainer){
     const routine=routines.find(r=>r.id===currentRating.routineId);
     const stars='⭐'.repeat(currentRating.stars);
     const msg=`💪 *Reporte de entrenamiento*\n\n👤 ${client?.name||'Cliente'}\n📅 ${entry.date}\n🏋️ ${routine?.day||''} - ${routine?.focus||''}\n${stars} (${currentRating.stars}/5)${comment?'\n\n💬 '+comment:''}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+    window.open(`https://wa.me/${TRAINER_WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
   }
 }
 
