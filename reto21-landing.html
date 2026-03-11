@@ -15,520 +15,104 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --gold: #c9952a; --gold2: #f0c040; --black: #080808; --dark: #111; --red: #cc2200; --white: #f5f0e8; --green: #25D366; --green-dark: #128C4A; }
+  body { background: var(--black); color: var(--white); font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
 
-  :root {
-    --gold: #c9952a;
-    --gold2: #f0c040;
-    --black: #080808;
-    --dark: #111;
-    --red: #cc2200;
-    --white: #f5f0e8;
-  }
+  .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow: hidden; padding: 0 20px 60px; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,149,42,0.18) 0%, transparent 70%), linear-gradient(180deg, #1a0800 0%, #0a0500 40%, #080808 100%); z-index: 0; }
+  .hero-bg::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(1px 1px at 20% 30%, rgba(255,150,0,0.4), transparent), radial-gradient(1px 1px at 60% 20%, rgba(255,200,0,0.3), transparent); animation: flicker 3s ease-in-out infinite alternate; }
+  @keyframes flicker { 0% { opacity: 0.6; } 100% { opacity: 1; } }
 
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'Montserrat', sans-serif;
-    overflow-x: hidden;
-  }
+  .topbar { position: relative; z-index: 10; width: 100%; max-width: 480px; display: flex; align-items: center; justify-content: center; padding: 24px 0 20px; }
+  .logo-badge { display: flex; align-items: center; gap: 10px; }
+  .logo-circle { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); overflow: hidden; box-shadow: 0 0 20px rgba(201,149,42,0.4); }
+  .logo-circle img { width: 100%; height: 100%; object-fit: contain; }
+  .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--gold); line-height: 1.2; }
+  .logo-sub { font-size: 10px; color: #888; letter-spacing: 2px; }
 
-  /* ── HERO ── */
-  .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    overflow: hidden;
-    padding: 0 20px 60px;
-  }
+  .headline-wrap { position: relative; z-index: 10; text-align: center; margin-bottom: 8px; width: 100%; max-width: 480px; animation: fadeDown 0.8s ease both; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+  .num-21 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(100px, 30vw, 140px); line-height: 0.85; background: linear-gradient(180deg, #f0c040 0%, #c9952a 50%, #8a5500 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 4px 20px rgba(201,149,42,0.5)); display: block; }
+  .dias-text { font-family: 'Bebas Neue', sans-serif; font-size: clamp(38px, 11vw, 56px); letter-spacing: 6px; color: var(--white); display: block; line-height: 1; margin-top: -16px; }
+  .sin-excusas { font-family: 'Bebas Neue', sans-serif; font-size: clamp(30px, 9vw, 44px); letter-spacing: 4px; color: var(--red); display: block; line-height: 1; text-shadow: 0 0 20px rgba(204,34,0,0.6); }
 
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,149,42,0.18) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(204,34,0,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(204,34,0,0.10) 0%, transparent 60%),
-      linear-gradient(180deg, #1a0800 0%, #0a0500 40%, #080808 100%);
-    z-index: 0;
-  }
+  .tagline-bar { position: relative; z-index: 10; background: linear-gradient(90deg, var(--red), #aa1100); width: calc(100% + 40px); max-width: 520px; padding: 8px 0; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 4px; color: var(--white); margin-bottom: 16px; }
 
-  /* Fire particles */
-  .hero-bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 20% 30%, rgba(255,150,0,0.4), transparent),
-      radial-gradient(1px 1px at 40% 60%, rgba(255,100,0,0.3), transparent),
-      radial-gradient(1px 1px at 60% 20%, rgba(255,200,0,0.3), transparent),
-      radial-gradient(1px 1px at 80% 70%, rgba(255,80,0,0.4), transparent),
-      radial-gradient(2px 2px at 15% 80%, rgba(255,150,0,0.2), transparent),
-      radial-gradient(2px 2px at 70% 40%, rgba(255,120,0,0.2), transparent);
-    animation: flicker 3s ease-in-out infinite alternate;
-  }
+  .fecha-inicio { position: relative; z-index: 10; width: 100%; max-width: 480px; text-align: center; margin-bottom: 16px; }
+  .fecha-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,149,42,0.12); border: 1px solid rgba(201,149,42,0.4); border-radius: 30px; padding: 8px 20px; font-size: 13px; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
 
-  @keyframes flicker {
-    0% { opacity: 0.6; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.02); }
-  }
+  .cupos-urgente { position: relative; z-index: 10; width: 100%; max-width: 480px; background: rgba(204,34,0,0.1); border: 1px solid rgba(204,34,0,0.3); border-radius: 12px; padding: 10px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .cupos-texto { font-size: 12px; font-weight: 700; color: #ff6644; letter-spacing: 1px; white-space: nowrap; }
+  .cupos-bar-wrap { flex: 1; }
+  .cupos-track { height: 5px; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+  .cupos-fill { height: 100%; width: 70%; background: linear-gradient(90deg, var(--gold), var(--red)); border-radius: 3px; animation: fillBar 2s 1.5s ease both; }
+  @keyframes fillBar { from { width: 0%; } to { width: 70%; } }
+  .cupos-num { font-size: 11px; color: #666; margin-top: 4px; }
 
-  /* ── TOP BAR ── */
-  .topbar {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 480px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 0 20px;
-  }
+  .section { position: relative; z-index: 10; width: 100%; max-width: 480px; margin-bottom: 28px; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(201,149,42,0.4), transparent); }
 
-  .logo-badge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .logo-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 2px solid var(--gold);
-    background: radial-gradient(circle, #2a1800, #0a0500);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px rgba(201,149,42,0.4);
-    overflow: hidden;
-  }
-  .logo-circle img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter: drop-shadow(0 0 8px rgba(201,149,42,0.6));
-  }
-
-  .logo-text {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 15px;
-    letter-spacing: 2px;
-    color: var(--gold);
-    line-height: 1.2;
-  }
-
-  .logo-sub {
-    font-size: 10px;
-    color: #888;
-    letter-spacing: 2px;
-  }
-
-  /* ── HEADLINE ── */
-  .headline-wrap {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    margin-bottom: 8px;
-    width: 100%;
-    max-width: 480px;
-    animation: fadeDown 0.8s ease both;
-  }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .num-21 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(100px, 30vw, 140px);
-    line-height: 0.85;
-    background: linear-gradient(180deg, #f0c040 0%, #c9952a 50%, #8a5500 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 4px 20px rgba(201,149,42,0.5));
-    display: block;
-  }
-
-  .dias-text {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(38px, 11vw, 56px);
-    letter-spacing: 6px;
-    color: var(--white);
-    display: block;
-    line-height: 1;
-    margin-top: -16px;
-  }
-
-  .sin-excusas {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(30px, 9vw, 44px);
-    letter-spacing: 4px;
-    color: var(--red);
-    display: block;
-    line-height: 1;
-    text-shadow: 0 0 20px rgba(204,34,0,0.6);
-  }
-
-  /* ── TAG LINE ── */
-  .tagline-bar {
-    position: relative;
-    z-index: 10;
-    background: linear-gradient(90deg, var(--red), #aa1100);
-    width: calc(100% + 40px);
-    max-width: 520px;
-    padding: 8px 0;
-    text-align: center;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 4px;
-    color: var(--white);
-    margin-bottom: 20px;
-    animation: fadeIn 1s 0.3s ease both;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  /* ── HERO IMAGE AREA ── */
-  .hero-claim {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    margin-bottom: 24px;
-    animation: fadeUp 1s 0.4s ease both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .hero-claim-main {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(28px, 8vw, 42px);
-    letter-spacing: 3px;
-    line-height: 1.1;
-    color: var(--white);
-  }
-
-  .hero-claim-main span {
-    color: var(--gold2);
-  }
-
-  /* ── FEATURES ── */
-  .features {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 480px;
-    margin-bottom: 28px;
-    animation: fadeUp 1s 0.5s ease both;
-  }
-
-  .feature-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(201,149,42,0.12);
-  }
-
+  .feature-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(201,149,42,0.1); }
   .feature-row:last-child { border-bottom: none; }
+  .feature-icon { width: 38px; height: 38px; border-radius: 10px; background: rgba(201,149,42,0.12); border: 1px solid rgba(201,149,42,0.25); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .feature-text { font-size: 14px; font-weight: 600; color: var(--white); line-height: 1.3; flex: 1; }
+  .feature-text span { display: block; font-size: 11px; font-weight: 400; color: #888; margin-top: 1px; }
+  .check-icon { color: var(--gold); font-size: 16px; flex-shrink: 0; }
 
-  .feature-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: rgba(201,149,42,0.12);
-    border: 1px solid rgba(201,149,42,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
+  .premio-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; margin-bottom: 8px; }
+  .premio-1 { background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(201,149,42,0.08)); border: 1px solid rgba(255,215,0,0.3); }
+  .premio-2 { background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(150,150,150,0.06)); border: 1px solid rgba(192,192,192,0.2); }
+  .premio-3 { background: linear-gradient(135deg, rgba(205,127,50,0.1), rgba(150,90,30,0.06)); border: 1px solid rgba(205,127,50,0.2); }
+  .premio-medal { font-size: 32px; flex-shrink: 0; }
+  .premio-lugar { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--white); line-height: 1; }
+  .premio-desc { font-size: 13px; color: #aaa; margin-top: 2px; }
+  .premio-criterio { font-size: 11px; color: #666; font-style: italic; margin-top: 10px; line-height: 1.5; }
 
-  .feature-text {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--white);
-    line-height: 1.3;
-  }
+  .pago-box { background: linear-gradient(135deg, #0a1a0a, #0d2a0d); border: 1px solid rgba(37,211,102,0.3); border-radius: 16px; padding: 20px; }
+  .pago-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .pago-row:last-child { border-bottom: none; }
+  .pago-label { font-size: 11px; color: #666; letter-spacing: 1px; min-width: 80px; }
+  .pago-value { font-size: 14px; font-weight: 700; color: var(--white); flex: 1; }
+  .pago-value.tarjeta { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 2px; color: var(--gold); }
+  .pago-copy { background: rgba(201,149,42,0.15); border: 1px solid rgba(201,149,42,0.3); border-radius: 6px; padding: 4px 10px; font-size: 11px; color: var(--gold); cursor: pointer; white-space: nowrap; font-weight: 700; }
 
-  .feature-text span {
-    display: block;
-    font-size: 11px;
-    font-weight: 400;
-    color: #888;
-    margin-top: 1px;
-  }
+  .price-box { background: linear-gradient(135deg, #1a0d00, #2d1800); border: 2px solid var(--gold); border-radius: 20px; padding: 20px 24px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 0 40px rgba(201,149,42,0.2); }
+  .price-amount { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1; background: linear-gradient(180deg, #f0c040, #c9952a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .price-label { font-size: 11px; letter-spacing: 3px; color: #888; margin-bottom: 4px; }
+  .price-note { font-size: 11px; color: #666; margin-top: 4px; }
+  .price-badge { background: rgba(204,34,0,0.2); border: 1px solid rgba(204,34,0,0.4); border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #ff6644; letter-spacing: 1px; margin-bottom: 8px; display: block; text-align: center; }
+  .price-badge2 { background: rgba(201,149,42,0.15); border: 1px solid rgba(201,149,42,0.3); border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 1px; display: block; text-align: center; }
 
-  .check-icon {
-    margin-left: auto;
-    color: var(--gold);
-    font-size: 16px;
-    flex-shrink: 0;
-  }
+  .quote-box { background: rgba(255,255,255,0.03); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 16px 20px; }
+  .quote-text { font-size: 14px; color: #ccc; line-height: 1.6; font-style: italic; margin-bottom: 8px; }
+  .quote-author { font-size: 12px; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
 
-  /* ── PRICE ── */
-  .price-box {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 480px;
-    background: linear-gradient(135deg, #1a0d00, #2d1800);
-    border: 2px solid var(--gold);
-    border-radius: 20px;
-    padding: 20px 24px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    box-shadow: 0 0 40px rgba(201,149,42,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
-    animation: fadeUp 1s 0.6s ease both;
-  }
+  .faq-item { border-bottom: 1px solid rgba(255,255,255,0.07); padding: 14px 0; cursor: pointer; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { font-size: 14px; font-weight: 700; color: var(--white); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .faq-arrow { color: var(--gold); font-size: 16px; transition: transform 0.2s; flex-shrink: 0; }
+  .faq-a { font-size: 13px; color: #888; line-height: 1.6; margin-top: 8px; display: none; }
+  .faq-item.open .faq-a { display: block; }
+  .faq-item.open .faq-arrow { transform: rotate(180deg); }
 
-  .price-left { flex: 1; }
+  .cta-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 20px; border-radius: 16px; background: linear-gradient(135deg, var(--green), var(--green-dark)); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; border: none; cursor: pointer; text-decoration: none; box-shadow: 0 8px 30px rgba(37,211,102,0.35); transition: transform 0.15s; margin-bottom: 10px; animation: pulse 2s ease-in-out infinite; }
+  .cta-btn:active { transform: scale(0.97); }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 8px 30px rgba(37,211,102,0.35); } 50% { box-shadow: 0 8px 50px rgba(37,211,102,0.6); } }
+  .cta-sub { text-align: center; font-size: 11px; color: #555; letter-spacing: 1px; }
 
-  .price-label {
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: #888;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
+  .paso { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .paso:last-child { border-bottom: none; }
+  .paso-num { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--black); font-family: 'Bebas Neue', sans-serif; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .paso-text { font-size: 14px; color: var(--white); line-height: 1.4; padding-top: 4px; }
+  .paso-text span { display: block; font-size: 11px; color: #666; margin-top: 2px; }
 
-  .price-amount {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 64px;
-    line-height: 1;
-    background: linear-gradient(180deg, #f0c040, #c9952a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  .footer { text-align: center; padding: 32px 20px 40px; border-top: 1px solid #1a1a1a; max-width: 480px; margin: 0 auto; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--gold); margin-bottom: 6px; }
+  .footer-sub { font-size: 11px; color: #444; letter-spacing: 2px; }
 
-  .price-note {
-    font-size: 11px;
-    color: #666;
-    margin-top: 4px;
-  }
-
-  .price-right {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-
-  .price-badge {
-    background: rgba(204,34,0,0.2);
-    border: 1px solid rgba(204,34,0,0.4);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #ff6644;
-    letter-spacing: 1px;
-    white-space: nowrap;
-  }
-
-  .price-badge2 {
-    background: rgba(201,149,42,0.15);
-    border: 1px solid rgba(201,149,42,0.3);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 1px;
-    white-space: nowrap;
-  }
-
-  /* ── EXTRAS ── */
-  .extras {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 480px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 32px;
-    animation: fadeUp 1s 0.7s ease both;
-  }
-
-  .extra-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 14px;
-    padding: 16px 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .extra-icon { font-size: 24px; }
-
-  .extra-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--white);
-    line-height: 1.2;
-  }
-
-  .extra-desc {
-    font-size: 11px;
-    color: #666;
-    line-height: 1.4;
-  }
-
-  /* ── CTA ── */
-  .cta-wrap {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 480px;
-    animation: fadeUp 1s 0.8s ease both;
-  }
-
-  .cta-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
-    padding: 20px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #25D366, #128C4A);
-    color: #fff;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 3px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    box-shadow: 0 8px 30px rgba(37,211,102,0.35);
-    transition: transform 0.15s, box-shadow 0.15s;
-    margin-bottom: 12px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .cta-btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-  }
-
-  .cta-btn:active {
-    transform: scale(0.97);
-    box-shadow: 0 4px 15px rgba(37,211,102,0.25);
-  }
-
-  .cta-btn .wa-icon { font-size: 26px; }
-
-  .cta-sub {
-    text-align: center;
-    font-size: 11px;
-    color: #555;
-    letter-spacing: 1px;
-  }
-
-  /* ── CUPOS ── */
-  .cupos-bar {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 480px;
-    margin: 24px 0;
-    animation: fadeUp 1s 0.9s ease both;
-  }
-
-  .cupos-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: #666;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
-
-  .cupos-label strong { color: var(--red); }
-
-  .cupos-track {
-    height: 6px;
-    background: #1a1a1a;
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .cupos-fill {
-    height: 100%;
-    width: 70%;
-    background: linear-gradient(90deg, var(--gold), var(--red));
-    border-radius: 3px;
-    animation: fillBar 2s 1.5s ease both;
-  }
-
-  @keyframes fillBar {
-    from { width: 0%; }
-    to { width: 70%; }
-  }
-
-  /* ── FOOTER ── */
-  .footer {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 32px 20px 40px;
-    border-top: 1px solid #1a1a1a;
-    max-width: 480px;
-    margin: 0 auto;
-  }
-
-  .footer-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 3px;
-    color: var(--gold);
-    margin-bottom: 6px;
-  }
-
-  .footer-sub {
-    font-size: 11px;
-    color: #444;
-    letter-spacing: 2px;
-  }
-
-  /* ── PULSE ANIMATION ON CTA ── */
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 8px 30px rgba(37,211,102,0.35); }
-    50% { box-shadow: 0 8px 50px rgba(37,211,102,0.6); }
-  }
-
-  .cta-btn { animation: pulse 2s ease-in-out infinite; }
-
-  /* Scroll reveal */
-  .reveal {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: none;
-  }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
 </style>
 </head>
 <body>
@@ -536,7 +120,6 @@
 <div class="hero">
   <div class="hero-bg"></div>
 
-  <!-- TOP -->
   <div class="topbar">
     <div class="logo-badge">
       <div class="logo-circle"><img src="logo-trainer.png" alt="CBC"></div>
@@ -547,129 +130,216 @@
     </div>
   </div>
 
-  <!-- HEADLINE -->
   <div class="headline-wrap">
     <span class="num-21">21</span>
     <span class="dias-text">DÍAS</span>
     <span class="sin-excusas">SIN EXCUSAS</span>
   </div>
 
-  <!-- TAGLINE BAR -->
-  <div class="tagline-bar">
-    SIN GYM &nbsp;·&nbsp; SIN EQUIPO &nbsp;·&nbsp; SIN EXCUSAS
+  <div class="tagline-bar">SIN GYM &nbsp;·&nbsp; SIN EQUIPO &nbsp;·&nbsp; SIN EXCUSAS</div>
+
+  <div class="fecha-inicio reveal">
+    <div class="fecha-badge">🗓 INICIO: LUNES 16 DE MARZO</div>
   </div>
 
-  <!-- CLAIM -->
-  <div class="hero-claim">
-    <div class="hero-claim-main">MEJORA TUS HÁBITOS<br><span>Y SIÉNTETE MEJOR</span></div>
+  <div class="cupos-urgente reveal">
+    <div class="cupos-texto">⚡ ¡CUPOS LIMITADOS!</div>
+    <div class="cupos-bar-wrap">
+      <div class="cupos-track"><div class="cupos-fill"></div></div>
+      <div class="cupos-num">Solo 6 lugares disponibles de 20</div>
+    </div>
   </div>
 
-  <!-- FEATURES -->
-  <div class="features reveal">
+  <!-- CTA ARRIBA -->
+  <div class="section reveal" style="margin-bottom:20px;">
+    <a href="https://wa.me/523319144359?text=Hola%20Ricardo%2C%20quiero%20unirme%20al%20Reto%2021%20D%C3%ADas%20Sin%20Excusas%20%F0%9F%94%A5%20%C2%BFC%C3%B3mo%20reservo%20mi%20lugar%3F" class="cta-btn" target="_blank">
+      📲 &nbsp;QUIERO UNIRME AL RETO
+    </a>
+    <div class="cta-sub">Te respondemos por WhatsApp · Solo 20 cupos · Inicio 16 de marzo</div>
+  </div>
+
+  <!-- QUE INCLUYE -->
+  <div class="section reveal">
+    <div class="section-title">📲 ¿Qué incluye?</div>
+    <div class="feature-row">
+      <div class="feature-icon">🔥</div>
+      <div class="feature-text">Entrenamientos diarios de solo 20 min<span>Cortos, efectivos y sin excusas</span></div>
+      <div class="check-icon">✓</div>
+    </div>
     <div class="feature-row">
       <div class="feature-icon">🏠</div>
-      <div class="feature-text">Entrena desde casa
-        <span>Sin necesidad de gimnasio ni equipo</span>
-      </div>
-      <div class="check-icon">✓</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-icon">⚡</div>
-      <div class="feature-text">Entrenamientos cortos y efectivos
-        <span>Máximo 30 minutos al día</span>
-      </div>
-      <div class="check-icon">✓</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-icon">📱</div>
-      <div class="feature-text">App exclusiva Colorado's Boxing
-        <span>Rutinas, progreso y ranking en tu celular</span>
-      </div>
+      <div class="feature-text">Entrena desde casa<span>Sin necesidad de gimnasio ni equipo</span></div>
       <div class="check-icon">✓</div>
     </div>
     <div class="feature-row">
       <div class="feature-icon">🎯</div>
-      <div class="feature-text">3 niveles de dificultad
-        <span>Principiante, Intermedio y Avanzado</span>
-      </div>
+      <div class="feature-text">3 niveles de dificultad<span>Principiante, Intermedio y Avanzado</span></div>
+      <div class="check-icon">✓</div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">🎥</div>
+      <div class="feature-text">Videos con cada ejercicio<span>Directo dentro de la app</span></div>
+      <div class="check-icon">✓</div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">📱</div>
+      <div class="feature-text">App exclusiva Colorado's Boxing<span>Rutinas, progreso y ranking en tu celular</span></div>
+      <div class="check-icon">✓</div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">📊</div>
+      <div class="feature-text">Seguimiento de tu progreso<span>Ve tu avance día a día durante los 21 días</span></div>
       <div class="check-icon">✓</div>
     </div>
   </div>
 
-  <!-- PRICE -->
-  <div class="price-box reveal">
-    <div class="price-left">
-      <div class="price-label">Inversión total</div>
-      <div class="price-amount">$249</div>
-      <div class="price-note">Pago único · 21 días completos</div>
+  <!-- PREMIOS -->
+  <div class="section reveal">
+    <div class="section-title">🏆 Premios del reto</div>
+    <div class="premio-card premio-1">
+      <div class="premio-medal">🥇</div>
+      <div>
+        <div class="premio-lugar">1er Lugar</div>
+        <div class="premio-desc">3 meses gratis en la Colorado's Boxing App</div>
+      </div>
     </div>
-    <div class="price-right">
-      <div class="price-badge">🔥 CUPOS LIMITADOS</div>
-      <div class="price-badge2">🏆 PREMIOS AL MEJOR</div>
+    <div class="premio-card premio-2">
+      <div class="premio-medal">🥈</div>
+      <div>
+        <div class="premio-lugar">2do Lugar</div>
+        <div class="premio-desc">2 meses gratis en la app</div>
+      </div>
+    </div>
+    <div class="premio-card premio-3">
+      <div class="premio-medal">🥉</div>
+      <div>
+        <div class="premio-lugar">3er Lugar</div>
+        <div class="premio-desc">1 mes gratis en la app</div>
+      </div>
+    </div>
+    <div class="premio-criterio">Los ganadores se eligen por constancia: completando entrenamientos y demostrando participación durante los 21 días.</div>
+  </div>
+
+  <!-- PRECIO -->
+  <div class="section reveal">
+    <div class="section-title">💰 Inversión</div>
+    <div class="price-box">
+      <div>
+        <div class="price-label">COSTO DEL RETO</div>
+        <div class="price-amount">$249</div>
+        <div class="price-note">Pago único · 21 días completos</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="price-badge">🔥 CUPOS LIMITADOS</div>
+        <div class="price-badge2">🏆 PREMIOS AL MEJOR</div>
+      </div>
     </div>
   </div>
 
-  <!-- EXTRAS -->
-  <div class="extras reveal">
-    <div class="extra-card">
-      <div class="extra-icon">👥</div>
-      <div class="extra-title">Grupo de Apoyo</div>
-      <div class="extra-desc">Comunidad para motivarte cada día</div>
+  <!-- PAGO -->
+  <div class="section reveal">
+    <div class="section-title">🏦 Datos de pago</div>
+    <div class="pago-box">
+      <div class="pago-row">
+        <div class="pago-label">BANCO</div>
+        <div class="pago-value">BBVA</div>
+      </div>
+      <div class="pago-row">
+        <div class="pago-label">NOMBRE</div>
+        <div class="pago-value">Ricardo Colorado</div>
+      </div>
+      <div class="pago-row">
+        <div class="pago-label">TARJETA</div>
+        <div class="pago-value tarjeta">4912 8245 0166 3555</div>
+        <button class="pago-copy" onclick="copiar('4912824501663555',this)">Copiar</button>
+      </div>
+      <div class="pago-row">
+        <div class="pago-label">CLABE</div>
+        <div class="pago-value" style="font-size:12px;">021320040641619951</div>
+        <button class="pago-copy" onclick="copiar('021320040641619951',this)">Copiar</button>
+      </div>
     </div>
-    <div class="extra-card">
-      <div class="extra-icon">🏆</div>
-      <div class="extra-title">Premios al Mejor Resultado</div>
-      <div class="extra-desc">Compite y gana</div>
-    </div>
-    <div class="extra-card">
-      <div class="extra-icon">📊</div>
-      <div class="extra-title">Seguimiento de Progreso</div>
-      <div class="extra-desc">Ve tu avance día a día</div>
-    </div>
-    <div class="extra-card">
-      <div class="extra-icon">🥊</div>
-      <div class="extra-title">Entrenador Personal</div>
-      <div class="extra-desc">Guía profesional todo el reto</div>
-    </div>
-  </div>
-
-  <!-- CUPOS -->
-  <div class="cupos-bar reveal">
-    <div class="cupos-label">
-      <span>Disponibilidad</span>
-      <strong>¡Pocos lugares!</strong>
-    </div>
-    <div class="cupos-track">
-      <div class="cupos-fill"></div>
+    <div style="font-size:12px;color:#666;margin-top:10px;line-height:1.6;text-align:center;">
+      Cuando hagas el pago mándame el comprobante por WhatsApp y te envío tu acceso a la app.
     </div>
   </div>
 
-  <!-- CTA -->
-  <div class="cta-wrap reveal">
-    <a href="https://wa.me/523319144359?text=Hola%2C%20quiero%20informes%20del%20Reto%2021%20D%C3%ADas%20Sin%20Excusas%20%F0%9F%94%A5" class="cta-btn" target="_blank">
-      <span class="wa-icon">📲</span>
-      QUIERO UNIRME AL RETO
+  <!-- PASOS -->
+  <div class="section reveal">
+    <div class="section-title">🚀 Cómo empezar</div>
+    <div class="paso"><div class="paso-num">1</div><div class="paso-text">Realiza tu pago por transferencia<span>$249 pesos, pago único</span></div></div>
+    <div class="paso"><div class="paso-num">2</div><div class="paso-text">Manda tu comprobante por WhatsApp<span>Al número de Ricardo Colorado</span></div></div>
+    <div class="paso"><div class="paso-num">3</div><div class="paso-text">Recibe tu acceso a la app<span>En menos de 24 horas</span></div></div>
+    <div class="paso"><div class="paso-num">4</div><div class="paso-text">¡Arranca el 16 de marzo!<span>Elige tu nivel y empieza a entrenar</span></div></div>
+  </div>
+
+  <!-- AUTOR -->
+  <div class="section reveal">
+    <div class="quote-box">
+      <div class="quote-text">"Diseñé este reto porque sé que el mayor obstáculo no es el tiempo ni el equipo — es empezar. 21 días es todo lo que necesitas para cambiar tu hábito para siempre."</div>
+      <div class="quote-author">— Ricardo Colorado, Entrenador</div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section reveal">
+    <div class="section-title">❓ Preguntas frecuentes</div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">¿Necesito experiencia previa? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">No. Tenemos 3 niveles: Principiante, Intermedio y Avanzado. Tú eliges con cuál empezar y puedes cambiar cuando quieras.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">¿Qué pasa si me pierdo un día? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">No pasa nada, puedes retomar al día siguiente. Los premios se dan a quienes demuestren mayor constancia, no requiere 21 días perfectos.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">¿Funciona en iPhone y Android? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Sí, en cualquier celular con internet. No necesitas descargar nada, se abre directo desde el navegador.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">¿Necesito equipo o pesas? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">No. Todos los ejercicios son con peso corporal, sin ningún equipo ni gimnasio.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">¿Cuándo recibo mi acceso? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">En menos de 24 horas después de enviar tu comprobante de pago por WhatsApp.</div>
+    </div>
+  </div>
+
+  <!-- CTA FINAL -->
+  <div class="section reveal">
+    <a href="https://wa.me/523319144359?text=Hola%20Ricardo%2C%20quiero%20unirme%20al%20Reto%2021%20D%C3%ADas%20Sin%20Excusas%20%F0%9F%94%A5%20%C2%BFC%C3%B3mo%20reservo%20mi%20lugar%3F" class="cta-btn" target="_blank">
+      📲 &nbsp;INSCRIBIRME AHORA
     </a>
-    <div class="cta-sub">Te respondemos por WhatsApp · Cupos limitados</div>
+    <div class="cta-sub">Inicio: 16 de marzo · Solo 20 cupos · $249 pesos</div>
   </div>
 
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
   <div class="footer-logo">COLORADO'S BOXING CLUB</div>
   <div class="footer-sub">ENTRENAMIENTO PROFESIONAL · RESULTADOS REALES</div>
 </div>
 
 <script>
-  // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if(e.isIntersecting){ e.target.classList.add('visible'); }
-    });
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1 });
-
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  function toggleFaq(el) { el.classList.toggle('open'); }
+
+  function copiar(texto, btn) {
+    navigator.clipboard.writeText(texto).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copiado';
+      btn.style.color = '#25D366';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+    }).catch(() => {
+      btn.textContent = 'Error';
+      setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+    });
+  }
 </script>
 </body>
 </html>
