@@ -2103,27 +2103,61 @@ function getRetoStreak() {
 function openAvatarPicker(){
   document.getElementById('avatar-file-input').click();
 }
+// ─── SUPABASE STORAGE UPLOAD ───
+async function uploadToStorage(file, folder){
+  // Resize image before upload to save space
+  const resized = await resizeImage(file, 800);
+  const ext = file.name.split('.').pop() || 'jpg';
+  const filename = `${folder}/${Date.now()}.${ext}`;
+  const res = await fetch(`${SB_URL}/storage/v1/object/reto-fotos/${filename}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': file.type || 'image/jpeg',
+      'x-upsert': 'true'
+    },
+    body: resized
+  });
+  if(!res.ok) throw new Error('Upload failed: ' + res.status);
+  return `${SB_URL}/storage/v1/object/public/reto-fotos/${filename}`;
+}
+
+async function resizeImage(file, maxWidth){
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.82);
+    };
+    img.src = url;
+  });
+}
+
 function handleAvatarUpload(event){
   const file = event.target.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = async function(e){
-    const base64 = e.target.result;
-    // Save to Supabase
+  showToast('📷 Subiendo foto...');
+  uploadToStorage(file, 'avatares').then(async url => {
     const res = await fetch(SB_URL+'/reto_clients?id=eq.'+retoClient.id, {
       method:'PATCH',
       headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-      body: JSON.stringify({photo: base64})
+      body: JSON.stringify({photo: url})
     });
     if(res.ok || res.status===204){
-      retoClient.photo = base64;
+      retoClient.photo = url;
       updateRetoAvatar();
       showToast('📷 Foto actualizada');
     } else {
       showToast('Error al guardar foto');
     }
-  };
-  reader.readAsDataURL(file);
+  }).catch(() => showToast('Error al subir foto'));
 }
 function updateRetoAvatar(){
   const avatarEl = document.getElementById('reto-avatar');
@@ -2450,21 +2484,18 @@ async function renderRetoRanking(){
 }
 
 // ─── RETO CHAT ───
-let chatFotoBase64 = null;
+let chatFotoFile = null;
 
 function previewChatFoto(e){
   const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    chatFotoBase64=ev.target.result;
-    document.getElementById('chat-foto-img').src=chatFotoBase64;
-    document.getElementById('chat-foto-preview').style.display='block';
-  };
-  reader.readAsDataURL(file);
+  chatFotoFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('chat-foto-img').src=url;
+  document.getElementById('chat-foto-preview').style.display='block';
 }
 
 function clearChatFoto(){
-  chatFotoBase64=null;
+  chatFotoFile=null;
   document.getElementById('chat-foto-input').value='';
   document.getElementById('chat-foto-preview').style.display='none';
 }
@@ -2472,20 +2503,33 @@ function clearChatFoto(){
 async function postRetoChat(){
   const msg=document.getElementById('chat-mensaje').value.trim();
   const videoLink=document.getElementById('chat-video-link').value.trim();
-  if(!msg&&!chatFotoBase64){showToast('Escribe algo o sube una foto');return;}
+  if(!msg&&!chatFotoFile){showToast('Escribe algo o sube una foto');return;}
   const day=isReto?getRetoDay():0;
-  const clientId=isReto?retoClient.id:null; // trainer posts with null client id
+  const clientId=isReto?retoClient.id:null;
+
+  showToast('Publicando...');
+
+  // Upload photo to Storage if exists
+  let fotoUrl = null;
+  if(chatFotoFile){
+    try {
+      fotoUrl = await uploadToStorage(chatFotoFile, 'chat');
+    } catch(e) {
+      showToast('Error al subir la foto');
+      return;
+    }
+  }
+
   const payload={
     id:Date.now(),
     reto_client_id:clientId,
     ronda:1,
     mensaje:msg||null,
-    foto:chatFotoBase64||null,
+    foto:fotoUrl||null,
     video_link:videoLink||null,
     dia_num:day,
     fecha_post:new Date().toISOString()
   };
-  showToast('Publicando...');
   const res=await fetch(SB_URL+'/reto_chat?apikey='+SB_KEY,{
     method:'POST',
     headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
