@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Colorado's Boxing — Entrenamiento</title>
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="logo-trainer.png">
 <link rel="icon" type="image/png" href="logo-trainer.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CBC Training">
+<meta name="theme-color" content="#c9952a">
+<meta name="mobile-web-app-capable" content="yes">
 <!-- CSP removed to allow Supabase connections -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
@@ -432,7 +435,10 @@ body.trainer-mode .client-only{display:none;}
 
   <!-- PARTICIPANTES -->
   <div id="reto-admin-participantes">
-    <button onclick="openRetoAddClientChecked()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border:none;cursor:pointer;margin-bottom:14px;">+ AGREGAR PARTICIPANTE</button>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button onclick="openRetoAddClientChecked()" style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;border:none;cursor:pointer;">+ AGREGAR</button>
+      <button onclick="sendPushRemindersUI()" style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,#0d2e0d,#1a5e1a);color:#25D366;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;border:1px solid #25D366;cursor:pointer;">📲 RECORDATORIO</button>
+    </div>
     <div id="reto-participants-list"></div>
   </div>
 
@@ -2071,6 +2077,7 @@ async function afterLoginReto() {
   updateLevelButtons();
   renderRetoClient();
   showToast('🔥 Bienvenido '+retoClient.name.split(' ')[0]);
+  // Ask for notification permission after login
 }
 
 function getRetoDay() {
@@ -2635,6 +2642,7 @@ function retoAdminTab(tab){
   if(tab==='chat') loadRetoChatAdmin();
 }
 
+
 function openRetoAddClientChecked(){
   const limit=new Date('2026-03-31'); limit.setHours(0,0,0,0);
   const today=new Date(); today.setHours(0,0,0,0);
@@ -2993,6 +3001,124 @@ async function saveRetoMsg(){
     </div>
   </div>
 </div>
+
+<!-- ═══ PWA INSTALL BANNER ═══ -->
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:80px;left:12px;right:12px;z-index:9999;background:linear-gradient(135deg,#1a0d00,#2d1a00);border:1.5px solid var(--gold);border-radius:16px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🥊</div>
+    <div style="flex:1;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;">INSTALAR CBC TRAINING</div>
+      <div style="font-size:11px;color:var(--gray2);margin-top:2px;">Agrégala a tu pantalla de inicio para acceso rápido y notificaciones</div>
+    </div>
+    <button onclick="dismissInstallBanner()" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer;padding:4px;">✕</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px;">
+    <button onclick="dismissInstallBanner()" style="flex:1;padding:10px;border-radius:8px;background:#222;border:1px solid #333;color:var(--gray2);font-size:12px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer;">Ahora no</button>
+    <button onclick="installPWA()" style="flex:2;padding:10px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);border:none;color:#000;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">📲 INSTALAR</button>
+  </div>
+</div>
+
+<!-- ═══ PWA INSTALL BANNER ═══ -->
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:80px;left:12px;right:12px;z-index:9999;background:linear-gradient(135deg,#1a0d00,#2d1a00);border:1.5px solid var(--gold);border-radius:16px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🥊</div>
+    <div style="flex:1;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;">INSTALAR CBC TRAINING</div>
+      <div style="font-size:11px;color:var(--gray2);margin-top:2px;">Agrégala a tu pantalla de inicio para acceso rápido</div>
+    </div>
+    <button onclick="dismissInstallBanner()" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer;padding:4px;">✕</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px;">
+    <button onclick="dismissInstallBanner()" style="flex:1;padding:10px;border-radius:8px;background:#222;border:1px solid #333;color:var(--gray2);font-size:12px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer;">Ahora no</button>
+    <button onclick="installPWA()" style="flex:2;padding:10px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);border:none;color:#000;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">📲 INSTALAR</button>
+  </div>
+</div>
+
+<script>
+let deferredInstallPrompt = null;
+
+// ─── PWA INSTALL ───
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  setTimeout(() => {
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+      const dismissed = localStorage.getItem('pwa_banner_dismissed');
+      if (!dismissed || Date.now() - parseInt(dismissed) > 7*24*60*60*1000) {
+        document.getElementById('pwa-install-banner').style.display = 'block';
+      }
+    }
+  }, 4000);
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-install-banner').style.display = 'none';
+  showToast('✅ ¡App instalada! Ábrela desde tu pantalla de inicio 🥊');
+  deferredInstallPrompt = null;
+});
+
+async function installPWA() {
+  if (!deferredInstallPrompt) {
+    showToast('En iPhone: toca compartir → "Añadir a pantalla de inicio"');
+    dismissInstallBanner();
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === 'accepted') showToast('🥊 ¡Instalando CBC Training!');
+  deferredInstallPrompt = null;
+  dismissInstallBanner();
+}
+
+function dismissInstallBanner() {
+  document.getElementById('pwa-install-banner').style.display = 'none';
+  localStorage.setItem('pwa_banner_dismissed', Date.now());
+}
+
+// ─── WHATSAPP RECORDATORIO ───
+async function sendPushRemindersUI() {
+  showToast('⏳ Cargando participantes...');
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const [clientsR, completionsR] = await Promise.all([
+      fetch(SB_URL+'/reto_clients?select=id,name,phone,start_date&apikey='+SB_KEY, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+      fetch(SB_URL+'/reto_completions?select=reto_client_id,date&date=eq.'+today+'&apikey='+SB_KEY, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
+    ]);
+    const clients = clientsR.ok ? await clientsR.json() : [];
+    const completions = completionsR.ok ? await completionsR.json() : [];
+    const doneIds = new Set(completions.map(c => String(c.reto_client_id)));
+    const pending = clients.filter(c => !doneIds.has(String(c.id)) && c.phone);
+
+    if (!pending.length) {
+      showToast('🎉 ¡Todos completaron su rutina hoy!');
+      return;
+    }
+
+    // Open WhatsApp one by one
+    let i = 0;
+    async function sendNext() {
+      if (i >= pending.length) { showToast(`✅ Recordatorios enviados a ${pending.length} participante${pending.length>1?'s':''}`); return; }
+      const c = pending[i++];
+      const parts = c.start_date ? c.start_date.split('-') : null;
+      const day = parts ? Math.max(1,Math.min(21,Math.floor((new Date()-new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])))/86400000)+1)) : '?';
+      const msg = encodeURIComponent(`🔥 ${c.name.split(' ')[0]}, ¡todavía estás a tiempo! Completa tu entrenamiento del Día ${day} antes de que termine el día. ¡No rompas la racha! 💪\n\nCBC Training 👉 https://coloradosboxing-cpu.github.io/cbc-training/`);
+      window.open(`https://wa.me/52${c.phone}?text=${msg}`, '_blank');
+      if (i < pending.length) {
+        setTimeout(() => {
+          if (confirm(`${i} de ${pending.length} enviados.\n\n¿Enviar al siguiente?\n👤 ${pending[i].name}`)) sendNext();
+        }, 1000);
+      } else {
+        setTimeout(() => showToast(`✅ Recordatorios enviados a ${pending.length} participante${pending.length>1?'s':''}`), 500);
+      }
+    }
+    if (confirm(`${pending.length} participante${pending.length>1?'s':''} no han completado el día de hoy.\n\n¿Enviar recordatorio por WhatsApp?`)) {
+      sendNext();
+    }
+  } catch(e) {
+    showToast('Error al cargar participantes');
+  }
+}
+</script>
 
 </body>
 </html>
