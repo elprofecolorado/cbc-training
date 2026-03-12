@@ -397,12 +397,10 @@ body.trainer-mode .client-only{display:none;}
   <div id="reto-ranking-list"></div>
 </div>
 
-<!-- RETO CHAT PAGE -->
+<!-- RETO CHAT PAGE (participantes) -->
 <div class="page" id="page-reto-chat">
   <div class="section-title">💬 Chat del Reto</div>
-  <div style="font-size:12px;color:var(--gray2);margin-bottom:14px;">Comparte tu progreso, fotos y motiva al grupo 🔥</div>
-
-  <!-- Post form -->
+  <div style="font-size:12px;color:var(--gray2);margin-bottom:14px;">Comparte tu progreso y motiva al grupo 🔥</div>
   <div style="background:var(--dark2);border:1px solid #333;border-radius:14px;padding:14px;margin-bottom:16px;">
     <textarea id="chat-mensaje" placeholder="Escribe algo al grupo..." style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:10px;font-size:13px;font-family:'Montserrat',sans-serif;resize:none;min-height:70px;margin-bottom:8px;"></textarea>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
@@ -420,25 +418,60 @@ body.trainer-mode .client-only{display:none;}
       <button onclick="clearChatFoto()" style="margin-top:4px;background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;">✕ Quitar foto</button>
     </div>
   </div>
-
-  <!-- Feed -->
   <div id="reto-chat-feed"></div>
 </div>
 
 <div class="page" id="page-reto-admin">
-  <div style="display:flex;gap:6px;margin-bottom:16px;">
+  <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;">
     <button class="reto-tab-btn active" id="rtab-participantes" onclick="retoAdminTab('participantes')">👥 Participantes</button>
     <button class="reto-tab-btn" id="rtab-rutinas" onclick="retoAdminTab('rutinas')">📋 Rutinas</button>
-    <button class="reto-tab-btn" id="rtab-mensaje" onclick="retoAdminTab('mensaje')">💬 Mensajes</button>
+    <button class="reto-tab-btn" id="rtab-vista" onclick="retoAdminTab('vista')">👁 Vista</button>
+    <button class="reto-tab-btn" id="rtab-chat" onclick="retoAdminTab('chat')">💬 Chat</button>
+    <button class="reto-tab-btn" id="rtab-mensaje" onclick="retoAdminTab('mensaje')">📣 Mensajes</button>
   </div>
+
+  <!-- PARTICIPANTES -->
   <div id="reto-admin-participantes">
-    <button onclick="openRetoAddClient()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border:none;cursor:pointer;margin-bottom:14px;">+ AGREGAR PARTICIPANTE</button>
+    <button onclick="openRetoAddClientChecked()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border:none;cursor:pointer;margin-bottom:14px;">+ AGREGAR PARTICIPANTE</button>
     <div id="reto-participants-list"></div>
   </div>
+
+  <!-- RUTINAS -->
   <div id="reto-admin-rutinas" style="display:none;">
     <div style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Configura las rutinas para los 21 días del reto.</div>
     <div id="reto-routines-list"></div>
   </div>
+
+  <!-- VISTA RÁPIDA 21 DÍAS -->
+  <div id="reto-admin-vista" style="display:none;">
+    <div style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Toca cualquier día para ver sus ejercicios.</div>
+    <div id="reto-vista-grid"></div>
+    <div id="reto-vista-detalle" style="display:none;margin-top:16px;"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="reto-admin-chat" style="display:none;">
+    <div style="background:var(--dark2);border:1px solid #333;border-radius:14px;padding:14px;margin-bottom:16px;">
+      <textarea id="chat-mensaje" placeholder="Escribe algo al grupo..." style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:10px;font-size:13px;font-family:'Montserrat',sans-serif;resize:none;min-height:70px;margin-bottom:8px;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <input type="text" id="chat-video-link" placeholder="🎥 Link de TikTok/Instagram (opcional)" style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:8px 10px;font-size:12px;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <label style="flex:1;padding:10px;border-radius:8px;background:#1a1a1a;border:1px solid #333;color:var(--gray2);font-size:12px;text-align:center;cursor:pointer;">
+          📷 Subir foto
+          <input type="file" accept="image/*" id="chat-foto-input" style="display:none" onchange="previewChatFoto(event)">
+        </label>
+        <button onclick="postRetoChat()" style="flex:1;padding:10px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;border:none;cursor:pointer;">PUBLICAR 🔥</button>
+      </div>
+      <div id="chat-foto-preview" style="margin-top:8px;display:none;">
+        <img id="chat-foto-img" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;" src="">
+        <button onclick="clearChatFoto()" style="margin-top:4px;background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;">✕ Quitar foto</button>
+      </div>
+    </div>
+    <div id="reto-chat-feed-admin"></div>
+  </div>
+
+  <!-- MENSAJES -->
   <div id="reto-admin-mensaje" style="display:none;">
     <div style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Agrega un mensaje motivacional para cada día.</div>
     <div id="reto-messages-admin-list"></div>
@@ -452,7 +485,6 @@ body.trainer-mode .client-only{display:none;}
   <button class="nav-btn active" onclick="showPage('rutinas',this)"><span class="nav-icon">🥊</span><span class="nav-label">Rutinas</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('reto-admin',this)"><span class="nav-icon">🔥</span><span class="nav-label">Reto 21</span></button>
-  <button class="nav-btn trainer-only" onclick="showPage('reto-chat',this)"><span class="nav-icon">💬</span><span class="nav-label">Chat Reto</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
 </div>
 <div class="bottom-nav" id="reto-nav" style="display:none;">
@@ -2463,116 +2495,114 @@ async function postRetoChat(){
   }
 }
 
+function renderChatFeed(posts, cls, reacciones, comentarios, currentClient, isTrainerView){
+  if(!posts.length) return '<div style="text-align:center;padding:30px;color:var(--gray2);">Sé el primero en publicar algo 🔥</div>';
+  const emojis=['🔥','💪','👏','❤️','🥊'];
+  return posts.map(p=>{
+    const cl=cls.find(c=>c.id===p.reto_client_id);
+    const name=p.reto_client_id===null?'🥊 Entrenador':(cl?cl.name:'Participante');
+    const avatar=p.reto_client_id===null
+      ?`<div style="width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;">🥊</div>`
+      :(cl?.photo
+        ?`<img src="${cl.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;">`
+        :`<div style="width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;">${name[0]}</div>`);
+    const isMe=isTrainerView?(p.reto_client_id===null):(currentClient&&p.reto_client_id===currentClient.id);
+    const fecha=new Date(p.fecha_post).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const videoEmbed=p.video_link?`<a href="${p.video_link}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:8px 12px;color:var(--gold);font-size:12px;text-decoration:none;margin-top:8px;">🎥 Ver video</a>`:'';
+
+    const postReacts=reacciones.filter(r=>r.chat_id===p.id);
+    const myReactId=isTrainerView?'trainer':(currentClient?String(currentClient.id):null);
+    const myReact=myReactId?postReacts.find(r=>String(r.reto_client_id)===myReactId||r.reto_client_id===null&&isTrainerView):null;
+    const reactCounts=emojis.map(e=>({e,count:postReacts.filter(r=>r.tipo===e).length})).filter(x=>x.count>0);
+    const reactBtns=emojis.map(e=>`<button onclick="toggleReaccion(${p.id},'${e}',${isTrainerView})" style="background:${myReact?.tipo===e?'rgba(201,149,42,0.25)':'#1a1a1a'};border:1px solid ${myReact?.tipo===e?'var(--gold)':'#333'};border-radius:20px;padding:4px 10px;font-size:14px;cursor:pointer;">${e}</button>`).join('');
+    const reactSummary=reactCounts.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${reactCounts.map(x=>`<span style="background:#1a1a1a;border-radius:20px;padding:2px 8px;font-size:12px;">${x.e} ${x.count}</span>`).join('')}</div>`:'';
+
+    const postComents=comentarios.filter(c=>c.chat_id===p.id);
+    const comentHtml=postComents.map(c=>{
+      const ccl=cls.find(x=>x.id===c.reto_client_id);
+      const cname=c.reto_client_id===null?'🥊 Entrenador':(ccl?ccl.name:'Participante');
+      return `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;">
+        <div style="font-weight:700;font-size:12px;color:var(--gold);white-space:nowrap;">${cname}:</div>
+        <div style="font-size:12px;color:var(--white);line-height:1.4;">${c.comentario}</div>
+      </div>`;
+    }).join('');
+
+    const feedId=isTrainerView?'admin':'client';
+    return `<div style="background:var(--dark2);border:1px solid ${isMe?'rgba(201,149,42,0.3)':'#222'};border-radius:14px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        ${avatar}
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px;color:var(--white);">${name}${isMe?' <span style="color:var(--gold);font-size:10px;">· Tú</span>':''}</div>
+          <div style="font-size:10px;color:var(--gray2);">${p.dia_num?'Día '+p.dia_num+' · ':''}${fecha}</div>
+        </div>
+      </div>
+      ${p.mensaje?`<div style="font-size:13px;color:var(--white);line-height:1.5;margin-bottom:8px;">${p.mensaje}</div>`:''}
+      ${p.foto?`<img src="${p.foto}" style="width:100%;border-radius:10px;max-height:280px;object-fit:cover;margin-bottom:8px;">`:''}
+      ${videoEmbed}
+      ${reactSummary}
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;margin-bottom:8px;">${reactBtns}</div>
+      ${postComents.length?`<div style="background:#111;border-radius:8px;padding:8px 10px;margin-bottom:8px;">${comentHtml}</div>`:''}
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <input id="coment-${feedId}-${p.id}" placeholder="Comentar..." style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:6px 10px;font-size:12px;">
+        <button onclick="enviarComentario(${p.id},${isTrainerView},'${feedId}')" style="background:rgba(201,149,42,0.2);border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">Enviar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 async function loadRetoChat(){
   const feed=document.getElementById('reto-chat-feed');
   if(!feed) return;
   feed.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray2);">Cargando...</div>';
   try{
-    const [postsR, clientsR, reactR, comentR]=await Promise.all([
-      fetch(SB_URL+'/reto_chat?select=*&order=fecha_post.desc&limit=50&apikey='+SB_KEY, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
-      fetch(SB_URL+'/reto_clients?select=id,name,photo&apikey='+SB_KEY, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
-      fetch(SB_URL+'/reto_chat_reacciones?select=*&apikey='+SB_KEY, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
-      fetch(SB_URL+'/reto_chat_comentarios?select=*&order=created_at.asc&apikey='+SB_KEY, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
+    const [postsR,clientsR,reactR,comentR]=await Promise.all([
+      fetch(SB_URL+'/reto_chat?select=*&order=fecha_post.desc&limit=50&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+      fetch(SB_URL+'/reto_clients?select=id,name,photo&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+      fetch(SB_URL+'/reto_chat_reacciones?select=*&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+      fetch(SB_URL+'/reto_chat_comentarios?select=*&order=created_at.asc&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
     ]);
     const posts=postsR.ok?await postsR.json():[];
     const cls=clientsR.ok?await clientsR.json():[];
     const reacciones=reactR.ok?await reactR.json():[];
     const comentarios=comentR.ok?await comentR.json():[];
-
-    if(!posts.length){
-      feed.innerHTML='<div style="text-align:center;padding:30px;color:var(--gray2);">Sé el primero en publicar algo 🔥</div>';
-      return;
-    }
-
-    const emojis=['🔥','💪','👏','❤️','🥊'];
-
-    feed.innerHTML=posts.map(p=>{
-      const cl=cls.find(c=>c.id===p.reto_client_id);
-      const name=p.reto_client_id===null?'🥊 Entrenador':(cl?cl.name:'Participante');
-      const avatar=cl?.photo
-        ?`<img src="${cl.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;">`
-        :`<div style="width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;">${name[0]}</div>`;
-      const isMe=retoClient&&p.reto_client_id===retoClient.id;
-      const fecha=new Date(p.fecha_post).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-      const videoEmbed=p.video_link?`<a href="${p.video_link}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:8px 12px;color:var(--gold);font-size:12px;text-decoration:none;margin-top:8px;">🎥 Ver video</a>`:'';
-
-      // Reactions for this post
-      const postReacts=reacciones.filter(r=>r.chat_id===p.id);
-      const myReact=retoClient?postReacts.find(r=>r.reto_client_id===retoClient.id):null;
-      const reactCounts=emojis.map(e=>({e,count:postReacts.filter(r=>r.tipo===e).length})).filter(x=>x.count>0);
-      const reactBtns=emojis.map(e=>`<button onclick="toggleReaccion(${p.id},'${e}')" style="background:${myReact?.tipo===e?'rgba(201,149,42,0.25)':'#1a1a1a'};border:1px solid ${myReact?.tipo===e?'var(--gold)':'#333'};border-radius:20px;padding:4px 10px;font-size:14px;cursor:pointer;">${e}</button>`).join('');
-      const reactSummary=reactCounts.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${reactCounts.map(x=>`<span style="background:#1a1a1a;border-radius:20px;padding:2px 8px;font-size:12px;">${x.e} ${x.count}</span>`).join('')}</div>`:'';
-
-      // Comments for this post
-      const postComents=comentarios.filter(c=>c.chat_id===p.id);
-      const comentHtml=postComents.map(c=>{
-        const ccl=cls.find(x=>x.id===c.reto_client_id);
-        const cname=ccl?ccl.name:'Participante';
-        return `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;">
-          <div style="font-weight:700;font-size:12px;color:var(--gold);white-space:nowrap;">${cname}:</div>
-          <div style="font-size:12px;color:var(--white);line-height:1.4;">${c.comentario}</div>
-        </div>`;
-      }).join('');
-
-      return `<div style="background:var(--dark2);border:1px solid ${isMe?'rgba(201,149,42,0.3)':'#222'};border-radius:14px;padding:14px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          ${avatar}
-          <div style="flex:1">
-            <div style="font-weight:700;font-size:13px;color:var(--white);">${name}${isMe?' <span style="color:var(--gold);font-size:10px;">· Tú</span>':''}</div>
-            <div style="font-size:10px;color:var(--gray2);">Día ${p.dia_num} · ${fecha}</div>
-          </div>
-        </div>
-        ${p.mensaje?`<div style="font-size:13px;color:var(--white);line-height:1.5;margin-bottom:8px;">${p.mensaje}</div>`:''}
-        ${p.foto?`<img src="${p.foto}" style="width:100%;border-radius:10px;max-height:280px;object-fit:cover;margin-bottom:8px;">`:''}
-        ${videoEmbed}
-        ${reactSummary}
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;margin-bottom:8px;">${reactBtns}</div>
-        ${postComents.length?`<div style="background:#111;border-radius:8px;padding:8px 10px;margin-bottom:8px;">${comentHtml}</div>`:''}
-        <div style="display:flex;gap:6px;margin-top:4px;">
-          <input id="coment-${p.id}" placeholder="Comentar..." style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:6px 10px;font-size:12px;">
-          <button onclick="enviarComentario(${p.id})" style="background:rgba(201,149,42,0.2);border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">Enviar</button>
-        </div>
-      </div>`;
-    }).join('');
+    feed.innerHTML=renderChatFeed(posts,cls,reacciones,comentarios,retoClient,false);
   }catch(e){
-    console.error(e);
     feed.innerHTML='<div style="color:var(--danger);text-align:center;padding:20px;">Error al cargar el chat</div>';
   }
 }
 
-async function toggleReaccion(chatId, emoji){
-  if(!retoClient){showToast('Inicia sesión primero');return;}
-  // Check if already reacted with same emoji
-  const existing=await fetch(SB_URL+'/reto_chat_reacciones?chat_id=eq.'+chatId+'&reto_client_id=eq.'+retoClient.id+'&apikey='+SB_KEY,
-    {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+async function toggleReaccion(chatId, emoji, isTrainerView){
+  const myId=isTrainerView?null:(retoClient?retoClient.id:null);
+  // Check existing reaction
+  let url=SB_URL+'/reto_chat_reacciones?chat_id=eq.'+chatId;
+  url+=isTrainerView?'&reto_client_id=is.null':'&reto_client_id=eq.'+myId;
+  const existing=await fetch(url+'&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
   const rows=existing.ok?await existing.json():[];
   if(rows.length>0){
-    // Delete existing reaction
     await fetch(SB_URL+'/reto_chat_reacciones?id=eq.'+rows[0].id+'&apikey='+SB_KEY,
       {method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
-    if(rows[0].tipo===emoji){loadRetoChat();return;} // just removed
+    if(rows[0].tipo===emoji){isTrainerView?loadRetoChatAdmin():loadRetoChat();return;}
   }
-  // Add new reaction
   await fetch(SB_URL+'/reto_chat_reacciones?apikey='+SB_KEY,{
     method:'POST',
     headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-    body:JSON.stringify({id:Date.now(),chat_id:chatId,reto_client_id:retoClient.id,tipo:emoji})
+    body:JSON.stringify({id:Date.now(),chat_id:chatId,reto_client_id:myId,tipo:emoji})
   });
-  loadRetoChat();
+  isTrainerView?loadRetoChatAdmin():loadRetoChat();
 }
 
-async function enviarComentario(chatId){
-  if(!retoClient){showToast('Inicia sesión primero');return;}
-  const input=document.getElementById('coment-'+chatId);
+async function enviarComentario(chatId, isTrainerView, feedId){
+  const myId=isTrainerView?null:(retoClient?retoClient.id:null);
+  const input=document.getElementById('coment-'+feedId+'-'+chatId);
   const texto=input?.value.trim();
   if(!texto){showToast('Escribe un comentario');return;}
   await fetch(SB_URL+'/reto_chat_comentarios?apikey='+SB_KEY,{
     method:'POST',
     headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-    body:JSON.stringify({id:Date.now(),chat_id:chatId,reto_client_id:retoClient.id,comentario:texto})
+    body:JSON.stringify({id:Date.now(),chat_id:chatId,reto_client_id:myId,comentario:texto})
   });
   if(input) input.value='';
-  loadRetoChat();
+  isTrainerView?loadRetoChatAdmin():loadRetoChat();
 }
 async function renderRetoAdmin(){
   try{
@@ -2594,13 +2624,101 @@ async function renderRetoAdmin(){
   renderRetoParticipants();
 }
 function retoAdminTab(tab){
-  ['participantes','rutinas','mensaje'].forEach(t=>{
+  ['participantes','rutinas','vista','chat','mensaje'].forEach(t=>{
     document.getElementById('reto-admin-'+t).style.display=t===tab?'block':'none';
     document.getElementById('rtab-'+t).classList.toggle('active',t===tab);
   });
   if(tab==='rutinas') renderRetoRoutinesList();
   if(tab==='mensaje') renderRetoMessagesList();
   if(tab==='participantes') renderRetoParticipants();
+  if(tab==='vista') renderRetoVistaGrid();
+  if(tab==='chat') loadRetoChatAdmin();
+}
+
+function openRetoAddClientChecked(){
+  const limit=new Date('2026-03-31'); limit.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  if(today>=limit){
+    showToast('❌ Fecha límite de inscripción: 30 de marzo');
+    return;
+  }
+  openRetoAddClient();
+}
+
+function renderRetoVistaGrid(){
+  const grid=document.getElementById('reto-vista-grid');
+  const detalle=document.getElementById('reto-vista-detalle');
+  detalle.style.display='none';
+  grid.innerHTML=Array.from({length:21},(_,i)=>{
+    const d=i+1;
+    const r=retoRoutines.find(x=>x.day_num===d);
+    const tiene=!!r;
+    return `<div onclick="showRetoDiaDetalle(${d})" style="background:${tiene?'var(--dark2)':'#111'};border:1px solid ${tiene?'rgba(201,149,42,0.4)':'#222'};border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${tiene?'var(--gold)':'var(--gray)'};">${d}</div>
+      <div style="font-size:9px;color:var(--gray2);margin-top:2px;">${r?r.focus||'Sin título':'Sin rutina'}</div>
+    </div>`;
+  }).join('');
+  grid.style.display='grid';
+  grid.style.gridTemplateColumns='repeat(4,1fr)';
+  grid.style.gap='8px';
+}
+
+function showRetoDiaDetalle(day){
+  const r=retoRoutines.find(x=>x.day_num===day);
+  const detalle=document.getElementById('reto-vista-detalle');
+  if(!r){detalle.innerHTML=`<div style="color:var(--gray);text-align:center;padding:20px;">Día ${day} sin rutina configurada</div>`;detalle.style.display='block';return;}
+
+  const niveles=['principiante','intermedio','avanzado'];
+  const iconos={'principiante':'🟢','intermedio':'🟡','avanzado':'🔴'};
+  let exs=[];try{exs=Array.isArray(r.exercises)?r.exercises:JSON.parse(r.exercises||'[]');}catch(e){}
+
+  const nivelHtml=niveles.map(nv=>{
+    const filtrados=exs.filter(e=>e.level===nv||(!e.level&&nv==='principiante'));
+    if(!filtrados.length) return '';
+    return `<div style="margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;">${iconos[nv]} ${nv.toUpperCase()}</div>
+      ${filtrados.map(e=>`<div style="background:#111;border-radius:8px;padding:8px 10px;margin-bottom:4px;font-size:12px;color:var(--white);">
+        <span style="font-weight:600;">${e.name||e.exercise||'Ejercicio'}</span>
+        <span style="color:var(--gray2);margin-left:8px;">${e.sets?e.sets+'x':''} ${e.reps||e.duration||''}</span>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  detalle.innerHTML=`
+    <div style="background:var(--dark2);border:1px solid rgba(201,149,42,0.3);border-radius:14px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);">DÍA ${day}</div>
+          <div style="font-size:13px;color:var(--white);font-weight:600;">${r.focus||'Sin título'}</div>
+        </div>
+        <button onclick="openRetoRoutineEdit(${day})" style="background:rgba(201,149,42,0.15);border:1px solid var(--gold);color:var(--gold);padding:8px 12px;border-radius:8px;font-size:12px;cursor:pointer;">✏️ Editar</button>
+      </div>
+      ${nivelHtml||'<div style="color:var(--gray);font-size:12px;">Sin ejercicios configurados</div>'}
+    </div>`;
+  detalle.style.display='block';
+  detalle.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+async function loadRetoChatAdmin(){
+  const feed=document.getElementById('reto-chat-feed-admin');
+  if(!feed) return;
+  feed.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray2);">Cargando...</div>';
+  try{
+    const [postsR,clientsR,reactR,comentR]=await Promise.all([
+      fetch(SB_URL+'/reto_chat?select=*&order=fecha_post.desc&limit=50&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+      fetch(SB_URL+'/reto_clients?select=id,name,photo&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+      fetch(SB_URL+'/reto_chat_reacciones?select=*&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+      fetch(SB_URL+'/reto_chat_comentarios?select=*&order=created_at.asc&apikey='+SB_KEY,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
+    ]);
+    const posts=postsR.ok?await postsR.json():[];
+    const cls=clientsR.ok?await clientsR.json():[];
+    const reacciones=reactR.ok?await reactR.json():[];
+    const comentarios=comentR.ok?await comentR.json():[];
+    feed.innerHTML=renderChatFeed(posts,cls,reacciones,comentarios,null,true);
+    if(!posts.length) feed.innerHTML='<div style="text-align:center;padding:30px;color:var(--gray2);">Sin publicaciones aún</div>';
+  }catch(e){
+    feed.innerHTML='<div style="color:var(--danger);text-align:center;padding:20px;">Error al cargar</div>';
+  }
 }
 function renderRetoParticipants(){
   const list=document.getElementById('reto-participants-list');
