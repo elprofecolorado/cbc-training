@@ -392,13 +392,13 @@ body.trainer-mode .client-only{display:none;}
   </div>
 </div>
 
-<div class="reto-page" id="page-reto-ranking">
+<div class="page" id="page-reto-ranking">
   <div class="section-title">🏆 Ranking</div>
   <div id="reto-ranking-list"></div>
 </div>
 
 <!-- RETO CHAT PAGE -->
-<div class="reto-page" id="page-reto-chat">
+<div class="page" id="page-reto-chat">
   <div class="section-title">💬 Chat del Reto</div>
   <div style="font-size:12px;color:var(--gray2);margin-bottom:14px;">Comparte tu progreso, fotos y motiva al grupo 🔥</div>
 
@@ -425,7 +425,7 @@ body.trainer-mode .client-only{display:none;}
   <div id="reto-chat-feed"></div>
 </div>
 
-<div class="reto-page" id="page-reto-admin">
+<div class="page" id="page-reto-admin">
   <div style="display:flex;gap:6px;margin-bottom:16px;">
     <button class="reto-tab-btn active" id="rtab-participantes" onclick="retoAdminTab('participantes')">👥 Participantes</button>
     <button class="reto-tab-btn" id="rtab-rutinas" onclick="retoAdminTab('rutinas')">📋 Rutinas</button>
@@ -452,12 +452,13 @@ body.trainer-mode .client-only{display:none;}
   <button class="nav-btn active" onclick="showPage('rutinas',this)"><span class="nav-icon">🥊</span><span class="nav-label">Rutinas</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('reto-admin',this)"><span class="nav-icon">🔥</span><span class="nav-label">Reto 21</span></button>
+  <button class="nav-btn trainer-only" onclick="showPage('reto-chat',this)"><span class="nav-icon">💬</span><span class="nav-label">Chat Reto</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
 </div>
 <div class="bottom-nav" id="reto-nav" style="display:none;">
-  <button class="nav-btn active" onclick="showRetoHome(this)"><span class="nav-icon">🔥</span><span class="nav-label">Mi Reto</span></button>
-  <button class="nav-btn" onclick="showRetoPage('reto-ranking',this)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
-  <button class="nav-btn" onclick="showRetoPage('reto-chat',this)"><span class="nav-icon">💬</span><span class="nav-label">Chat</span></button>
+  <button class="nav-btn active" onclick="showPage('reto',this)"><span class="nav-icon">🔥</span><span class="nav-label">Mi Reto</span></button>
+  <button class="nav-btn" onclick="showPage('reto-ranking',this)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
+  <button class="nav-btn" onclick="showPage('reto-chat',this)"><span class="nav-icon">💬</span><span class="nav-label">Chat</span></button>
 </div>
 
 <!-- RATING POPUP -->
@@ -882,16 +883,14 @@ function applyMode() {
 
 // ─── NAVIGATION ───
 function showPage(page, btn) {
-  // Reto sub-pages use their own system
-  const retoSubPages=['reto-ranking','reto-chat','reto-admin'];
-  if(retoSubPages.includes(page)){
-    showRetoPage(page, btn); return;
-  }
   document.querySelectorAll('.page').forEach(p=>{ p.classList.remove('active'); p.style.display='none'; });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const _pg = document.getElementById('page-'+page);
   if (_pg) { _pg.classList.add('active'); _pg.style.display='block'; }
   if(btn) btn.classList.add('active');
+  if (page==='reto-admin') setTimeout(renderRetoAdmin, 50);
+  if (page==='reto-ranking') setTimeout(renderRetoRanking, 50);
+  if (page==='reto-chat') setTimeout(loadRetoChat, 50);
   document.getElementById('main-scroll').scrollTop=0;
   if(page==='ajustes'){renderSavedRoutines();renderMessagesList();renderLibrary();renderTemplates();}
   if(page==='progreso'){
@@ -901,31 +900,12 @@ function showPage(page, btn) {
   if(page==='dashboard') renderDashboard();
 }
 
-function showRetoPage(page, btn) {
-  // Hide main page (reto) and all reto sub-pages
-  const mainReto = document.getElementById('page-reto');
-  if(mainReto){ mainReto.classList.remove('active'); mainReto.style.display='none'; }
-  document.querySelectorAll('.reto-page').forEach(p=>{ p.style.display='none'; });
-  document.querySelectorAll('#reto-nav .nav-btn').forEach(b=>b.classList.remove('active'));
-
-  const _pg = document.getElementById('page-'+page);
-  if(_pg){ _pg.style.display='block'; }
-  if(btn) btn.classList.add('active');
-  document.getElementById('main-scroll').scrollTop=0;
-
-  if(page==='reto-admin') setTimeout(renderRetoAdmin, 50);
-  if(page==='reto-ranking') setTimeout(renderRetoRanking, 50);
-  if(page==='reto-chat') setTimeout(loadRetoChat, 50);
+function showRetoHome(btn){
+  showPage('reto', btn);
 }
 
-function showRetoHome(btn){
-  // Show main reto page, hide sub-pages
-  document.querySelectorAll('.reto-page').forEach(p=>{ p.style.display='none'; });
-  document.querySelectorAll('#reto-nav .nav-btn').forEach(b=>b.classList.remove('active'));
-  const mainReto = document.getElementById('page-reto');
-  if(mainReto){ mainReto.classList.add('active'); mainReto.style.display='block'; }
-  if(btn) btn.classList.add('active');
-  document.getElementById('main-scroll').scrollTop=0;
+function showRetoPage(page, btn){
+  showPage(page, btn);
 }
 
 function switchGestionTab(tab) {
@@ -2055,7 +2035,7 @@ async function afterLoginReto() {
   const mn=document.getElementById('main-nav'); if(mn) mn.style.display='none';
   const rn=document.getElementById('reto-nav'); if(rn) rn.style.display='flex';
   document.querySelector('.mode-badge').textContent='RETO 21';
-  showRetoHome(document.querySelector('#reto-nav .nav-btn'));
+  showPage('reto', document.querySelector('#reto-nav .nav-btn'));
   updateLevelButtons();
   renderRetoClient();
   showToast('🔥 Bienvenido '+retoClient.name.split(' ')[0]);
@@ -2454,10 +2434,11 @@ async function postRetoChat(){
   const msg=document.getElementById('chat-mensaje').value.trim();
   const videoLink=document.getElementById('chat-video-link').value.trim();
   if(!msg&&!chatFotoBase64){showToast('Escribe algo o sube una foto');return;}
-  const day=getRetoDay();
+  const day=isReto?getRetoDay():0;
+  const clientId=isReto?retoClient.id:null; // trainer posts with null client id
   const payload={
     id:Date.now(),
-    reto_client_id:retoClient.id,
+    reto_client_id:clientId,
     ronda:1,
     mensaje:msg||null,
     foto:chatFotoBase64||null,
@@ -2507,7 +2488,7 @@ async function loadRetoChat(){
 
     feed.innerHTML=posts.map(p=>{
       const cl=cls.find(c=>c.id===p.reto_client_id);
-      const name=cl?cl.name:'Participante';
+      const name=p.reto_client_id===null?'🥊 Entrenador':(cl?cl.name:'Participante');
       const avatar=cl?.photo
         ?`<img src="${cl.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;">`
         :`<div style="width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;">${name[0]}</div>`;
