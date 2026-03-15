@@ -2456,7 +2456,7 @@ function sendRetoWhatsApp(clientId) {
     'Hola ' + c.name.split(' ')[0] + '! 👊\n\n' +
     'Tu acceso a la app de entrenamiento:\n' +
     '🔑 PIN: *' + c.pin + '*\n' +
-    '🌐 App: https://coloradosboxing-cpu.github.io/cbc-training/\n\n' +
+    '🌐 App: https://elprofecolorado.github.io/cbc-training/\n\n' +
     '¡Nos vemos en el reto! 💪'
   );
   window.open('https://wa.me/' + phone + '?text=' + msg, '_blank');
@@ -3424,7 +3424,7 @@ async function renderRetoHistorial(){
 
 function inviteRetoHistorial(nombre, telefono){
   const tel = telefono.replace(/\D/g,'');
-  const msg = encodeURIComponent(`Hola ${nombre}! 🥊🔥\n\nEl próximo Reto 21 Días de Colorado's Boxing ya está abierto.\n¿Te apuntas? Inscríbete aquí 👇\nhttps://coloradosboxing-cpu.github.io/cbc-training/reto21-landing.html`);
+  const msg = encodeURIComponent(`Hola ${nombre}! 🥊🔥\n\nEl próximo Reto 21 Días de Colorado's Boxing ya está abierto.\n¿Te apuntas? Inscríbete aquí 👇\nhttps://elprofecolorado.github.io/cbc-training/reto21-landing.html`);
   window.open(`https://wa.me/${tel}?text=${msg}`, '_blank');
 }
 
@@ -3927,7 +3927,7 @@ async function sendPushRemindersUI() {
       const c = pending[i++];
       const parts = c.start_date ? c.start_date.split('-') : null;
       const day = parts ? Math.max(1,Math.min(21,Math.floor((new Date()-new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])))/86400000)+1)) : '?';
-      const msg = encodeURIComponent(`🔥 ${c.name.split(' ')[0]}, ¡todavía estás a tiempo! Completa tu entrenamiento del Día ${day} antes de que termine el día. ¡No rompas la racha! 💪\n\nCBC Training 👉 https://coloradosboxing-cpu.github.io/cbc-training/`);
+      const msg = encodeURIComponent(`🔥 ${c.name.split(' ')[0]}, ¡todavía estás a tiempo! Completa tu entrenamiento del Día ${day} antes de que termine el día. ¡No rompas la racha! 💪\n\nCBC Training 👉 https://elprofecolorado.github.io/cbc-training/`);
       window.open(`https://wa.me/52${c.phone}?text=${msg}`, '_blank');
       if (i < pending.length) {
         setTimeout(() => {
