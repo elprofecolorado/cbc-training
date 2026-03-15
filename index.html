@@ -3388,6 +3388,43 @@ function startSupabasePing() {
   setInterval(ping, 4 * 24 * 60 * 60 * 1000); // every 4 days
 }
 startSupabasePing();
+// --- LÓGICA DEL CRONÓMETRO ---
+let tSecs = 0;
+let tInt = null;
+const bell = new Audio('https://actions.google.com/sounds/v1/sports/boxing_bell.ogg');
+
+function tToggle() {
+  const btn = document.getElementById('t-btn');
+  if (tInt) {
+    clearInterval(tInt);
+    tInt = null;
+    btn.innerText = 'REANUDAR';
+    btn.style.background = '#c9952a';
+  } else {
+    if (tSecs === 0) bell.play().catch(()=>{}); 
+    tInt = setInterval(() => {
+      tSecs++;
+      let m = Math.floor(tSecs / 60);
+      let s = tSecs % 60;
+      document.getElementById('t-display').innerText = 
+        (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      
+      if (tSecs > 0 && tSecs % 180 === 0) bell.play().catch(()=>{});
+    }, 1000);
+    btn.innerText = 'PAUSA';
+    btn.style.background = '#e74c3c'; 
+  }
+}
+
+function tReset() {
+  clearInterval(tInt);
+  tInt = null;
+  tSecs = 0;
+  document.getElementById('t-display').innerText = '00:00';
+  const btn = document.getElementById('t-btn');
+  btn.innerText = 'INICIAR';
+  btn.style.background = '#c9952a';
+}
 </script>
 
 </body>
