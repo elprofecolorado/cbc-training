@@ -190,7 +190,7 @@ body.trainer-mode .client-only{display:none;}
 .video-modal-close{margin-top:14px;width:100%;padding:12px;background:rgba(201,149,42,0.15);border:1px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;}
 
 /* ═══ TIMER MODAL ═══ */
-.timer-fab{position:fixed;bottom:80px;right:16px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07010);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:22px;z-index:500;box-shadow:0 4px 16px rgba(201,149,42,0.5);transition:transform 0.2s;}
+.timer-fab{position:fixed;bottom:90px;right:16px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07010);border:2px solid rgba(255,255,255,0.15);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:24px;z-index:1500;box-shadow:0 4px 20px rgba(201,149,42,0.6);transition:transform 0.2s;}
 .timer-fab.visible{display:flex;}
 .timer-fab:active{transform:scale(0.92);}
 .timer-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:2500;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
@@ -912,6 +912,7 @@ async function doLogin() {
     localStorage.setItem('cbc_mode','trainer');
     localStorage.setItem('cbc_client_id','');
     await afterLogin();
+    showTimerFab();
     return;
   }
 
@@ -951,6 +952,7 @@ async function doLogin() {
     localStorage.setItem('cbc_mode','client');
     localStorage.setItem('cbc_client_id', String(client.id));
     await afterLogin();
+    showTimerFab();
     return;
   }
 
@@ -967,6 +969,7 @@ async function doLogin() {
           localStorage.setItem('cbc_mode','reto');
           localStorage.setItem('cbc_reto_id', String(rmatch.id));
           await afterLoginReto();
+          showTimerFab();
           return;
         }
       }
