@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '26';
+const APP_VERSION = '27';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -701,19 +701,19 @@ body.trainer-mode .client-only{display:none;}
       <button onclick="loadRetoChatAdmin()" style="background:none;border:1px solid #333;border-radius:8px;padding:6px 10px;color:var(--gray2);font-size:13px;cursor:pointer;">🔄</button>
     </div>
     <div style="background:var(--dark2);border:1px solid #333;border-radius:14px;padding:14px;margin-bottom:16px;">
-      <textarea id="chat-mensaje" placeholder="Escribe algo al grupo..." style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:10px;font-size:13px;font-family:'Montserrat',sans-serif;resize:none;min-height:70px;margin-bottom:8px;"></textarea>
+      <textarea id="chat-mensaje-admin" placeholder="Escribe algo al grupo..." style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:10px;font-size:13px;font-family:'Montserrat',sans-serif;resize:none;min-height:70px;margin-bottom:8px;"></textarea>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-        <input type="text" id="chat-video-link" placeholder="🎥 Link de TikTok/Instagram (opcional)" style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:8px 10px;font-size:12px;">
+        <input type="text" id="chat-video-link-admin" placeholder="🎥 Link de TikTok/Instagram (opcional)" style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:8px 10px;font-size:12px;">
       </div>
       <div style="display:flex;gap:8px;">
         <label style="flex:1;padding:10px;border-radius:8px;background:#1a1a1a;border:1px solid #333;color:var(--gray2);font-size:12px;text-align:center;cursor:pointer;">
           📷 Subir foto
-          <input type="file" accept="image/*" id="chat-foto-input" style="display:none" onchange="previewChatFoto(event)">
+          <input type="file" accept="image/*" id="chat-foto-input-admin" style="display:none" onchange="previewChatFoto(event)">
         </label>
         <button onclick="postRetoChat()" style="flex:1;padding:10px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;border:none;cursor:pointer;">PUBLICAR 🔥</button>
       </div>
-      <div id="chat-foto-preview" style="margin-top:8px;display:none;">
-        <img id="chat-foto-img" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;" src="">
+      <div id="chat-foto-preview-admin" style="margin-top:8px;display:none;">
+        <img id="chat-foto-img-admin" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;" src="">
         <button onclick="clearChatFoto()" style="margin-top:4px;background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;">✕ Quitar foto</button>
       </div>
     </div>
@@ -3581,8 +3581,15 @@ function clearChatFoto(){
 }
 
 async function postRetoChat(){
-  const msg=document.getElementById('chat-mensaje').value.trim();
-  const videoLink=document.getElementById('chat-video-link').value.trim();
+  // Read from whichever chat input is visible (participant or admin)
+  const msgEl = document.getElementById('chat-mensaje-admin')?.offsetParent !== null
+    ? document.getElementById('chat-mensaje-admin')
+    : document.getElementById('chat-mensaje');
+  const videoEl = document.getElementById('chat-video-link-admin')?.offsetParent !== null
+    ? document.getElementById('chat-video-link-admin')
+    : document.getElementById('chat-video-link');
+  const msg = msgEl ? msgEl.value.trim() : '';
+  const videoLink = videoEl ? videoEl.value.trim() : '';
   if(!msg&&!chatFotoFile){showToast('Escribe algo o sube una foto');return;}
   const day=isReto?getRetoDay():0;
   const clientId=isReto?retoClient.id:null;
@@ -3618,6 +3625,8 @@ async function postRetoChat(){
   if(res.ok||res.status===201){
     document.getElementById('chat-mensaje').value='';
     document.getElementById('chat-video-link').value='';
+    if(document.getElementById('chat-mensaje-admin')) document.getElementById('chat-mensaje-admin').value='';
+    if(document.getElementById('chat-video-link-admin')) document.getElementById('chat-video-link-admin').value='';
     clearChatFoto();
     showToast('✅ Publicado');
     loadRetoChat();
