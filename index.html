@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '23';
+const APP_VERSION = '24';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -3672,9 +3672,26 @@ function renderChatFeed(posts, cls, reacciones, comentarios, currentClient, isTr
       <div style="display:flex;gap:6px;margin-top:4px;">
         <input id="coment-${feedId}-${p.id}" placeholder="Comentar..." style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:var(--white);padding:6px 10px;font-size:12px;">
         <button onclick="enviarComentario(${p.id},${isTrainerView},'${feedId}')" style="background:rgba(201,149,42,0.2);border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">Enviar</button>
+        ${isTrainerView?`<button onclick="deleteChatPost(${p.id})" style="background:#2a0a0a;border:1px solid #5a1a1a;color:var(--danger);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">🗑</button>`:''}
       </div>
     </div>`;
   }).join('');
+}
+
+async function deleteChatPost(id){
+  if(!confirm('¿Borrar esta publicación?')) return;
+  // Delete reactions and comments first, then the post
+  await Promise.all([
+    fetch(SB_URL+'/reto_chat_reacciones?chat_id=eq.'+id+'&apikey='+SB_KEY,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
+    fetch(SB_URL+'/reto_chat_comentarios?chat_id=eq.'+id+'&apikey='+SB_KEY,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
+  ]);
+  const res=await fetch(SB_URL+'/reto_chat?id=eq.'+id+'&apikey='+SB_KEY,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+  if(res.ok||res.status===204){
+    showToast('🗑 Publicación eliminada');
+    loadRetoChatAdmin();
+  } else {
+    showToast('Error al eliminar');
+  }
 }
 
 // ─── CHAT AUTO-REFRESH (solo cuando hay mensajes nuevos) ───
