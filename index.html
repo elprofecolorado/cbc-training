@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '24';
+const APP_VERSION = '25';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -573,6 +573,81 @@ body.trainer-mode .client-only{display:none;}
   </div>
 </div>
 
+<!-- RETO INFO PAGE -->
+<div class="page" id="page-reto-info" style="padding-bottom:32px;">
+  <!-- HERO -->
+  <div style="background:linear-gradient(135deg,#1a0a00,#2d1500);border:1px solid rgba(201,149,42,0.4);border-radius:16px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;">
+    <div style="position:absolute;font-size:80px;opacity:0.05;top:-10px;right:-10px;">🥊</div>
+    <div style="width:60px;height:60px;border-radius:50%;border:2px solid rgba(201,149,42,0.6);background:rgba(201,149,42,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+      <img src="logo-trainer.png" style="width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(201,149,42,0.5));">
+    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:var(--gold);line-height:1;">CBC TRAINING</div>
+    <div style="font-size:11px;letter-spacing:3px;color:var(--gray2);margin-top:4px;text-transform:uppercase;">Reto 21 Días Sin Excusas</div>
+    <div style="font-size:13px;color:rgba(240,237,232,0.7);margin-top:12px;line-height:1.6;">Transforma tu cuerpo y hábitos en 21 días con entrenamientos diarios, seguimiento en tiempo real y el apoyo de tu entrenador.</div>
+  </div>
+
+  <!-- CÓMO FUNCIONA -->
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:10px;">📋 CÓMO FUNCIONA</div>
+  ${[
+    ['1','Entra cada día','Abre la app y ve a Mi Reto para ver tu rutina del día'],
+    ['2','Elige tu nivel','Selecciona Principiante 🟢, Intermedio 🟡 o Avanzado 🔴'],
+    ['3','Haz los ejercicios','Toca cada ejercicio para marcarlo como completado'],
+    ['4','Marca el día','Toca MARCAR DÍA COMPLETO al terminar todos los ejercicios'],
+    ['5','Califica','Dile a tu entrenador cómo estuvo el entrenamiento ⭐'],
+  ].map(([n,t,d])=>`
+    <div style="display:flex;gap:12px;background:var(--dark2);border:1px solid #252525;border-radius:12px;padding:14px;margin-bottom:8px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--gold),var(--orange));border-radius:2px 0 0 2px;"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1;width:28px;flex-shrink:0;">${n}</div>
+      <div><div style="font-weight:700;font-size:13px;margin-bottom:3px;">${t}</div><div style="font-size:11px;color:rgba(240,237,232,0.6);line-height:1.5;">${d}</div></div>
+    </div>`).join('')}
+
+  <!-- SECCIONES -->
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin:16px 0 10px;">📱 SECCIONES DE LA APP</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+    ${[
+      ['🔥','Mi Reto','Tu día, racha, insignias y rutina de hoy'],
+      ['🏆','Ranking','Tu posición vs los demás participantes'],
+      ['🎵','Música','Radio de entrenamiento — 6 estaciones'],
+      ['⏱','Timer','Cronómetro con alarma para tus ejercicios'],
+      ['💬','Chat','Comparte tu progreso con el grupo'],
+      ['⚖️','Mi Peso','Registra tu peso inicial y final del reto'],
+    ].map(([i,t,d])=>`
+      <div style="background:var(--dark2);border:1px solid #252525;border-radius:12px;padding:14px;">
+        <div style="font-size:26px;margin-bottom:6px;">${i}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--gold);margin-bottom:4px;">${t}</div>
+        <div style="font-size:11px;color:rgba(240,237,232,0.55);line-height:1.4;">${d}</div>
+      </div>`).join('')}
+  </div>
+
+  <!-- INSIGNIAS -->
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:10px;">🏅 INSIGNIAS</div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    ${[['🥊','Semana 1','7 días'],['💪','Semana 2','14 días'],['🏆','Completado','21 días']].map(([i,t,d])=>`
+      <div style="flex:1;background:var(--dark2);border:1px solid rgba(201,149,42,0.3);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:4px;">${i}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--gold);">${t}</div>
+        <div style="font-size:10px;color:var(--gray2);">${d}</div>
+      </div>`).join('')}
+  </div>
+
+  <!-- REGLAS -->
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:10px;">⚡ REGLAS</div>
+  <div style="background:var(--dark2);border:1px solid #252525;border-radius:12px;padding:16px;margin-bottom:16px;">
+    ${['📅 Entrena todos los días durante 21 días','💧 Mantente hidratado y descansa bien','🔥 No rompas tu racha — ¡sin excusas!','📲 Marca tu día como completado en la app','⭐ Califica tu entrenamiento al terminar'].map(r=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:12px;color:rgba(240,237,232,0.8);">
+        <span style="font-size:16px;">${r.split(' ')[0]}</span>
+        <span>${r.split(' ').slice(1).join(' ')}</span>
+      </div>`).join('')}
+  </div>
+
+  <!-- CONTACTO -->
+  <div style="background:linear-gradient(135deg,#0d2e0d,#1a4a1a);border:1px solid rgba(37,211,102,0.3);border-radius:14px;padding:20px;text-align:center;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#25d366;margin-bottom:6px;">📲 ¿DUDAS?</div>
+    <div style="font-size:12px;color:rgba(240,237,232,0.6);margin-bottom:14px;line-height:1.6;">Contacta a tu entrenador por WhatsApp para cualquier pregunta sobre los ejercicios o la app.</div>
+    <button onclick="contactTrainer()" style="width:100%;padding:14px;border-radius:50px;background:#25d366;color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border:none;cursor:pointer;">💬 ESCRIBIR AL ENTRENADOR</button>
+  </div>
+</div>
+
 <!-- RETO CHAT PAGE (participantes) -->
 <div class="page" id="page-reto-chat">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
@@ -742,6 +817,7 @@ body.trainer-mode .client-only{display:none;}
   <button class="nav-btn" onclick="showPage('reto-musica',this)"><span class="nav-icon">🎵</span><span class="nav-label">Música</span></button>
   <button class="nav-btn" onclick="showPage('reto-timer',this)"><span class="nav-icon">⏱</span><span class="nav-label">Timer</span></button>
   <button class="nav-btn" onclick="showPage('reto-chat',this)"><span class="nav-icon">💬</span><span class="nav-label">Chat</span></button>
+  <button class="nav-btn" onclick="showPage('reto-info',this)"><span class="nav-icon">📖</span><span class="nav-label">Info</span></button>
 </div>
 
 <!-- RATING POPUP -->
@@ -854,6 +930,38 @@ body.trainer-mode .client-only{display:none;}
       <button class="timer-btn timer-btn-reset" onclick="resetTimer()" title="Reiniciar">↺</button>
       <button class="timer-btn timer-btn-play" id="timer-play-btn" onclick="toggleTimer()">▶</button>
       <button class="timer-btn timer-btn-close" onclick="closeTimerModal()" title="Cerrar">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- WELCOME POPUP (primera vez) -->
+<div id="welcome-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:5000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);">
+  <div style="background:var(--dark2);border:1px solid rgba(201,149,42,0.5);border-radius:20px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;animation:slideUp 0.4s ease;">
+    <div style="background:linear-gradient(135deg,#1a0a00,#2d1500);border-radius:20px 20px 0 0;padding:28px 24px;text-align:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;font-size:80px;opacity:0.06;top:-10px;right:-10px;">🥊</div>
+      <div style="width:70px;height:70px;border-radius:50%;border:2px solid rgba(201,149,42,0.6);background:rgba(201,149,42,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 0 30px rgba(201,149,42,0.3);">
+        <img src="logo-trainer.png" style="width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(201,149,42,0.5));">
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--orange);margin-bottom:4px;">BIENVENIDO AL</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:var(--gold);line-height:1;">RETO 21 DÍAS</div>
+      <div style="font-size:11px;letter-spacing:2px;color:var(--gray2);margin-top:4px;">SIN EXCUSAS — CBC TRAINING</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <div style="font-size:13px;color:rgba(240,237,232,0.8);line-height:1.7;margin-bottom:16px;">
+        Hola <strong id="welcome-name" style="color:var(--gold);">campeón</strong> 👊<br><br>
+        Estás a punto de iniciar el reto más importante de tu vida. Durante los próximos <strong>21 días</strong> tendrás una rutina diaria adaptada a tu nivel, seguimiento en tiempo real y el apoyo de tu entrenador.
+      </div>
+      <div style="background:var(--dark3);border-radius:12px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold2);margin-bottom:10px;">⚡ RECUERDA SIEMPRE:</div>
+        ${['📅 Entrena todos los días sin excusas','🔥 Marca tu día completo en la app','⭐ Califica tu entrenamiento al terminar','💬 Comparte tu progreso en el Chat'].map(r=>`
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,237,232,0.7);margin-bottom:6px;">
+            <span>${r.split(' ')[0]}</span><span>${r.split(' ').slice(1).join(' ')}</span>
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeWelcomePopup(true)" style="flex:1;padding:14px;border-radius:50px;background:linear-gradient(135deg,var(--gold),#a07010);color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border:none;cursor:pointer;">🥊 ¡EMPEZAR!</button>
+        <button onclick="showPage('reto-info',null);closeWelcomePopup(true)" style="padding:14px 16px;border-radius:50px;background:transparent;border:1px solid rgba(201,149,42,0.4);color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">📖 Ver guía</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2087,6 +2195,20 @@ async function renderRetoRankingAdmin(){
       </div>`).join('');
   }catch(e){list.innerHTML='<div class="empty-state"><p>Error al cargar</p></div>';}
 }
+// ─── WELCOME POPUP ───
+function showWelcomePopup(){
+  if(!retoClient) return;
+  const key='cbc_welcome_shown_'+retoClient.id;
+  if(localStorage.getItem(key)) return;
+  const nameEl=document.getElementById('welcome-name');
+  if(nameEl) nameEl.textContent=retoClient.name.split(' ')[0];
+  document.getElementById('welcome-popup').style.display='flex';
+}
+function closeWelcomePopup(save=true){
+  document.getElementById('welcome-popup').style.display='none';
+  if(save&&retoClient) localStorage.setItem('cbc_welcome_shown_'+retoClient.id,'1');
+}
+
 let _ptInterval=null, _ptTotal=0, _ptRemaining=0, _ptRunning=false;
 const PT_CIRC=477.52;
 function pageTimerSet(secs){
@@ -3143,6 +3265,7 @@ async function afterLoginReto() {
   updateLevelButtons();
   renderRetoClient();
   showToast('🔥 Bienvenido '+retoClient.name.split(' ')[0]);
+  setTimeout(showWelcomePopup, 800);
   // Ask for notification permission after login
 }
 
