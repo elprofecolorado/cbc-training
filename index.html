@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '29';
+const APP_VERSION = '30';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -3647,7 +3647,7 @@ function renderChatFeed(posts, cls, reacciones, comentarios, currentClient, isTr
         ?`<img src="${cl.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;">`
         :`<div style="width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;">${name[0]}</div>`);
     const isMe=isTrainerView?(p.reto_client_id===null):(currentClient&&p.reto_client_id===currentClient.id);
-    const fecha=new Date(p.fecha_post).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const fecha=new Date(p.fecha_post).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'});
     const videoEmbed=p.video_link?`<a href="${p.video_link}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:8px 12px;color:var(--gold);font-size:12px;text-decoration:none;margin-top:8px;">🎥 Ver video</a>`:'';
 
     const postReacts=reacciones.filter(r=>r.chat_id===p.id);
