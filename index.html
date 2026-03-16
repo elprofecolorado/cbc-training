@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '22';
+const APP_VERSION = '23';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -480,6 +480,20 @@ body.trainer-mode .client-only{display:none;}
     <div id="reto-ejercicios-list"></div>
     <button class="reto-complete-btn" id="reto-complete-btn" onclick="retoCompleteDay()" disabled>MARCAR DÍA COMPLETO</button>
   </div>
+  <!-- PESO DEL PARTICIPANTE -->
+  <div id="reto-peso-card" style="margin-top:12px;background:linear-gradient(135deg,#1a1200,#2a1f00);border:1px solid rgba(201,149,42,0.4);border-radius:14px;padding:16px;margin-bottom:4px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;">⚖️ MI PESO</div>
+    <div style="font-size:11px;color:var(--gray2);margin-bottom:12px;">Registra tu peso para ver tu progreso al terminar el reto</div>
+    <div id="reto-peso-display"></div>
+    <div id="reto-peso-form" style="display:none;">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="reto-peso-input" type="number" step="0.1" placeholder="ej: 75.5" class="form-input" style="flex:1;">
+        <span style="color:var(--gray2);font-size:13px;font-weight:600;">kg</span>
+        <button onclick="saveRetoPeso()" style="padding:10px 16px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#a07010);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">GUARDAR</button>
+      </div>
+    </div>
+  </div>
+
   <div style="margin-top:16px;margin-bottom:8px;">
     <button onclick="contactTrainer()" style="width:100%;padding:14px;border-radius:12px;background:#0d2e0d;border:1px solid #25D366;color:#25D366;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
       <span style="font-size:20px;">📲</span> CONTACTAR AL ENTRENADOR
@@ -1918,7 +1932,80 @@ function showNotifBanner(){
 }
 
 // Show music FAB after login
-// ─── ADMIN TIMER ───
+// ─── PESO PARTICIPANTE ───
+function renderRetoPesoCard(){
+  const display=document.getElementById('reto-peso-display');
+  const form=document.getElementById('reto-peso-form');
+  if(!display||!form||!retoClient) return;
+  const day=getRetoDay();
+  const hasPesoInicial=retoClient.peso_inicial;
+  const hasPesoFinal=retoClient.peso_final;
+  const diff=hasPesoInicial&&hasPesoFinal?(parseFloat(retoClient.peso_inicial)-parseFloat(retoClient.peso_final)).toFixed(1):null;
+
+  if(!hasPesoInicial){
+    // Ask for initial weight
+    display.innerHTML=`<div style="font-size:12px;color:var(--white);margin-bottom:8px;">¿Cuál es tu peso al inicio del reto?</div>`;
+    form.style.display='block';
+    document.getElementById('reto-peso-input').dataset.tipo='inicial';
+  } else if(day>=21&&!hasPesoFinal){
+    // Ask for final weight
+    display.innerHTML=`
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <div><div style="font-size:11px;color:var(--gray2);">PESO INICIAL</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--white);">${retoClient.peso_inicial} kg</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--gold);margin-bottom:8px;">🏁 ¡Completaste el reto! ¿Cuál es tu peso final?</div>`;
+    form.style.display='block';
+    document.getElementById('reto-peso-input').dataset.tipo='final';
+  } else if(hasPesoInicial){
+    // Show both weights
+    form.style.display='none';
+    display.innerHTML=`
+      <div style="display:flex;justify-content:space-around;text-align:center;">
+        <div>
+          <div style="font-size:10px;letter-spacing:1px;color:var(--gray2);text-transform:uppercase;">Inicio</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);">${retoClient.peso_inicial}</div>
+          <div style="font-size:10px;color:var(--gray2);">kg</div>
+        </div>
+        ${hasPesoFinal?`
+        <div>
+          <div style="font-size:10px;letter-spacing:1px;color:var(--gray2);text-transform:uppercase;">Final</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--success);">${retoClient.peso_final}</div>
+          <div style="font-size:10px;color:var(--gray2);">kg</div>
+        </div>
+        <div>
+          <div style="font-size:10px;letter-spacing:1px;color:var(--gray2);text-transform:uppercase;">Perdiste</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${diff>0?'var(--success)':'var(--gold)'};">${diff>0?'-'+diff:diff}</div>
+          <div style="font-size:10px;color:var(--gray2);">kg</div>
+        </div>`:'<div style="font-size:11px;color:var(--gray2);align-self:center;">Peso final al completar día 21</div>'}
+      </div>
+      ${!hasPesoFinal?`<button onclick="document.getElementById('reto-peso-form').style.display='block';document.getElementById('reto-peso-input').dataset.tipo='final'" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;background:rgba(201,149,42,0.1);border:1px solid rgba(201,149,42,0.3);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;">+ Registrar peso final</button>`:''}`;
+  }
+}
+
+async function saveRetoPeso(){
+  const input=document.getElementById('reto-peso-input');
+  const tipo=input.dataset.tipo||'inicial';
+  const val=parseFloat(input.value);
+  if(!val||val<20||val>300){showToast('Ingresa un peso válido');return;}
+  const field=tipo==='inicial'?'peso_inicial':'peso_final';
+  const res=await fetch(SB_URL+'/reto_clients?id=eq.'+retoClient.id,{
+    method:'PATCH',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+    body:JSON.stringify({[field]:val})
+  });
+  if(res.ok||res.status===204){
+    retoClient[field]=val;
+    input.value='';
+    document.getElementById('reto-peso-form').style.display='none';
+    renderRetoPesoCard();
+    showToast(`⚖️ Peso ${tipo==='inicial'?'inicial':'final'} guardado!`);
+    if(tipo==='final') launchConfetti();
+  } else {
+    showToast('Error al guardar. Verifica la columna en Supabase.');
+  }
+}
+
+// ─── TRAINER WEIGHT CHART ───
 let _atInterval=null,_atTotal=0,_atRemaining=0,_atRunning=false;
 function adminTimerSet(s){adminTimerPause();_atTotal=s;_atRemaining=s;updateAdminTimer();}
 function adminTimerCustom(){const m=parseInt(document.getElementById('admin-timer-min').value)||0;const s=parseInt(document.getElementById('admin-timer-sec').value)||0;const t=m*60+s;if(t>0)adminTimerSet(t);}
@@ -3274,6 +3361,7 @@ function renderRetoClient() {
   document.getElementById('reto-msg-container').innerHTML=msg?`<div class="reto-msg-card"><div class="reto-msg-text">"${msg.message}"</div><div style="font-size:10px;color:var(--gray);margin-top:6px;">— Mensaje del día ${day}</div></div>`:'';
   updateLevelButtons();
   renderRetoEjercicios();
+  renderRetoPesoCard();
 }
 
 function renderRetoEjercicios() {
@@ -3916,8 +4004,6 @@ function openRetoAddClient(){
   document.getElementById('reto-client-pin').value='';
   document.getElementById('reto-client-phone').value='';
   document.getElementById('reto-client-start').value=new Date().toISOString().split('T')[0];
-  document.getElementById('reto-client-peso-inicial').value='';
-  document.getElementById('reto-client-peso-final').value='';
   document.getElementById('reto-client-modal-title').textContent='AGREGAR PARTICIPANTE';
   openModal('modal-reto-client');
 }
@@ -3928,8 +4014,6 @@ function editRetoClient(id){
   document.getElementById('reto-client-pin').value=c.pin||'';
   document.getElementById('reto-client-phone').value=c.phone||'';
   document.getElementById('reto-client-start').value=c.start_date||'';
-  document.getElementById('reto-client-peso-inicial').value=c.peso_inicial||'';
-  document.getElementById('reto-client-peso-final').value=c.peso_final||'';
   document.getElementById('reto-client-modal-title').textContent='EDITAR PARTICIPANTE';
   openModal('modal-reto-client');
 }
@@ -3939,10 +4023,10 @@ async function saveRetoClient(){
   const pin=document.getElementById('reto-client-pin').value.trim();
   const phone=document.getElementById('reto-client-phone').value.trim();
   const start=document.getElementById('reto-client-start').value;
-  const peso_inicial=document.getElementById('reto-client-peso-inicial').value||null;
-  const peso_final=document.getElementById('reto-client-peso-final').value||null;
+  const peso_inicial=document.getElementById('reto-client-peso-inicial')?.value||null;
+  const peso_final=document.getElementById('reto-client-peso-final')?.value||null;
   if(!name||!pin){showToast('Nombre y PIN requeridos');return;}
-  const payload={name,pin,phone,start_date:start,peso_inicial,peso_final};
+  const payload={name,pin,phone,start_date:start};
   let ok;
   if(eid){
     const r=await fetch(SB_URL+'/reto_clients?id=eq.'+eid+'&apikey='+SB_KEY,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
@@ -4113,10 +4197,6 @@ async function saveRetoMsg(){
     <div class="form-group"><label class="form-label">PIN (4 dígitos)</label><input class="form-input" id="reto-client-pin" type="number" placeholder="ej: 5678"></div>
     <div class="form-group"><label class="form-label">TELÉFONO (opcional)</label><input class="form-input" id="reto-client-phone" placeholder="+52..."></div>
     <div class="form-group"><label class="form-label">FECHA INICIO</label><input class="form-input" id="reto-client-start" type="date"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="form-group"><label class="form-label">⚖️ PESO INICIAL (kg)</label><input class="form-input" id="reto-client-peso-inicial" type="number" step="0.1" placeholder="ej: 75.5"></div>
-      <div class="form-group"><label class="form-label">🏁 PESO FINAL (kg)</label><input class="form-input" id="reto-client-peso-final" type="number" step="0.1" placeholder="al terminar"></div>
-    </div>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button onclick="closeModal('modal-reto-client')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
       <button onclick="saveRetoClient()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
