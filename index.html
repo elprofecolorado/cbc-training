@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '19';
+const APP_VERSION = '21';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -200,9 +200,9 @@ body.trainer-mode .client-only{display:none;}
 #confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;display:none;}
 
 /* ═══ MUSIC PANEL ═══ */
-.music-fab{position:fixed;bottom:160px;right:16px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1db954,#0e8c3a);border:2px solid rgba(255,255,255,0.15);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:24px;z-index:1500;box-shadow:0 4px 20px rgba(29,185,84,0.5);transition:transform 0.2s;}
-.music-fab.visible{display:flex;}
-.music-fab:active{transform:scale(0.92);}
+
+
+
 .music-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:2500;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
 .music-modal-overlay.open{display:flex;}
 .music-modal{background:var(--dark2);border:1px solid #333;border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:24px 20px 32px;animation:slideUp 0.3s ease;}
@@ -258,9 +258,9 @@ body.trainer-mode .client-only{display:none;}
 .video-modal-close{margin-top:14px;width:100%;padding:12px;background:rgba(201,149,42,0.15);border:1px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;}
 
 /* ═══ TIMER MODAL ═══ */
-.timer-fab{position:fixed;bottom:90px;right:16px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07010);border:2px solid rgba(255,255,255,0.15);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:24px;z-index:1500;box-shadow:0 4px 20px rgba(201,149,42,0.6);transition:transform 0.2s;}
-.timer-fab.visible{display:flex;}
-.timer-fab:active{transform:scale(0.92);}
+
+
+
 .timer-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:2500;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
 .timer-modal-overlay.open{display:flex;}
 .timer-modal{background:var(--dark2);border:1px solid #333;border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:24px 20px 32px;animation:slideUp 0.3s ease;}
@@ -665,7 +665,7 @@ body.trainer-mode .client-only{display:none;}
   <button class="nav-btn active" onclick="showPage('rutinas',this)"><span class="nav-icon">🥊</span><span class="nav-label">Rutinas</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('reto-admin',this)"><span class="nav-icon">🔥</span><span class="nav-label">Reto 21</span></button>
-  <button class="nav-btn trainer-only" onclick="showPage('reto-ranking',this);setTimeout(renderRetoRanking,50)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
+  <button class="nav-btn trainer-only" onclick="showPage('reto-ranking',this);setTimeout(renderRetoRanking,100)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
 </div>
 <div class="bottom-nav" id="reto-nav" style="display:none;">
@@ -701,7 +701,6 @@ body.trainer-mode .client-only{display:none;}
 <canvas id="confetti-canvas"></canvas>
 
 <!-- MUSIC FAB -->
-<button class="music-fab" id="music-fab" onclick="openMusicModal()" title="Música">🎵</button>
 
 <!-- MUSIC MODAL -->
 <div class="music-modal-overlay" id="music-modal">
@@ -752,7 +751,6 @@ body.trainer-mode .client-only{display:none;}
 </div>
 
 <!-- TIMER FAB -->
-<button class="timer-fab" id="timer-fab" onclick="openTimerModal()" title="Cronómetro">⏱</button>
 
 <!-- TIMER MODAL -->
 <div class="timer-modal-overlay" id="timer-modal">
@@ -1079,8 +1077,6 @@ async function doLogin() {
     localStorage.setItem('cbc_mode','trainer');
     localStorage.setItem('cbc_client_id','');
     await afterLogin();
-    showTimerFab();
-    showMusicFab();
     return;
   }
 
@@ -1120,8 +1116,6 @@ async function doLogin() {
     localStorage.setItem('cbc_mode','client');
     localStorage.setItem('cbc_client_id', String(client.id));
     await afterLogin();
-    showTimerFab();
-    showMusicFab();
     showNotifBanner();
     return;
   }
@@ -1139,8 +1133,6 @@ async function doLogin() {
           localStorage.setItem('cbc_mode','reto');
           localStorage.setItem('cbc_reto_id', String(rmatch.id));
           await afterLoginReto();
-          showTimerFab();
-          showMusicFab();
           return;
         }
       }
@@ -1178,14 +1170,11 @@ async function afterLogin() {
       renderClients();
       openClientWorkout(client.id);
       showToast('✓ Bienvenido ' + client.name.split(' ')[0]);
-      showTimerFab();
       return;
     }
   }
   renderClients();
   showToast('✓ Bienvenido');
-  showTimerFab();
-  showMusicFab();
   scheduleWorkoutReminder();
 }
 
@@ -1527,9 +1516,8 @@ function closeVideoModal(){
 let _timerInterval=null, _timerTotal=0, _timerRemaining=0, _timerRunning=false;
 const CIRC=439.82;
 
-function showTimerFab(){
-  document.getElementById('timer-fab').classList.add('visible');
-}
+function showTimerFab(){ /* FABs removed - timer is in reto tabs */ }
+function showMusicFab(){ /* FABs removed - music is in reto tabs */ }
 function openTimerModal(){
   document.getElementById('timer-modal').classList.add('open');
 }
@@ -1543,7 +1531,6 @@ function openTimerForEx(name,sets){
   document.getElementById('timer-ex-sets').textContent=sets||'';
   if(secs>0) setTimerPreset(secs);
   openTimerModal();
-  showTimerFab();
 }
 function parseTimeFromSets(s){
   if(!s) return 0;
@@ -1877,8 +1864,6 @@ function showNotifBanner(){
 }
 
 // Show music FAB after login
-function showMusicFab(){ document.getElementById('music-fab').classList.add('visible'); }
-
 // ─── PAGE TIMER (inside reto) ───
 let _ptInterval=null, _ptTotal=0, _ptRemaining=0, _ptRunning=false;
 const PT_CIRC=477.52;
@@ -2200,53 +2185,83 @@ function renumberExRows(){
 // ─── DRAG & DROP ───
 let _dragSrc=null;
 function initDragDrop(el){
+  // Mouse drag
   el.addEventListener('dragstart',e=>{
-    _dragSrc=el; el.classList.add('dragging');
+    _dragSrc=el;
+    el.classList.add('dragging');
     e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain','');
   });
   el.addEventListener('dragend',()=>{
     el.classList.remove('dragging');
     document.querySelectorAll('.ex-row-draggable').forEach(r=>r.classList.remove('drag-over'));
   });
   el.addEventListener('dragover',e=>{
-    e.preventDefault(); e.dataTransfer.dropEffect='move';
-    if(el!==_dragSrc){ el.classList.add('drag-over'); }
+    e.preventDefault();
+    e.dataTransfer.dropEffect='move';
+    if(el!==_dragSrc) el.classList.add('drag-over');
   });
   el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
   el.addEventListener('drop',e=>{
     e.preventDefault();
-    if(_dragSrc&&_dragSrc!==el){
+    if(_dragSrc && _dragSrc!==el){
       const container=document.getElementById('exercises-builder');
       const kids=[...container.children];
       const srcIdx=kids.indexOf(_dragSrc);
       const tgtIdx=kids.indexOf(el);
-      if(srcIdx<tgtIdx) container.insertBefore(_dragSrc,el.nextSibling);
-      else container.insertBefore(_dragSrc,el);
+      if(srcIdx < tgtIdx) container.insertBefore(_dragSrc, el.nextSibling);
+      else container.insertBefore(_dragSrc, el);
+      renumberExRows();
     }
     el.classList.remove('drag-over');
   });
-  // Touch support
-  let touchY=0;
-  el.addEventListener('touchstart',e=>{_dragSrc=el;touchY=e.touches[0].clientY;},{ passive:true });
-  el.addEventListener('touchmove',e=>{
+
+  // Touch drag
+  const handle=el.querySelector('.drag-handle');
+  if(!handle) return;
+  let startY=0, startX=0, clone=null;
+
+  handle.addEventListener('touchstart',e=>{
+    _dragSrc=el;
+    startY=e.touches[0].clientY;
+    startX=e.touches[0].clientX;
+    el.style.opacity='0.5';
+    // Create visual clone
+    clone=el.cloneNode(true);
+    clone.style.cssText=`position:fixed;left:${el.getBoundingClientRect().left}px;top:${el.getBoundingClientRect().top}px;width:${el.offsetWidth}px;opacity:0.85;pointer-events:none;z-index:9999;border:2px solid var(--gold);border-radius:10px;`;
+    document.body.appendChild(clone);
+  },{passive:true});
+
+  handle.addEventListener('touchmove',e=>{
     e.preventDefault();
+    if(!clone) return;
     const t=e.touches[0];
-    const over=document.elementFromPoint(t.clientX,t.clientY)?.closest('.ex-row-draggable');
+    const dy=t.clientY-startY;
+    const dx=t.clientX-startX;
+    clone.style.transform=`translate(${dx}px,${dy}px)`;
+    // Highlight target
     document.querySelectorAll('.ex-row-draggable').forEach(r=>r.classList.remove('drag-over'));
-    if(over&&over!==_dragSrc) over.classList.add('drag-over');
+    const over=document.elementFromPoint(t.clientX,t.clientY)?.closest('.ex-row-draggable');
+    if(over && over!==_dragSrc) over.classList.add('drag-over');
   },{passive:false});
-  el.addEventListener('touchend',e=>{
+
+  handle.addEventListener('touchend',e=>{
+    if(clone){ clone.remove(); clone=null; }
+    if(_dragSrc) _dragSrc.style.opacity='';
     const t=e.changedTouches[0];
     const over=document.elementFromPoint(t.clientX,t.clientY)?.closest('.ex-row-draggable');
-    if(over&&over!==_dragSrc){
+    if(over && over!==_dragSrc && _dragSrc){
       const container=document.getElementById('exercises-builder');
       const kids=[...container.children];
       const srcIdx=kids.indexOf(_dragSrc);
       const tgtIdx=kids.indexOf(over);
-      if(srcIdx<tgtIdx) container.insertBefore(_dragSrc,over.nextSibling);
-      else container.insertBefore(_dragSrc,over);
+      if(srcIdx < tgtIdx) container.insertBefore(_dragSrc, over.nextSibling);
+      else container.insertBefore(_dragSrc, over);
+      renumberExRows();
+      showToast('✓ Ejercicio movido');
     }
     document.querySelectorAll('.ex-row-draggable').forEach(r=>r.classList.remove('drag-over'));
+    _dragSrc=null;
   });
 }
 
@@ -2906,7 +2921,6 @@ async function afterLoginReto() {
   updateLevelButtons();
   renderRetoClient();
   showToast('🔥 Bienvenido '+retoClient.name.split(' ')[0]);
-  showTimerFab();
   // Ask for notification permission after login
 }
 
