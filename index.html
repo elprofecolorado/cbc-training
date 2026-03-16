@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '21';
+const APP_VERSION = '22';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -591,6 +591,9 @@ body.trainer-mode .client-only{display:none;}
     <button class="reto-tab-btn active" id="rtab-participantes" onclick="retoAdminTab('participantes')">👥 Participantes</button>
     <button class="reto-tab-btn" id="rtab-rutinas" onclick="retoAdminTab('rutinas')">📋 Rutinas</button>
     <button class="reto-tab-btn" id="rtab-vista" onclick="retoAdminTab('vista')">👁 Vista</button>
+    <button class="reto-tab-btn" id="rtab-ranking" onclick="retoAdminTab('ranking')">🏆 Ranking</button>
+    <button class="reto-tab-btn" id="rtab-musica" onclick="retoAdminTab('musica')">🎵 Música</button>
+    <button class="reto-tab-btn" id="rtab-timer" onclick="retoAdminTab('timer')">⏱ Timer</button>
     <button class="reto-tab-btn" id="rtab-chat" onclick="retoAdminTab('chat')">💬 Chat</button>
     <button class="reto-tab-btn" id="rtab-mensaje" onclick="retoAdminTab('mensaje')">📣 Mensajes</button>
     <button class="reto-tab-btn" id="rtab-historial" onclick="retoAdminTab('historial')">📚 Historial</button>
@@ -610,6 +613,57 @@ body.trainer-mode .client-only{display:none;}
   <div id="reto-admin-historial" style="display:none;">
     <div style="font-size:12px;color:var(--gray2);margin-bottom:14px;">Participantes de retos anteriores. Invítalos al próximo reto.</div>
     <div id="reto-historial-list"></div>
+  </div>
+
+  <!-- RANKING -->
+  <div id="reto-admin-ranking" style="display:none;">
+    <div id="reto-ranking-list-admin"></div>
+  </div>
+
+  <!-- MÚSICA -->
+  <div id="reto-admin-musica" style="display:none;">
+    <div style="background:linear-gradient(135deg,#1a1200,#2a1f00);border:1px solid rgba(201,149,42,0.3);border-radius:14px;padding:16px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;">📻 RADIO WORKOUT</div>
+      <div style="font-size:11px;color:var(--gray2);margin-bottom:14px;">Selecciona una estación</div>
+      <div id="reto-radio-stations-admin"></div>
+      <audio id="reto-radio-audio-admin"></audio>
+      <div id="reto-radio-nowplaying-admin" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(201,149,42,0.1);border:1px solid rgba(201,149,42,0.3);border-radius:8px;font-size:12px;font-weight:700;color:var(--gold);text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div id="reto-admin-timer" style="display:none;">
+    <div style="background:var(--dark2);border:1px solid #2a2a2a;border-radius:16px;padding:24px 20px;text-align:center;">
+      <div style="width:180px;height:180px;margin:0 auto 12px;position:relative;">
+        <svg width="180" height="180" viewBox="0 0 180 180" style="transform:rotate(-90deg);">
+          <circle fill="none" stroke="#222" stroke-width="10" cx="90" cy="90" r="76"/>
+          <circle id="admin-timer-ring" fill="none" stroke="var(--gold)" stroke-width="10" stroke-linecap="round"
+            cx="90" cy="90" r="76" stroke-dasharray="477.52" stroke-dashoffset="0"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
+          <div id="admin-timer-display" style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--gold);line-height:1;letter-spacing:3px;">00:00</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="timer-preset-btn" onclick="adminTimerSet(20)">20s</button>
+        <button class="timer-preset-btn" onclick="adminTimerSet(30)">30s</button>
+        <button class="timer-preset-btn" onclick="adminTimerSet(45)">45s</button>
+        <button class="timer-preset-btn" onclick="adminTimerSet(60)">1 min</button>
+        <button class="timer-preset-btn" onclick="adminTimerSet(90)">90s</button>
+        <button class="timer-preset-btn" onclick="adminTimerSet(120)">2 min</button>
+        <button class="timer-preset-btn" onclick="adminTimerSet(180)">3 min</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:16px;">
+        <input class="timer-custom-input" id="admin-timer-min" type="number" min="0" max="59" placeholder="min" value="0">
+        <span style="color:var(--gold);font-size:20px;font-weight:700;">:</span>
+        <input class="timer-custom-input" id="admin-timer-sec" type="number" min="0" max="59" placeholder="seg" value="30">
+        <button class="timer-preset-btn" onclick="adminTimerCustom()">▶ Usar</button>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="timer-btn timer-btn-reset" onclick="adminTimerReset()">↺</button>
+        <button class="timer-btn timer-btn-play" id="admin-timer-play-btn" onclick="adminTimerToggle()">▶</button>
+      </div>
+    </div>
   </div>
 
   <!-- RUTINAS -->
@@ -1864,7 +1918,88 @@ function showNotifBanner(){
 }
 
 // Show music FAB after login
-// ─── PAGE TIMER (inside reto) ───
+// ─── ADMIN TIMER ───
+let _atInterval=null,_atTotal=0,_atRemaining=0,_atRunning=false;
+function adminTimerSet(s){adminTimerPause();_atTotal=s;_atRemaining=s;updateAdminTimer();}
+function adminTimerCustom(){const m=parseInt(document.getElementById('admin-timer-min').value)||0;const s=parseInt(document.getElementById('admin-timer-sec').value)||0;const t=m*60+s;if(t>0)adminTimerSet(t);}
+function adminTimerToggle(){_atRunning?adminTimerPause():adminTimerStart();}
+function adminTimerStart(){
+  if(_atTotal===0)adminTimerSet(30);
+  if(_atRemaining<=0)_atRemaining=_atTotal;
+  _atRunning=true;
+  document.getElementById('admin-timer-play-btn').textContent='⏸';
+  _atInterval=setInterval(()=>{
+    _atRemaining--;updateAdminTimer();
+    if(_atRemaining<=0){clearInterval(_atInterval);_atRunning=false;document.getElementById('admin-timer-play-btn').textContent='▶';timerBeep();showToast('⏱ ¡Tiempo!');}
+  },1000);
+}
+function adminTimerPause(){clearInterval(_atInterval);_atRunning=false;const b=document.getElementById('admin-timer-play-btn');if(b)b.textContent='▶';}
+function adminTimerReset(){adminTimerPause();_atRemaining=_atTotal;updateAdminTimer();}
+function updateAdminTimer(){
+  const d=document.getElementById('admin-timer-display');
+  const r=document.getElementById('admin-timer-ring');
+  if(!d||!r)return;
+  d.textContent=formatTimer(_atRemaining);
+  const pct=_atTotal>0?_atRemaining/_atTotal:1;
+  r.style.strokeDashoffset=477.52*(1-pct);
+  if(_atRemaining<=10&&_atRemaining>0){d.style.color='#ff6b00';r.style.stroke='#ff6b00';}
+  else if(_atRemaining<=0){d.style.color='var(--success)';r.style.stroke='var(--success)';}
+  else{d.style.color='var(--gold)';r.style.stroke='var(--gold)';}
+}
+
+// ─── ADMIN RADIO ───
+let _adminCurrentStation=null;
+function renderRetoRadioAdmin(){
+  const list=document.getElementById('reto-radio-stations-admin');
+  if(!list)return;
+  list.innerHTML=RADIO_STATIONS.map((s,i)=>`
+    <button onclick="playAdminStation(${i})" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:10px;border:1px solid ${_adminCurrentStation===i?'var(--gold)':'#333'};background:${_adminCurrentStation===i?'rgba(201,149,42,0.12)':'var(--dark3)'};margin-bottom:8px;cursor:pointer;">
+      <span style="font-size:26px;">${s.icon}</span>
+      <div style="flex:1;text-align:left;">
+        <div style="font-weight:700;font-size:13px;color:${_adminCurrentStation===i?'var(--gold)':'var(--white)'};">${s.name}</div>
+        <div style="font-size:11px;color:var(--gray2);">${s.sub}</div>
+      </div>
+      <span style="font-size:20px;">${_adminCurrentStation===i?'⏹':'▶'}</span>
+    </button>`).join('');
+}
+function playAdminStation(i){
+  const audio=document.getElementById('reto-radio-audio-admin');
+  const np=document.getElementById('reto-radio-nowplaying-admin');
+  if(_adminCurrentStation===i){audio.pause();audio.src='';_adminCurrentStation=null;np.style.display='none';}
+  else{_adminCurrentStation=i;audio.src=RADIO_STATIONS[i].url;audio.play().catch(()=>showToast('Error al reproducir'));np.style.display='block';np.textContent='▶ '+RADIO_STATIONS[i].name;}
+  renderRetoRadioAdmin();
+}
+
+// ─── ADMIN RANKING ───
+async function renderRetoRankingAdmin(){
+  const list=document.getElementById('reto-ranking-list-admin');
+  if(!list)return;
+  list.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray);">Cargando...</div>';
+  // Reuse existing renderRetoRanking logic but render into admin list
+  try{
+    const [cr,compr]=await Promise.all([
+      fetch(SB_URL+'/reto_clients?select=id,name,start_date,peso_inicial,peso_final&apikey='+SB_KEY),
+      fetch(SB_URL+'/reto_completions?select=reto_client_id,day_num,date&apikey='+SB_KEY)
+    ]);
+    const ac=cr.ok?await cr.json():[];
+    const ac2=compr.ok?await compr.json():[];
+    const ranked=ac.map(c=>{
+      const mc=ac2.filter(x=>x.reto_client_id===c.id);
+      const diff=c.peso_inicial&&c.peso_final?(parseFloat(c.peso_inicial)-parseFloat(c.peso_final)).toFixed(1):null;
+      return{...c,days:mc.length,diff};
+    }).sort((a,b)=>b.days-a.days);
+    const medals=['🥇','🥈','🥉'];
+    list.innerHTML=ranked.map((p,i)=>`
+      <div class="ranking-card">
+        <div class="ranking-pos ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${medals[i]||i+1}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:13px;">${p.name}</div>
+          <div style="font-size:11px;color:var(--gray2);">${p.days}/21 días${p.diff?` · ⬇ ${p.diff}kg`:''}</div>
+        </div>
+        ${p.peso_inicial?`<div style="text-align:right;font-size:11px;color:var(--gray2);">${p.peso_inicial}kg${p.peso_final?` → <span style="color:var(--success)">${p.peso_final}kg</span>`:''}</div>`:''}
+      </div>`).join('');
+  }catch(e){list.innerHTML='<div class="empty-state"><p>Error al cargar</p></div>';}
+}
 let _ptInterval=null, _ptTotal=0, _ptRemaining=0, _ptRunning=false;
 const PT_CIRC=477.52;
 function pageTimerSet(secs){
@@ -3557,9 +3692,11 @@ async function renderRetoAdmin(){
   renderRetoParticipants();
 }
 function retoAdminTab(tab){
-  ['participantes','rutinas','vista','chat','mensaje','historial'].forEach(t=>{
-    document.getElementById('reto-admin-'+t).style.display=t===tab?'block':'none';
-    document.getElementById('rtab-'+t).classList.toggle('active',t===tab);
+  ['participantes','rutinas','vista','ranking','musica','timer','chat','mensaje','historial'].forEach(t=>{
+    const el=document.getElementById('reto-admin-'+t);
+    if(el) el.style.display=t===tab?'block':'none';
+    const btn=document.getElementById('rtab-'+t);
+    if(btn) btn.classList.toggle('active',t===tab);
   });
   if(tab==='rutinas') renderRetoRoutinesList();
   if(tab==='mensaje') renderRetoMessagesList();
@@ -3567,6 +3704,8 @@ function retoAdminTab(tab){
   if(tab==='vista') renderRetoVistaGrid();
   if(tab==='chat') { loadRetoChatAdmin(); }
   if(tab==='historial') renderRetoHistorial();
+  if(tab==='ranking') { setTimeout(renderRetoRankingAdmin,50); }
+  if(tab==='musica') { setTimeout(renderRetoRadioAdmin,50); }
 }
 
 
@@ -3751,7 +3890,8 @@ function renderRetoParticipants(){
     const s=c.start_date?new Date(c.start_date):null;
     const dn=s?Math.max(1,Math.min(21,Math.floor((new Date()-s)/86400000)+1)):'?';
     const retoTerminado = mc.length >= 21 || new Set(mc.map(x=>x.day_num)).size >= 21;
-    return `<div class="reto-participant-card"><div class="reto-p-header"><div class="reto-p-avatar" style="overflow:hidden;padding:0;">${c.photo?`<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:`<span>${c.name[0]}</span>`}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;">${c.name}</div><div style="font-size:11px;color:var(--gray2)">PIN: ${c.pin}${c.phone?' · '+c.phone:''}</div></div><button onclick="sendRetoWhatsApp(${c.id})" style="background:#0d2e0d;border:1px solid #1a5e1a;color:#25D366;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px;">📲</button><button onclick="editRetoClient(${c.id})" style="background:#222;border:1px solid #333;color:var(--gold);padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px;">✏️</button><button onclick="resetRetoClient(${c.id},'${c.name.replace(/'/g,"\'")}')" style="background:#1a0a1a;border:1px solid #4a1a4a;color:#cc44cc;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px;">🔄</button><button onclick="deleteRetoClient(${c.id})" style="background:#2a0a0a;border:1px solid #5a1a1a;color:var(--danger);padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;">🗑</button></div><div class="reto-p-stats"><div class="reto-p-stat"><div class="reto-p-stat-val">${dn}</div><div class="reto-p-stat-label">DÍA</div></div><div class="reto-p-stat"><div class="reto-p-stat-val">${mc.length}</div><div class="reto-p-stat-label">HECHOS</div></div><div class="reto-p-stat"><div class="reto-p-stat-val" style="color:${doneToday?'var(--success)':'var(--danger)'}">${doneToday?'✓':'✗'}</div><div class="reto-p-stat-label">HOY</div></div></div>${retoTerminado?`<div style="margin-top:10px;padding:10px;background:linear-gradient(135deg,#1a0a00,#2d1500);border:1px solid var(--gold);border-radius:10px;display:flex;align-items:center;gap:10px;"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--gold);">🏆 ¡RETO COMPLETADO!</div><div style="font-size:11px;color:var(--gray2);margin-top:2px;">Invítalo a rutinas personalizadas</div></div><button onclick="inviteToRutinas(${c.id},'${c.name.replace(/'/g,"\'")}',${c.phone?`'${c.phone}'`:'null'})" style="background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">💪 INVITAR</button></div>`:''}
+    const pesoDiff = c.peso_inicial && c.peso_final ? (parseFloat(c.peso_inicial) - parseFloat(c.peso_final)).toFixed(1) : null;
+    return `<div class="reto-participant-card"><div class="reto-p-header"><div class="reto-p-avatar" style="overflow:hidden;padding:0;">${c.photo?`<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:`<span>${c.name[0]}</span>`}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;">${c.name}</div><div style="font-size:11px;color:var(--gray2)">PIN: ${c.pin}${c.phone?' · '+c.phone:''}</div>${c.peso_inicial?`<div style="font-size:11px;color:var(--gold2);margin-top:2px;">⚖️ ${c.peso_inicial}kg${c.peso_final?` → <span style="color:var(--success)">${c.peso_final}kg</span>${pesoDiff&&pesoDiff>0?` <span style="color:var(--success)">(-${pesoDiff}kg)</span>`:''}`:' → pendiente'}</div>`:''}</div><button onclick="sendRetoWhatsApp(${c.id})" style="background:#0d2e0d;border:1px solid #1a5e1a;color:#25D366;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px;">📲</button><button onclick="editRetoClient(${c.id})" style="background:#222;border:1px solid #333;color:var(--gold);padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px;">✏️</button><button onclick="resetRetoClient(${c.id},'${c.name.replace(/'/g,"\'")}')" style="background:#1a0a1a;border:1px solid #4a1a4a;color:#cc44cc;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:4px;">🔄</button><button onclick="deleteRetoClient(${c.id})" style="background:#2a0a0a;border:1px solid #5a1a1a;color:var(--danger);padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;">🗑</button></div><div class="reto-p-stats"><div class="reto-p-stat"><div class="reto-p-stat-val">${dn}</div><div class="reto-p-stat-label">DÍA</div></div><div class="reto-p-stat"><div class="reto-p-stat-val">${mc.length}</div><div class="reto-p-stat-label">HECHOS</div></div><div class="reto-p-stat"><div class="reto-p-stat-val" style="color:${doneToday?'var(--success)':'var(--danger)'}">${doneToday?'✓':'✗'}</div><div class="reto-p-stat-label">HOY</div></div></div>${retoTerminado?`<div style="margin-top:10px;padding:10px;background:linear-gradient(135deg,#1a0a00,#2d1500);border:1px solid var(--gold);border-radius:10px;display:flex;align-items:center;gap:10px;"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--gold);">🏆 ¡RETO COMPLETADO!</div><div style="font-size:11px;color:var(--gray2);margin-top:2px;">Invítalo a rutinas personalizadas</div></div><button onclick="inviteToRutinas(${c.id},'${c.name.replace(/'/g,"\'")}',${c.phone?`'${c.phone}'`:'null'})" style="background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">💪 INVITAR</button></div>`:''}
     </div>`;
   }).join('');
 }
@@ -3776,6 +3916,8 @@ function openRetoAddClient(){
   document.getElementById('reto-client-pin').value='';
   document.getElementById('reto-client-phone').value='';
   document.getElementById('reto-client-start').value=new Date().toISOString().split('T')[0];
+  document.getElementById('reto-client-peso-inicial').value='';
+  document.getElementById('reto-client-peso-final').value='';
   document.getElementById('reto-client-modal-title').textContent='AGREGAR PARTICIPANTE';
   openModal('modal-reto-client');
 }
@@ -3786,6 +3928,8 @@ function editRetoClient(id){
   document.getElementById('reto-client-pin').value=c.pin||'';
   document.getElementById('reto-client-phone').value=c.phone||'';
   document.getElementById('reto-client-start').value=c.start_date||'';
+  document.getElementById('reto-client-peso-inicial').value=c.peso_inicial||'';
+  document.getElementById('reto-client-peso-final').value=c.peso_final||'';
   document.getElementById('reto-client-modal-title').textContent='EDITAR PARTICIPANTE';
   openModal('modal-reto-client');
 }
@@ -3795,8 +3939,10 @@ async function saveRetoClient(){
   const pin=document.getElementById('reto-client-pin').value.trim();
   const phone=document.getElementById('reto-client-phone').value.trim();
   const start=document.getElementById('reto-client-start').value;
+  const peso_inicial=document.getElementById('reto-client-peso-inicial').value||null;
+  const peso_final=document.getElementById('reto-client-peso-final').value||null;
   if(!name||!pin){showToast('Nombre y PIN requeridos');return;}
-  const payload={name,pin,phone,start_date:start};
+  const payload={name,pin,phone,start_date:start,peso_inicial,peso_final};
   let ok;
   if(eid){
     const r=await fetch(SB_URL+'/reto_clients?id=eq.'+eid+'&apikey='+SB_KEY,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
@@ -3967,6 +4113,10 @@ async function saveRetoMsg(){
     <div class="form-group"><label class="form-label">PIN (4 dígitos)</label><input class="form-input" id="reto-client-pin" type="number" placeholder="ej: 5678"></div>
     <div class="form-group"><label class="form-label">TELÉFONO (opcional)</label><input class="form-input" id="reto-client-phone" placeholder="+52..."></div>
     <div class="form-group"><label class="form-label">FECHA INICIO</label><input class="form-input" id="reto-client-start" type="date"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-group"><label class="form-label">⚖️ PESO INICIAL (kg)</label><input class="form-input" id="reto-client-peso-inicial" type="number" step="0.1" placeholder="ej: 75.5"></div>
+      <div class="form-group"><label class="form-label">🏁 PESO FINAL (kg)</label><input class="form-input" id="reto-client-peso-final" type="number" step="0.1" placeholder="al terminar"></div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button onclick="closeModal('modal-reto-client')" style="flex:1;padding:12px;border-radius:8px;background:#222;color:var(--white);border:1px solid #333;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;">CANCELAR</button>
       <button onclick="saveRetoClient()" style="flex:2;padding:12px;border-radius:8px;background:linear-gradient(135deg,#c9952a,#8a6009);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">GUARDAR</button>
