@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '18';
+const APP_VERSION = '19';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -509,6 +509,56 @@ body.trainer-mode .client-only{display:none;}
   <div id="reto-ranking-list"></div>
 </div>
 
+<!-- MÚSICA PAGE -->
+<div class="page" id="page-reto-musica">
+  <div class="section-title">🎵 Música para entrenar</div>
+  <div style="background:linear-gradient(135deg,#1a1200,#2a1f00);border:1px solid rgba(201,149,42,0.3);border-radius:14px;padding:16px;margin-bottom:16px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;">📻 RADIO WORKOUT</div>
+    <div style="font-size:11px;color:var(--gray2);margin-bottom:14px;">Selecciona una estación y entrena con buena música</div>
+    <div id="reto-radio-stations"></div>
+    <audio id="reto-radio-audio"></audio>
+    <div id="reto-radio-nowplaying" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(201,149,42,0.1);border:1px solid rgba(201,149,42,0.3);border-radius:8px;font-size:12px;font-weight:700;color:var(--gold);text-align:center;"></div>
+  </div>
+</div>
+
+<!-- TIMER PAGE -->
+<div class="page" id="page-reto-timer">
+  <div class="section-title">⏱ Cronómetro</div>
+  <div style="background:var(--dark2);border:1px solid #2a2a2a;border-radius:16px;padding:24px 20px;text-align:center;">
+    <div id="page-timer-ex-name" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);margin-bottom:4px;">CRONÓMETRO</div>
+    <div id="page-timer-ex-sets" style="font-size:12px;color:var(--gold2);margin-bottom:16px;">Selecciona un tiempo o ingresa uno personalizado</div>
+    <div style="width:180px;height:180px;margin:0 auto 12px;position:relative;">
+      <svg width="180" height="180" viewBox="0 0 180 180" style="transform:rotate(-90deg);">
+        <circle fill="none" stroke="#222" stroke-width="10" cx="90" cy="90" r="76"/>
+        <circle id="page-timer-ring" fill="none" stroke="var(--gold)" stroke-width="10" stroke-linecap="round"
+          cx="90" cy="90" r="76" stroke-dasharray="477.52" stroke-dashoffset="0"/>
+      </svg>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
+        <div id="page-timer-display" style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--gold);line-height:1;letter-spacing:3px;">00:00</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;">
+      <button class="timer-preset-btn" onclick="pageTimerSet(20)">20s</button>
+      <button class="timer-preset-btn" onclick="pageTimerSet(30)">30s</button>
+      <button class="timer-preset-btn" onclick="pageTimerSet(45)">45s</button>
+      <button class="timer-preset-btn" onclick="pageTimerSet(60)">1 min</button>
+      <button class="timer-preset-btn" onclick="pageTimerSet(90)">90s</button>
+      <button class="timer-preset-btn" onclick="pageTimerSet(120)">2 min</button>
+      <button class="timer-preset-btn" onclick="pageTimerSet(180)">3 min</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:16px;">
+      <input class="timer-custom-input" id="page-timer-min" type="number" min="0" max="59" placeholder="min" value="0">
+      <span style="color:var(--gold);font-size:20px;font-weight:700;">:</span>
+      <input class="timer-custom-input" id="page-timer-sec" type="number" min="0" max="59" placeholder="seg" value="30">
+      <button class="timer-preset-btn" onclick="pageTimerCustom()">▶ Usar</button>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button class="timer-btn timer-btn-reset" onclick="pageTimerReset()" title="Reiniciar">↺</button>
+      <button class="timer-btn timer-btn-play" id="page-timer-play-btn" onclick="pageTimerToggle()">▶</button>
+    </div>
+  </div>
+</div>
+
 <!-- RETO CHAT PAGE (participantes) -->
 <div class="page" id="page-reto-chat">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
@@ -621,6 +671,8 @@ body.trainer-mode .client-only{display:none;}
 <div class="bottom-nav" id="reto-nav" style="display:none;">
   <button class="nav-btn active" onclick="showPage('reto',this)"><span class="nav-icon">🔥</span><span class="nav-label">Mi Reto</span></button>
   <button class="nav-btn" onclick="showPage('reto-ranking',this)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
+  <button class="nav-btn" onclick="showPage('reto-musica',this)"><span class="nav-icon">🎵</span><span class="nav-label">Música</span></button>
+  <button class="nav-btn" onclick="showPage('reto-timer',this)"><span class="nav-icon">⏱</span><span class="nav-label">Timer</span></button>
   <button class="nav-btn" onclick="showPage('reto-chat',this)"><span class="nav-icon">💬</span><span class="nav-label">Chat</span></button>
 </div>
 
@@ -655,13 +707,6 @@ body.trainer-mode .client-only{display:none;}
 <div class="music-modal-overlay" id="music-modal">
   <div class="music-modal">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);margin-bottom:16px;text-align:center;">🎵 MÚSICA</div>
-    <button class="music-btn spotify" onclick="openSpotify()">
-      <div class="music-btn-icon">🎧</div>
-      <div class="music-btn-info">
-        <div class="music-btn-title">Spotify</div>
-        <div class="music-btn-sub">Abre Spotify y elige tu música favorita</div>
-      </div>
-    </button>
     <button class="music-btn radio" onclick="toggleRadioPlayer()">
       <div class="music-btn-icon">📻</div>
       <div class="music-btn-info">
@@ -1167,6 +1212,7 @@ function showPage(page, btn) {
   if (page==='reto-admin') setTimeout(renderRetoAdmin, 50);
   if (page==='reto-ranking') setTimeout(renderRetoRanking, 50);
   if (page==='reto-chat') { setTimeout(loadRetoChat, 50); }
+  if (page==='reto-musica') setTimeout(renderRetoRadio, 50);
   document.getElementById('main-scroll').scrollTop=0;
   if(page==='ajustes'){renderSavedRoutines();renderMessagesList();renderLibrary();renderTemplates();}
   if(page==='progreso'){
@@ -1833,6 +1879,86 @@ function showNotifBanner(){
 // Show music FAB after login
 function showMusicFab(){ document.getElementById('music-fab').classList.add('visible'); }
 
+// ─── PAGE TIMER (inside reto) ───
+let _ptInterval=null, _ptTotal=0, _ptRemaining=0, _ptRunning=false;
+const PT_CIRC=477.52;
+function pageTimerSet(secs){
+  pageTimerPause(); _ptTotal=secs; _ptRemaining=secs;
+  updatePageTimer();
+  document.querySelectorAll('#page-reto-timer .timer-preset-btn').forEach(b=>b.classList.remove('active'));
+}
+function pageTimerCustom(){
+  const m=parseInt(document.getElementById('page-timer-min').value)||0;
+  const s=parseInt(document.getElementById('page-timer-sec').value)||0;
+  const t=m*60+s; if(t>0) pageTimerSet(t);
+}
+function pageTimerToggle(){ _ptRunning?pageTimerPause():pageTimerStart(); }
+function pageTimerStart(){
+  if(_ptTotal===0){ pageTimerSet(30); }
+  if(_ptRemaining<=0) _ptRemaining=_ptTotal;
+  _ptRunning=true;
+  document.getElementById('page-timer-play-btn').textContent='⏸';
+  _ptInterval=setInterval(()=>{
+    _ptRemaining--;
+    updatePageTimer();
+    if(_ptRemaining<=0){
+      clearInterval(_ptInterval); _ptRunning=false;
+      document.getElementById('page-timer-play-btn').textContent='▶';
+      timerBeep();
+      showToast('⏱ ¡Tiempo!');
+    }
+  },1000);
+}
+function pageTimerPause(){
+  clearInterval(_ptInterval); _ptRunning=false;
+  document.getElementById('page-timer-play-btn').textContent='▶';
+}
+function pageTimerReset(){
+  pageTimerPause(); _ptRemaining=_ptTotal; updatePageTimer();
+  document.getElementById('page-timer-display').style.color='var(--gold)';
+  document.getElementById('page-timer-ring').style.stroke='var(--gold)';
+}
+function updatePageTimer(){
+  const disp=document.getElementById('page-timer-display');
+  const ring=document.getElementById('page-timer-ring');
+  if(!disp||!ring) return;
+  disp.textContent=formatTimer(_ptRemaining);
+  const pct=_ptTotal>0?_ptRemaining/_ptTotal:1;
+  ring.style.strokeDashoffset=PT_CIRC*(1-pct);
+  if(_ptRemaining<=10&&_ptRemaining>0){ disp.style.color='#ff6b00'; ring.style.stroke='#ff6b00'; }
+  else if(_ptRemaining<=0){ disp.style.color='var(--success)'; ring.style.stroke='var(--success)'; }
+  else { disp.style.color='var(--gold)'; ring.style.stroke='var(--gold)'; }
+}
+
+// ─── RETO RADIO ───
+let _retoCurrentStation=null;
+function renderRetoRadio(){
+  const list=document.getElementById('reto-radio-stations');
+  if(!list) return;
+  list.innerHTML=RADIO_STATIONS.map((s,i)=>`
+    <button onclick="playRetoStation(${i})" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:10px;border:1px solid ${_retoCurrentStation===i?'var(--gold)':'#333'};background:${_retoCurrentStation===i?'rgba(201,149,42,0.12)':'var(--dark3)'};margin-bottom:8px;cursor:pointer;transition:all 0.2s;">
+      <span style="font-size:26px;">${s.icon}</span>
+      <div style="flex:1;text-align:left;">
+        <div style="font-weight:700;font-size:13px;color:${_retoCurrentStation===i?'var(--gold)':'var(--white)'};">${s.name}</div>
+        <div style="font-size:11px;color:var(--gray2);">${s.sub}</div>
+      </div>
+      <span style="font-size:20px;">${_retoCurrentStation===i?'⏹':'▶'}</span>
+    </button>`).join('');
+}
+function playRetoStation(i){
+  const audio=document.getElementById('reto-radio-audio');
+  const np=document.getElementById('reto-radio-nowplaying');
+  if(_retoCurrentStation===i){ audio.pause(); audio.src=''; _retoCurrentStation=null; np.style.display='none'; }
+  else {
+    _retoCurrentStation=i;
+    audio.src=RADIO_STATIONS[i].url;
+    audio.play().catch(()=>showToast('Error al reproducir. Intenta otra estación.'));
+    np.style.display='block';
+    np.textContent='▶ Reproduciendo: '+RADIO_STATIONS[i].name;
+  }
+  renderRetoRadio();
+}
+
 // ─── TOGGLE DONE ───
 async function toggleDone(key,index,routineId,clientId){
   if(!completions[key]) completions[key]=[];
@@ -2035,7 +2161,7 @@ function addExerciseRow(preset={}){
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <div style="display:flex;align-items:center;gap:6px;">
         <span class="drag-handle" title="Arrastrar para reordenar">⠿</span>
-        <span style="font-size:11px;font-weight:700;color:var(--gold2);">EJERCICIO ${id+1}</span>
+        <span class="ex-label" style="font-size:11px;font-weight:700;color:var(--gold2);">EJERCICIO ${id+1}</span>
       </div>
       <button onclick="document.getElementById('ex-row-${id}').remove();renumberExRows()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button>
     </div>
