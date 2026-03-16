@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '17';
+const APP_VERSION = '18';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -239,7 +239,12 @@ body.trainer-mode .client-only{display:none;}
 .progress-photo-box .photo-label{font-size:10px;letter-spacing:2px;color:var(--gray2);text-transform:uppercase;margin-top:6px;position:relative;z-index:1;}
 .progress-photo-box .photo-icon{font-size:28px;position:relative;z-index:1;}
 
-/* ═══ NOTIFICATION BANNER ═══ */
+/* ═══ EXERCISE BUILDER DRAG & DROP ═══ */
+.ex-row-draggable{background:var(--dark3);border-radius:10px;padding:12px;margin-bottom:8px;cursor:default;transition:opacity 0.2s,transform 0.2s;}
+.ex-row-draggable.dragging{opacity:0.4;transform:scale(0.98);}
+.ex-row-draggable.drag-over{border:2px dashed var(--gold);background:rgba(201,149,42,0.08);}
+.drag-handle{color:var(--gray);font-size:18px;cursor:grab;padding:0 4px;touch-action:none;}
+.drag-handle:active{cursor:grabbing;}
 .notif-banner{background:linear-gradient(135deg,#1a1200,#2a1f00);border:1px solid rgba(201,149,42,0.4);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
 .notif-banner-icon{font-size:28px;flex-shrink:0;}
 .notif-banner-text{font-size:12px;color:var(--gray2);line-height:1.5;}
@@ -388,7 +393,10 @@ body.trainer-mode .client-only{display:none;}
           <button class="btn btn-outline btn-sm" onclick="openLibraryPicker()">📚 Biblioteca</button>
         </div>
         <div id="exercises-builder"></div>
-        <button class="btn btn-outline" style="margin-bottom:10px;" onclick="addExerciseRow()">+ Agregar ejercicio</button>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <button class="btn btn-outline" style="flex:1;" onclick="addExerciseRow()">+ Ejercicio</button>
+          <button class="btn btn-outline" style="flex:1;border-color:#ff6b00;color:#ff6b00;" onclick="addWarmupRow()">🔥 Calentamiento</button>
+        </div>
         <button class="btn btn-gold" id="save-routine-btn" onclick="saveRoutine()">💾 GUARDAR RUTINA</button>
         <button class="btn btn-outline" style="margin-top:8px;display:none;" id="cancel-edit-btn" onclick="cancelEditRoutine()">✕ Cancelar edición</button>
       </div>
@@ -607,6 +615,7 @@ body.trainer-mode .client-only{display:none;}
   <button class="nav-btn active" onclick="showPage('rutinas',this)"><span class="nav-icon">🥊</span><span class="nav-label">Rutinas</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('reto-admin',this)"><span class="nav-icon">🔥</span><span class="nav-label">Reto 21</span></button>
+  <button class="nav-btn trainer-only" onclick="showPage('reto-ranking',this);setTimeout(renderRetoRanking,50)"><span class="nav-icon">🏆</span><span class="nav-label">Ranking</span></button>
   <button class="nav-btn trainer-only" onclick="showPage('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Gestión</span></button>
 </div>
 <div class="bottom-nav" id="reto-nav" style="display:none;">
@@ -1611,10 +1620,12 @@ function launchConfetti(){
 
 // ─── MUSIC ───
 const RADIO_STATIONS=[
-  {name:'Workout Radio',sub:'Hip Hop & R&B Workout',url:'https://stream.zeno.fm/yn65m0s9p88uv',icon:'🏋️'},
-  {name:'Hard Rock FM',sub:'Rock & Metal para entrenar',url:'https://stream.zeno.fm/0r0xa792kwzuv',icon:'🎸'},
-  {name:'Electronic Workout',sub:'EDM & Electronic',url:'https://stream.zeno.fm/f3wvbbqmdg8uv',icon:'⚡'},
-  {name:'Latin Beats',sub:'Reggaeton & Latino',url:'https://stream.zeno.fm/sbvgiv5tze8uv',icon:'🔥'},
+  {name:'Power Hits',sub:'Top 40 & Pop Workout',url:'https://streams.ilovemusic.de/iloveradio2.mp3',icon:'💥'},
+  {name:'Hard Rock',sub:'Rock & Metal para entrenar',url:'https://streams.ilovemusic.de/iloveradio17.mp3',icon:'🎸'},
+  {name:'Hip Hop',sub:'Hip Hop & Rap Workout',url:'https://streams.ilovemusic.de/iloveradio3.mp3',icon:'🏋️'},
+  {name:'Electronic',sub:'EDM & House',url:'https://streams.ilovemusic.de/iloveradio6.mp3',icon:'⚡'},
+  {name:'Latino',sub:'Reggaeton & Latino',url:'https://streams.ilovemusic.de/iloveradio13.mp3',icon:'🔥'},
+  {name:'80s & 90s',sub:'Clásicos para entrenar',url:'https://streams.ilovemusic.de/iloveradio18.mp3',icon:'🕺'},
 ];
 let _currentStation=null;
 
@@ -1945,12 +1956,7 @@ function openEditRoutine(id){
   const builder=document.getElementById('exercises-builder');
   builder.innerHTML=''; exRowCount=0;
   r.exercises.forEach(ex=>{
-    addExerciseRow();
-    const row=builder.lastElementChild;
-    row.querySelector('.ex-name-inp').value=ex.name||'';
-    row.querySelector('.ex-sets-inp').value=ex.sets||'';
-    row.querySelector('.ex-video-inp').value=ex.video||'';
-    row.querySelector('.ex-notes-inp').value=ex.notes||'';
+    addExerciseRow({name:ex.name||'',sets:ex.sets||'',video:ex.video||'',notes:ex.notes||''});
   });
   document.getElementById('save-routine-btn').textContent='💾 ACTUALIZAR RUTINA';
   document.getElementById('routine-form-title').textContent='EDITAR RUTINA';
@@ -2018,22 +2024,104 @@ function updateAvailableDays(){
   } else {saveBtn.disabled=false;saveBtn.style.opacity='1';}
 }
 
-function addExerciseRow(){
+function addExerciseRow(preset={}){
   const container=document.getElementById('exercises-builder');
   const id=exRowCount++;
   const div=document.createElement('div');
   div.id=`ex-row-${id}`;
-  div.style.cssText='background:var(--dark3);border-radius:10px;padding:12px;margin-bottom:8px;';
+  div.className='ex-row-draggable';
+  div.draggable=true;
   div.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <span style="font-size:11px;font-weight:700;color:var(--gold2);">EJERCICIO ${id+1}</span>
-      <button onclick="document.getElementById('ex-row-${id}').remove()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="drag-handle" title="Arrastrar para reordenar">⠿</span>
+        <span style="font-size:11px;font-weight:700;color:var(--gold2);">EJERCICIO ${id+1}</span>
+      </div>
+      <button onclick="document.getElementById('ex-row-${id}').remove();renumberExRows()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button>
     </div>
-    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-name-inp" type="text" placeholder="Nombre del ejercicio"></div>
-    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-sets-inp" type="text" placeholder="Series y reps: ej. 3x12"></div>
-    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-video-inp" type="text" placeholder="Link YouTube (opcional)"></div>
-    <div class="form-group" style="margin-bottom:0;"><input class="form-input ex-notes-inp" type="text" placeholder="Notas (opcional)"></div>`;
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-name-inp" type="text" placeholder="Nombre del ejercicio" value="${preset.name||''}"></div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-sets-inp" type="text" placeholder="Series y reps: ej. 3x12" value="${preset.sets||''}"></div>
+    <div class="form-group" style="margin-bottom:8px;"><input class="form-input ex-video-inp" type="text" placeholder="Link YouTube (opcional)" value="${preset.video||''}"></div>
+    <div class="form-group" style="margin-bottom:0;"><input class="form-input ex-notes-inp" type="text" placeholder="Notas (opcional)" value="${preset.notes||''}"></div>`;
   container.appendChild(div);
+  initDragDrop(div);
+}
+
+function addWarmupRow(){
+  const WARMUP_EXERCISES=[
+    {name:'Trote en su lugar',sets:'3 min',notes:'Ritmo moderado para elevar temperatura'},
+    {name:'Saltos de tijera (Jumping Jacks)',sets:'3x20 reps',notes:''},
+    {name:'Rotación de hombros',sets:'2x15 reps cada lado',notes:''},
+    {name:'Rotación de cadera',sets:'2x10 reps cada lado',notes:''},
+    {name:'Sentadilla sin peso',sets:'2x15 reps',notes:'Rango completo de movimiento'},
+    {name:'Estiramiento de cuádriceps',sets:'30 seg cada pierna',notes:''},
+    {name:'Círculos con los brazos',sets:'2x10 reps',notes:'Adelante y atrás'},
+  ];
+  // Add 3 default warmup exercises
+  const defaults=WARMUP_EXERCISES.slice(0,3);
+  defaults.forEach(ex=>addExerciseRow(ex));
+  showToast('🔥 Calentamiento agregado');
+}
+
+function renumberExRows(){
+  const rows=document.getElementById('exercises-builder').querySelectorAll('.ex-row-draggable');
+  rows.forEach((r,i)=>{
+    const label=r.querySelector('.ex-label');
+    if(label) label.textContent='EJERCICIO '+(i+1);
+  });
+}
+
+// ─── DRAG & DROP ───
+let _dragSrc=null;
+function initDragDrop(el){
+  el.addEventListener('dragstart',e=>{
+    _dragSrc=el; el.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+  });
+  el.addEventListener('dragend',()=>{
+    el.classList.remove('dragging');
+    document.querySelectorAll('.ex-row-draggable').forEach(r=>r.classList.remove('drag-over'));
+  });
+  el.addEventListener('dragover',e=>{
+    e.preventDefault(); e.dataTransfer.dropEffect='move';
+    if(el!==_dragSrc){ el.classList.add('drag-over'); }
+  });
+  el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+  el.addEventListener('drop',e=>{
+    e.preventDefault();
+    if(_dragSrc&&_dragSrc!==el){
+      const container=document.getElementById('exercises-builder');
+      const kids=[...container.children];
+      const srcIdx=kids.indexOf(_dragSrc);
+      const tgtIdx=kids.indexOf(el);
+      if(srcIdx<tgtIdx) container.insertBefore(_dragSrc,el.nextSibling);
+      else container.insertBefore(_dragSrc,el);
+    }
+    el.classList.remove('drag-over');
+  });
+  // Touch support
+  let touchY=0;
+  el.addEventListener('touchstart',e=>{_dragSrc=el;touchY=e.touches[0].clientY;},{ passive:true });
+  el.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    const t=e.touches[0];
+    const over=document.elementFromPoint(t.clientX,t.clientY)?.closest('.ex-row-draggable');
+    document.querySelectorAll('.ex-row-draggable').forEach(r=>r.classList.remove('drag-over'));
+    if(over&&over!==_dragSrc) over.classList.add('drag-over');
+  },{passive:false});
+  el.addEventListener('touchend',e=>{
+    const t=e.changedTouches[0];
+    const over=document.elementFromPoint(t.clientX,t.clientY)?.closest('.ex-row-draggable');
+    if(over&&over!==_dragSrc){
+      const container=document.getElementById('exercises-builder');
+      const kids=[...container.children];
+      const srcIdx=kids.indexOf(_dragSrc);
+      const tgtIdx=kids.indexOf(over);
+      if(srcIdx<tgtIdx) container.insertBefore(_dragSrc,over.nextSibling);
+      else container.insertBefore(_dragSrc,over);
+    }
+    document.querySelectorAll('.ex-row-draggable').forEach(r=>r.classList.remove('drag-over'));
+  });
 }
 
 // ─── COPY WEEK ───
