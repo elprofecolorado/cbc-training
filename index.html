@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '27';
+const APP_VERSION = '28';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -1458,8 +1458,8 @@ function renderWorkout(client,myRoutines,week) {
 
   const allWeeks=[...new Set(myRoutines.map(r=>r.week||0))].filter(w=>w>0).sort((a,b)=>a-b);
   const curW=getWeekNum();
-  const weekTabs=allWeeks.map((w,idx)=>{
-    const label='Sem '+(idx+1)+(w===curW?' ★':'');
+  const weekTabs=allWeeks.map((w)=>{
+    const label='Sem '+w+(w===curW?' ★':'');
     return `<div class="week-tab ${w===week?'active':''} ${w===curW?'current':''}" onclick="switchWeek(${w},${client.id})">${label}</div>`;
   }).join('');
   const dayTabs=weekRoutines.map(r=>`<div class="day-tab ${r.day===currentDay?'active':''}" onclick="switchDay('${r.day}',${client.id},${week})">${r.day}</div>`).join('');
@@ -1510,8 +1510,7 @@ function renderWorkout(client,myRoutines,week) {
       <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openPhotoUpload(${client.id})">📸 Mi foto</button>
     </div>`;
 
-  const weekIdx = allWeeks.indexOf(week);
-  const weekLabel = weekIdx >= 0 ? 'SEMANA ' + (weekIdx + 1) : '';
+  const weekLabel = week > 0 ? 'SEMANA ' + week : '';
   document.getElementById('workout-content').innerHTML=`
     ${motBanner}
     ${weekLabel ? `<div style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gray2);margin-bottom:2px;">${weekLabel}</div>` : ''}
