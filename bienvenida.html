@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienvenido al Reto 21 Días — CBC Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9952a;
+    --gold2: #e8b84b;
+    --gold3: #f5d080;
+    --black: #0a0a0a;
+    --dark: #111;
+    --dark2: #1a1a1a;
+    --dark3: #222;
+    --white: #f0ede8;
+    --gray: #888;
+    --success: #2ecc71;
+    --orange: #ff6b00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,149,42,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255,107,0,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,149,42,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,149,42,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .logo-wrap {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid rgba(201,149,42,0.6);
+    background: rgba(201,149,42,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 40px rgba(201,149,42,0.3);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(201,149,42,0.3); }
+    50% { box-shadow: 0 0 70px rgba(201,149,42,0.5); }
+  }
+
+  .logo-wrap img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(201,149,42,0.6));
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,107,0,0.15);
+    border: 1px solid rgba(255,107,0,0.4);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 14vw, 96px);
+    line-height: 0.9;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    animation: fadeDown 0.7s ease 0.1s both;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, var(--gold), var(--gold3), var(--orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(22px, 6vw, 38px);
+    letter-spacing: 6px;
+    color: var(--gray);
+    margin-bottom: 24px;
+    animation: fadeDown 0.7s ease 0.2s both;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: rgba(240,237,232,0.7);
+    line-height: 1.7;
+    max-width: 480px;
+    margin: 0 auto 36px;
+    animation: fadeDown 0.7s ease 0.3s both;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--gold), #a07010);
+    color: var(--black);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    padding: 16px 36px;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(201,149,42,0.35);
+    transition: all 0.3s;
+    animation: fadeDown 0.7s ease 0.4s both;
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(201,149,42,0.5);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--gray);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 80px 24px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 8vw, 52px);
+    letter-spacing: 3px;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .section-title em {
+    color: var(--gold);
+    font-style: normal;
+  }
+
+  .section-text {
+    font-size: 14px;
+    color: rgba(240,237,232,0.7);
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,149,42,0.3), transparent);
+    margin: 0;
+  }
+
+  /* ── STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 16px; }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--dark2);
+    border: 1px solid #252525;
+    border-radius: 14px;
+    padding: 18px;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, var(--gold), var(--orange));
+    border-radius: 2px 0 0 2px;
+  }
+
+  .step:hover { border-color: rgba(201,149,42,0.3); }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--gold);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 36px;
+  }
+
+  .step-content {}
+  .step-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: rgba(240,237,232,0.6); line-height: 1.6; }
+
+  /* ── FEATURES GRID ── */
+  .features { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  @media (max-width: 480px) { .features { grid-template-columns: 1fr; } }
+
+  .feature {
+    background: var(--dark2);
+    border: 1px solid #252525;
+    border-radius: 14px;
+    padding: 20px;
+    transition: all 0.2s;
+  }
+
+  .feature:hover {
+    border-color: rgba(201,149,42,0.3);
+    transform: translateY(-2px);
+  }
+
+  .feature-icon { font-size: 32px; margin-bottom: 10px; }
+  .feature-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .feature-desc { font-size: 12px; color: rgba(240,237,232,0.6); line-height: 1.6; }
+
+  /* ── RULES ── */
+  .rules { display: flex; flex-direction: column; gap: 10px; }
+
+  .rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--dark2);
+    border-radius: 10px;
+    border: 1px solid #252525;
+    font-size: 13px;
+  }
+
+  .rule-icon { font-size: 20px; flex-shrink: 0; }
+
+  /* ── PIN BOX ── */
+  .pin-box {
+    background: linear-gradient(135deg, #1a1200, #2a1f00);
+    border: 1px solid rgba(201,149,42,0.5);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pin-box::before {
+    content: '🔑';
+    position: absolute;
+    font-size: 100px;
+    opacity: 0.05;
+    right: -10px;
+    bottom: -10px;
+  }
+
+  .pin-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .pin-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 12px;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 8px;
+    text-shadow: 0 0 30px rgba(201,149,42,0.4);
+  }
+
+  .pin-note { font-size: 12px; color: rgba(240,237,232,0.5); }
+
+  /* ── APP LINK ── */
+  .app-link-box {
+    background: var(--dark2);
+    border: 1px solid rgba(201,149,42,0.3);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  .app-link-icon { font-size: 36px; flex-shrink: 0; }
+
+  .app-link-url {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 700;
+    word-break: break-all;
+    margin-bottom: 4px;
+  }
+
+  .app-link-desc { font-size: 11px; color: var(--gray); }
+
+  /* ── CONTACT ── */
+  .contact-box {
+    background: linear-gradient(135deg, #0d2e0d, #1a4a1a);
+    border: 1px solid rgba(37,211,102,0.3);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 3px;
+    color: #25d366;
+    margin-bottom: 6px;
+  }
+
+  .contact-desc { font-size: 13px; color: rgba(240,237,232,0.6); margin-bottom: 18px; line-height: 1.6; }
+
+  .wa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25d366;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 6px 24px rgba(37,211,102,0.25);
+  }
+
+  .wa-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(37,211,102,0.4); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid #1a1a1a;
+    color: var(--gray);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  footer strong { color: var(--gold); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── SEPARATOR ── */
+  .fire-sep {
+    text-align: center;
+    font-size: 24px;
+    padding: 20px 0;
+    letter-spacing: 8px;
+    opacity: 0.4;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="logo-wrap">
+    <img src="logo-trainer.png" alt="CBC">
+  </div>
+  <div class="hero-badge">🔥 Reto 21 Días Sin Excusas</div>
+  <h1 class="hero-title"><span>CBC</span><br>Training</h1>
+  <div class="hero-sub">Colorado's Boxing Club</div>
+  <p class="hero-desc">Tu entrenamiento diario, tu progreso, tu transformación. Todo en una app diseñada para llevarte al siguiente nivel en 21 días.</p>
+  <a href="https://elprofecolorado.github.io/cbc-training/" class="hero-cta">
+    🥊 ABRIR LA APP
+  </a>
+  <div class="hero-scroll">
+    <span>Sigue leyendo</span>
+    <span>↓</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- BIENVENIDA -->
+<section class="reveal">
+  <div class="section-label">Bienvenido</div>
+  <h2 class="section-title">¿De qué trata el <em>reto</em>?</h2>
+  <p class="section-text">
+    El <strong>Reto 21 Días Sin Excusas</strong> es un programa de entrenamiento diseñado por Colorado's Boxing Club para transformar tu cuerpo y hábitos en solo 3 semanas. Cada día tendrás una rutina específica adaptada a tu nivel, con seguimiento en tiempo real y apoyo de tu entrenador.
+  </p>
+  <p class="section-text">
+    21 días. Sin excusas. Con resultados.
+  </p>
+
+  <div class="rules">
+    <div class="rule"><span class="rule-icon">📅</span><span>Entrena <strong>todos los días</strong> durante 21 días consecutivos</span></div>
+    <div class="rule"><span class="rule-icon">⏱</span><span>Cada rutina toma entre <strong>20 y 45 minutos</strong></span></div>
+    <div class="rule"><span class="rule-icon">💧</span><span>Hidratación y descanso adecuado son parte del reto</span></div>
+    <div class="rule"><span class="rule-icon">📲</span><span>Marca tu día como completado en la app cada vez que entrenes</span></div>
+    <div class="rule"><span class="rule-icon">🔥</span><span>Mantén tu racha — no rompas la cadena</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CÓMO ENTRAR -->
+<section class="reveal">
+  <div class="section-label">Primeros pasos</div>
+  <h2 class="section-title">Cómo usar <em>la app</em></h2>
+  <p class="section-text">Es muy sencillo. Solo sigue estos pasos:</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Abre la app</div>
+        <div class="step-desc">Entra desde tu celular a <strong style="color:var(--gold)">elprofecolorado.github.io/cbc-training/</strong> — puedes guardarla en tu pantalla de inicio para acceder más rápido como si fuera una app normal.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Ingresa tu PIN</div>
+        <div class="step-desc">Tu entrenador te dará un PIN personal de 4 dígitos. Ese es tu acceso único a la app. Guárdalo bien.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Registra tu peso inicial</div>
+        <div class="step-desc">Al entrar por primera vez verás una tarjeta para registrar tu peso inicial. Esto nos ayuda a medir tu transformación al final del reto.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">Haz tu rutina del día</div>
+        <div class="step-desc">Cada día verás los ejercicios asignados. Selecciona tu nivel (Principiante, Intermedio o Avanzado) y completa cada ejercicio tachándolo.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <div class="step-title">Marca el día completo</div>
+        <div class="step-desc">Al terminar todos los ejercicios toca el botón <strong style="color:var(--gold)">MARCAR DÍA COMPLETO</strong>. Esto registra tu progreso y suma tu racha.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <div class="step-title">Califica tu entrenamiento</div>
+        <div class="step-desc">Después de completar el día, aparece una pantalla para calificar cómo estuvo el entrenamiento y mandarle feedback a tu entrenador.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FUNCIONES -->
+<section class="reveal">
+  <div class="section-label">La app</div>
+  <h2 class="section-title">¿Qué tiene <em>la app</em>?</h2>
+  <p class="section-text">Todo lo que necesitas para completar el reto en un solo lugar:</p>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">🔥</div>
+      <div class="feature-title">Mi Reto</div>
+      <div class="feature-desc">Tu página principal. Muestra el día del reto, tu racha, insignias ganadas, el calendario de los 21 días y la rutina de hoy.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-title">Ranking</div>
+      <div class="feature-desc">Ve en qué posición estás vs los demás participantes. Se ordena por días completados, racha y calificación promedio.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🎵</div>
+      <div class="feature-title">Música</div>
+      <div class="feature-desc">Radio de entrenamiento directo en la app. Elige entre 6 estaciones: Pop, Rock, Hip Hop, Electronic, Latino y 80s/90s.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⏱</div>
+      <div class="feature-title">Cronómetro</div>
+      <div class="feature-desc">Timer integrado para ejercicios con tiempo. Presets de 20s hasta 3 min, anillo visual y alarma sonora al terminar.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">💬</div>
+      <div class="feature-title">Chat del Reto</div>
+      <div class="feature-desc">Chatea con los demás participantes. Comparte fotos de tu progreso, videos motivadores y frases de apoyo al grupo.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⚖️</div>
+      <div class="feature-title">Mi Peso</div>
+      <div class="feature-desc">Registra tu peso al inicio y al final del reto. Al día 21 verás cuántos kg perdiste durante la transformación.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">▶️</div>
+      <div class="feature-title">Videos de Ejercicios</div>
+      <div class="feature-desc">Cada ejercicio puede tener un video de YouTube que se reproduce dentro de la app para que veas la técnica correcta.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🎊</div>
+      <div class="feature-title">Celebración</div>
+      <div class="feature-desc">Al completar el día, la app lanza confeti para celebrar tu logro. ¡Cada día completado es una victoria!</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- NIVELES -->
+<section class="reveal">
+  <div class="section-label">Intensidad</div>
+  <h2 class="section-title">Elige tu <em>nivel</em></h2>
+  <p class="section-text">Cada rutina tiene 3 versiones. Tú decides qué tan duro te quieres exigir:</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num" style="color:#4CAF50;">🟢</div>
+      <div class="step-content">
+        <div class="step-title" style="color:#4CAF50;">Principiante</div>
+        <div class="step-desc">Ideal si estás comenzando o llevas tiempo sin entrenar. Movimientos más sencillos, menor volumen y tiempo de descanso adecuado.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#FFA726;">🟡</div>
+      <div class="step-content">
+        <div class="step-title" style="color:#FFA726;">Intermedio</div>
+        <div class="step-desc">Para quienes ya tienen base física. Mayor intensidad, más series y ejercicios más demandantes.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#EF5350;">🔴</div>
+      <div class="step-content">
+        <div class="step-title" style="color:#EF5350;">Avanzado</div>
+        <div class="step-desc">Sin piedad. Máxima intensidad, ejercicios complejos y volumen alto. Para los que buscan el reto real.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INSIGNIAS -->
+<section class="reveal">
+  <div class="section-label">Logros</div>
+  <h2 class="section-title">Gana <em>insignias</em></h2>
+  <p class="section-text">Conforme avances en el reto, desbloquearás insignias especiales:</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">🥊</div>
+      <div class="step-content">
+        <div class="step-title">Insignia Semana 1</div>
+        <div class="step-desc">Completa los primeros 7 días. El inicio es lo más difícil — si llegaste aquí, tienes lo que se necesita.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">💪</div>
+      <div class="step-content">
+        <div class="step-title">Insignia Semana 2</div>
+        <div class="step-desc">14 días completados. Ya empiezas a ver y sentir los cambios. Sigue.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">🏆</div>
+      <div class="step-content">
+        <div class="step-title">Reto Completado</div>
+        <div class="step-desc">21 días. Lo lograste. Eres parte de los pocos que terminan lo que empiezan. ¡Felicitaciones!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ACCESO -->
+<section class="reveal">
+  <div class="section-label">Tu acceso</div>
+  <h2 class="section-title">Tu <em>PIN</em> y el link</h2>
+  <p class="section-text">Tu entrenador te asignará un PIN personal. Guárdalo en un lugar seguro — es tu llave de entrada a la app.</p>
+
+  <div class="pin-box">
+    <div class="pin-label">Tu PIN de acceso</div>
+    <div class="pin-value">????</div>
+    <div class="pin-note">Tu entrenador te lo enviará por WhatsApp</div>
+  </div>
+
+  <div class="app-link-box">
+    <div class="app-link-icon">📱</div>
+    <div>
+      <div class="app-link-url">elprofecolorado.github.io/cbc-training/</div>
+      <div class="app-link-desc">Abre este link en tu celular y entra con tu PIN</div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;background:var(--dark2);border:1px solid #252525;border-radius:14px;padding:18px;">
+    <div style="font-weight:700;font-size:13px;margin-bottom:8px;">💡 Tip: Instala la app en tu celular</div>
+    <div style="font-size:12px;color:rgba(240,237,232,0.6);line-height:1.7;">
+      <strong>iPhone:</strong> Abre el link en Safari → toca el ícono de compartir → "Añadir a pantalla de inicio"<br>
+      <strong>Android:</strong> Abre el link en Chrome → toca los 3 puntos → "Añadir a pantalla de inicio"
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACTO -->
+<section class="reveal">
+  <div class="section-label">Soporte</div>
+  <h2 class="section-title">¿Dudas o <em>problemas</em>?</h2>
+  <p class="section-text">Tu entrenador está disponible para ayudarte con cualquier duda sobre los ejercicios, la app o el reto.</p>
+
+  <div class="contact-box">
+    <div class="contact-title">📲 Contacta a tu entrenador</div>
+    <p class="contact-desc">
+      Colorado's Boxing Club<br>
+      <strong style="color:var(--white);">Profe Colorado</strong><br>
+      Disponible por WhatsApp para cualquier duda
+    </p>
+    <a href="https://wa.me/523319144359?text=Hola%20Profe%20Colorado!%20Soy%20participante%20del%20Reto%2021%20D%C3%ADas%20%F0%9F%A5%8A" class="wa-btn">
+      <span style="font-size:20px;">💬</span> ESCRIBIR AL ENTRENADOR
+    </a>
+  </div>
+</section>
+
+<div class="fire-sep">🥊 🔥 🥊 🔥 🥊</div>
+
+<footer>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:var(--gold);margin-bottom:6px;">CBC TRAINING</div>
+  <div style="margin-bottom:4px;"><strong>Colorado's Boxing Club</strong></div>
+  <div style="color:#555;">Reto 21 Días Sin Excusas · 2026</div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+</script>
+
+</body>
+</html>
