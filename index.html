@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '31';
+const APP_VERSION = '32';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -3166,11 +3166,14 @@ function getRetoDay() {
 }
 function getRetoStreak() {
   const todayMex = getMexDate();
+  const yesterdayMex = getMexDate(new Date(Date.now() - 86400000));
   let streak=0;
   for(let i=0;i<21;i++){
     const d=new Date(); d.setDate(d.getDate()-i);
     const ds=getMexDate(d);
-    if(retoCompletions.find(c=>c.date===ds)) streak++; else if(i>0) break;
+    // Check by date string OR by day_num matching the expected day
+    const found=retoCompletions.find(c=>c.date===ds);
+    if(found) streak++; else if(i>0) break;
   }
   return streak;
 }
@@ -3510,12 +3513,14 @@ async function renderRetoRanking(){
         diasDisponibles=Math.min(21,Math.max(1,Math.floor((today-startD)/86400000)+1));
       }
 
-      // Streak - compare date strings in Mexico time
+      // Streak - check both Mexico date and UTC date for compatibility
       let streak=0;
       for(let i=0;i<sorted.length;i++){
         const d=new Date(today); d.setDate(d.getDate()-i);
-        const ds=getMexDate(d);
-        if(sorted[i]===ds) streak++;
+        const dsMex=getMexDate(d);
+        // Also check UTC equivalent (in case data was saved with UTC)
+        const dsUTC=new Date(d.getTime()-6*60*60*1000).toISOString().split('T')[0];
+        if(sorted[i]===dsMex||sorted[i]===dsUTC) streak++;
         else break;
       }
 
@@ -4009,10 +4014,11 @@ async function loadRetoChatAdmin(){
 function renderRetoParticipants(){
   const list=document.getElementById('reto-participants-list');
   if(!retoClients.length){list.innerHTML='<div style="text-align:center;color:var(--gray);padding:20px;font-size:13px;">Sin participantes. Agrega el primero.</div>';return;}
-  const today=new Date().toISOString().split('T')[0];
+  const today=getMexDate();
   list.innerHTML=retoClients.map(c=>{
     const mc=retoCompletions.filter(x=>x.reto_client_id===c.id);
-    const doneToday=mc.find(x=>x.date===today);
+    const todayUTC=new Date().toISOString().split('T')[0];
+    const doneToday=mc.find(x=>x.date===today||x.date===todayUTC);
     const s=c.start_date?new Date(c.start_date):null;
     const dn=s?Math.max(1,Math.min(21,Math.floor((new Date()-s)/86400000)+1)):'?';
     const retoTerminado = mc.length >= 21 || new Set(mc.map(x=>x.day_num)).size >= 21;
@@ -4400,7 +4406,7 @@ function dismissIOSBanner() {
 // ─── WHATSAPP RECORDATORIO ───
 async function sendPushRemindersUI() {
   showToast('⏳ Cargando participantes...');
-  const today = new Date().toISOString().split('T')[0];
+  const today = getMexDate();
   try {
     const [clientsR, completionsR] = await Promise.all([
       fetch(SB_URL+'/reto_clients?select=id,name,phone,start_date&apikey='+SB_KEY, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}),
