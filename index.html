@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '30';
+const APP_VERSION = '31';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -1037,6 +1037,12 @@ let isReto=false, retoClient=null, retoClients=[], retoRoutines=[], retoCompleti
 let retoLevel = localStorage.getItem('cbc_reto_level') || 'principiante';
 let isTrainer=true, currentClientId=null, currentDay=null, currentWeek=getWeekNum(), exRowCount=0;
 let currentRating={routineId:null,clientId:null,stars:0};
+
+// Helper: get today's date string in Mexico timezone (UTC-6)
+function getMexDate(date){
+  const d = date ? new Date(date) : new Date();
+  return d.toLocaleDateString('en-CA', {timeZone:'America/Mexico_City'}); // returns YYYY-MM-DD
+}
 
 function getWeekNum(date) {
   const d = date ? new Date(date) : new Date();
@@ -3159,11 +3165,11 @@ function getRetoDay() {
   return Math.max(1,Math.min(21,Math.floor((t-s)/86400000)+1));
 }
 function getRetoStreak() {
-  const today=new Date(); today.setHours(0,0,0,0);
+  const todayMex = getMexDate();
   let streak=0;
   for(let i=0;i<21;i++){
-    const d=new Date(today); d.setDate(d.getDate()-i);
-    const ds=d.toISOString().split('T')[0];
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const ds=getMexDate(d);
     if(retoCompletions.find(c=>c.date===ds)) streak++; else if(i>0) break;
   }
   return streak;
@@ -3372,7 +3378,7 @@ function renderRetoEjercicios() {
   const day=getRetoDay();
   const routine=retoRoutines.find(r=>r.day_num===day);
   const exList=document.getElementById('reto-ejercicios-list');
-  const todayStr=new Date().toISOString().split('T')[0];
+  const todayStr=getMexDate();
   const alreadyDone=retoCompletions.find(c=>c.day_num===day||c.date===todayStr);
   if(!routine){
     exList.innerHTML='<div style="text-align:center;color:var(--gray);padding:30px;font-size:13px;">⏳ Rutina del día '+day+' próximamente</div>';
@@ -3429,7 +3435,7 @@ function toggleRetoEx(i){
   else{ck.classList.remove('done');ck.textContent='';cd.classList.remove('done');}
 }
 async function retoCompleteDay(){
-  const day=getRetoDay(), todayStr=new Date().toISOString().split('T')[0];
+  const day=getRetoDay(), todayStr=getMexDate();
   const btn=document.getElementById('reto-complete-btn');
   btn.disabled=true; btn.textContent='GUARDANDO...';
   const payload={id:Date.now(),reto_client_id:retoClient.id,day_num:day,date:todayStr};
@@ -3489,7 +3495,8 @@ async function renderRetoRanking(){
     const ac2=compr.ok?await compr.json():[];
     const ratingsData=ratingsr.ok?await ratingsr.json():[];
 
-    const today=new Date(); today.setHours(0,0,0,0);
+    const todayMex = getMexDate();
+    const today=new Date(todayMex+'T12:00:00'); // noon to avoid DST issues
 
     const ranked=ac.map(c=>{
       const mc=ac2.filter(x=>x.reto_client_id===c.id);
@@ -3503,11 +3510,12 @@ async function renderRetoRanking(){
         diasDisponibles=Math.min(21,Math.max(1,Math.floor((today-startD)/86400000)+1));
       }
 
-      // Streak
+      // Streak - compare date strings in Mexico time
       let streak=0;
       for(let i=0;i<sorted.length;i++){
-        const d=new Date(sorted[i]); d.setHours(0,0,0,0);
-        if(Math.floor((today-d)/86400000)===i) streak++;
+        const d=new Date(today); d.setDate(d.getDate()-i);
+        const ds=getMexDate(d);
+        if(sorted[i]===ds) streak++;
         else break;
       }
 
