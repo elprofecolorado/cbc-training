@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '32';
+const APP_VERSION = '33';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -3165,15 +3165,15 @@ function getRetoDay() {
   return Math.max(1,Math.min(21,Math.floor((t-s)/86400000)+1));
 }
 function getRetoStreak() {
-  const todayMex = getMexDate();
-  const yesterdayMex = getMexDate(new Date(Date.now() - 86400000));
   let streak=0;
   for(let i=0;i<21;i++){
     const d=new Date(); d.setDate(d.getDate()-i);
-    const ds=getMexDate(d);
-    // Check by date string OR by day_num matching the expected day
-    const found=retoCompletions.find(c=>c.date===ds);
-    if(found) streak++; else if(i>0) break;
+    const dsMex=getMexDate(d);
+    const dsUTC=new Date(d.getTime()+6*60*60*1000).toISOString().split('T')[0];
+    const dsUTCm=new Date(d.getTime()-6*60*60*1000).toISOString().split('T')[0];
+    const found=retoCompletions.find(c=>c.date===dsMex||c.date===dsUTC||c.date===dsUTCm);
+    if(found) streak++;
+    else if(i>0) break;
   }
   return streak;
 }
@@ -3513,15 +3513,17 @@ async function renderRetoRanking(){
         diasDisponibles=Math.min(21,Math.max(1,Math.floor((today-startD)/86400000)+1));
       }
 
-      // Streak - check both Mexico date and UTC date for compatibility
+      // Streak - robust calculation checking each day back from today
       let streak=0;
-      for(let i=0;i<sorted.length;i++){
+      for(let i=0;i<21;i++){
         const d=new Date(today); d.setDate(d.getDate()-i);
         const dsMex=getMexDate(d);
-        // Also check UTC equivalent (in case data was saved with UTC)
-        const dsUTC=new Date(d.getTime()-6*60*60*1000).toISOString().split('T')[0];
-        if(sorted[i]===dsMex||sorted[i]===dsUTC) streak++;
-        else break;
+        const dsUTC=new Date(d.getTime()+6*60*60*1000).toISOString().split('T')[0];
+        const dsUTCm=new Date(d.getTime()-6*60*60*1000).toISOString().split('T')[0];
+        // Check if any completion matches this day (by date or day_num)
+        const found=mc.find(x=>x.date===dsMex||x.date===dsUTC||x.date===dsUTCm);
+        if(found) streak++;
+        else if(i>0) break; // only break on gap after first day
       }
 
       // Speed: total days elapsed to complete mc.length days
