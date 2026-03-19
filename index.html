@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '33';
+const APP_VERSION = '36';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -246,6 +246,10 @@ body.trainer-mode .client-only{display:none;}
 .ex-row-draggable.drag-over{border:2px dashed var(--gold);background:rgba(201,149,42,0.08);}
 .drag-handle{color:var(--gray);font-size:18px;cursor:grab;padding:0 4px;touch-action:none;}
 .drag-handle:active{cursor:grabbing;}
+/* ═══ LIBRARY ZONE FILTERS ═══ */
+.filter-tab-lib{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid #333;color:var(--gray2);background:var(--dark2);text-transform:uppercase;white-space:nowrap;}
+.filter-tab-lib.active{background:var(--gold);color:var(--black);border-color:var(--gold);}
+#lib-zone-filters::-webkit-scrollbar{display:none;}
 .notif-banner{background:linear-gradient(135deg,#1a1200,#2a1f00);border:1px solid rgba(201,149,42,0.4);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
 .notif-banner-icon{font-size:28px;flex-shrink:0;}
 .notif-banner-text{font-size:12px;color:var(--gray2);line-height:1.5;}
@@ -416,8 +420,25 @@ body.trainer-mode .client-only{display:none;}
     <!-- TAB BIBLIOTECA -->
     <div id="gtab-biblioteca" style="display:none;">
       <div class="section-title">📚 Biblioteca de Ejercicios</div>
-      <p style="font-size:12px;color:var(--gray2);margin-bottom:14px;">Se agrega automáticamente al guardar rutinas. También puedes agregar manualmente.</p>
-      <button class="btn btn-gold" style="margin-bottom:16px;" onclick="openModal('modal-add-exercise')">+ Agregar ejercicio</button>
+      <p style="font-size:12px;color:var(--gray2);margin-bottom:12px;">Incluye ejercicios de rutinas normales y del Reto 21 Días, organizados por zona muscular.</p>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="btn btn-gold btn-sm" style="flex:1;" onclick="openModal('modal-add-exercise')">+ Agregar</button>
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="syncRetoExercisesToLibrary()">🔄 Sincronizar Reto</button>
+      </div>
+      <input class="form-input" id="lib-search-main" placeholder="🔍 Buscar ejercicio..." oninput="renderLibrary()" style="margin-bottom:10px;">
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none;" id="lib-zone-filters">
+        <button class="filter-tab-lib active" onclick="setLibZone('')">Todos</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Piernas')">🦵 Piernas</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Glúteos')">🍑 Glúteos</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Abdomen')">💪 Abdomen</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Pecho')">🏋️ Pecho</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Espalda')">🔙 Espalda</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Hombros')">🤸 Hombros</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Bíceps')">💪 Bíceps</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Tríceps')">💪 Tríceps</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Cardio')">🏃 Cardio</button>
+        <button class="filter-tab-lib" onclick="setLibZone('Full Body')">⚡ Full Body</button>
+      </div>
       <div id="library-list"></div>
     </div>
 
@@ -2524,26 +2545,90 @@ async function copyWeek(){
 }
 
 // ─── LIBRARY ───
+let _libZoneFilter='';
+function setLibZone(zone){
+  _libZoneFilter=zone;
+  document.querySelectorAll('.filter-tab-lib').forEach(b=>b.classList.toggle('active',b.textContent.includes(zone)||(!zone&&b.textContent==='Todos')));
+  renderLibrary();
+}
+
 function renderLibrary(){
   const list=document.getElementById('library-list'); if(!list) return;
-  if(!exerciseLibrary.length){list.innerHTML='<div class="empty-state"><div class="ei">📚</div><p>Biblioteca vacía.</p></div>';return;}
+  const q=(document.getElementById('lib-search-main')?.value||'').toLowerCase();
   const lc={'principiante':'rgba(46,125,50,0.2)','intermedio':'rgba(245,127,23,0.2)','avanzado':'rgba(198,40,40,0.2)'};
   const lt={'principiante':'#4CAF50','intermedio':'#FFA726','avanzado':'#EF5350'};
-  list.innerHTML=exerciseLibrary.map(ex=>`
-    <div class="ex-lib-item">
-      <div style="flex:1;">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-          <div style="font-weight:700;font-size:13px;">${ex.name}</div>
-          ${ex.level?`<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:${lc[ex.level]||'#222'};color:${lt[ex.level]||'var(--gray)'};font-weight:700;">${ex.level}</span>`:''}
+  const zoneIcons={'Piernas':'🦵','Glúteos':'🍑','Abdomen':'💪','Pecho':'🏋️','Espalda':'🔙','Hombros':'🤸','Bíceps':'💪','Tríceps':'💪','Cardio':'🏃','Full Body':'⚡','General':'📌'};
+
+  let filtered=exerciseLibrary;
+  if(q) filtered=filtered.filter(e=>e.name.toLowerCase().includes(q)||(e.muscleGroup||'').toLowerCase().includes(q));
+  if(_libZoneFilter) filtered=filtered.filter(e=>(e.muscleGroup||'General')===_libZoneFilter);
+
+  if(!filtered.length){
+    list.innerHTML='<div class="empty-state"><div class="ei">📚</div><p>Sin ejercicios en esta zona.<br>Agrega uno o sincroniza el Reto.</p></div>';
+    return;
+  }
+
+  // Group by muscleGroup
+  const groups={};
+  filtered.forEach(ex=>{
+    const g=ex.muscleGroup||'General';
+    if(!groups[g]) groups[g]=[];
+    groups[g].push(ex);
+  });
+
+  const ORDER=['Piernas','Glúteos','Abdomen','Pecho','Espalda','Hombros','Bíceps','Tríceps','Cardio','Full Body','General'];
+  const sortedGroups=Object.keys(groups).sort((a,b)=>(ORDER.indexOf(a)+1||99)-(ORDER.indexOf(b)+1||99));
+
+  list.innerHTML=sortedGroups.map(g=>`
+    <div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px;">
+      <span style="font-size:18px;">${zoneIcons[g]||'💪'}</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--gold2);">${g}</span>
+      <span style="font-size:10px;color:var(--gray2);background:#222;border-radius:10px;padding:2px 8px;">${groups[g].length}</span>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,149,42,0.2),transparent);"></div>
+    </div>
+    ${groups[g].map(ex=>`
+      <div class="ex-lib-item">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap;">
+            <div style="font-weight:700;font-size:13px;">${ex.name}</div>
+            ${ex.level?`<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:${lc[ex.level]||'#222'};color:${lt[ex.level]||'var(--gray)'};font-weight:700;">${ex.level}</span>`:''}
+            ${ex.source==='reto'?`<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:rgba(255,107,0,0.15);color:#ff6b00;border:1px solid rgba(255,107,0,0.3);font-weight:700;">🔥 Reto</span>`:''}
+          </div>
+          <div style="font-size:11px;color:var(--gold2);">${ex.sets||''}</div>
+          ${ex.notes?`<div style="font-size:11px;color:var(--gray2);">${ex.notes}</div>`:''}
         </div>
-        <div style="font-size:11px;color:var(--gold2);">${ex.sets||''} ${ex.muscleGroup?'· '+ex.muscleGroup:''} ${ex.category?'· '+ex.category:''}</div>
-        ${ex.notes?`<div style="font-size:11px;color:var(--gray2);">${ex.notes}</div>`:''}
-      </div>
-      <div style="display:flex;gap:6px;">
-        ${ex.video?`<a href="${ex.video}" target="_blank" style="background:#ff0000;color:white;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;">▶</a>`:''}
-        <button class="btn btn-danger btn-sm" onclick="deleteLibraryExercise(${ex.id})">🗑</button>
-      </div>
-    </div>`).join('');
+        <div style="display:flex;gap:6px;">
+          ${ex.video?`<button onclick="openVideoModal('${ex.video.replace(/'/g,"\\'")}','${ex.name.replace(/'/g,"\\'")}')}" style="background:#ff0000;color:white;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;border:none;cursor:pointer;">▶</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteLibraryExercise(${ex.id})">🗑</button>
+        </div>
+      </div>`).join('')}`).join('');
+}
+
+async function syncRetoExercisesToLibrary(){
+  showToast('⏳ Sincronizando ejercicios del Reto...');
+  try{
+    const res=await fetch(SB_URL+'/reto_routines?select=exercises&apikey='+SB_KEY);
+    if(!res.ok){showToast('Error al cargar rutinas del Reto');return;}
+    const routines=await res.json();
+    let added=0;
+    for(const r of routines){
+      let exs=[];
+      try{ exs=Array.isArray(r.exercises)?r.exercises:(typeof r.exercises==='string'?JSON.parse(r.exercises):[]);}catch(e){}
+      for(const ex of exs){
+        if(!ex.name) continue;
+        const exists=exerciseLibrary.find(e=>e.name.toLowerCase()===ex.name.toLowerCase());
+        if(!exists){
+          const newEx={id:Date.now()+Math.random()*1000|0,name:ex.name,sets:ex.sets||'',video:ex.video||'',notes:ex.notes||'',muscleGroup:ex.muscleGroup||'General',level:ex.level||'',source:'reto'};
+          if(await dbInsert('training_exercises',newEx)){
+            exerciseLibrary.push(newEx);
+            added++;
+          }
+        }
+      }
+    }
+    renderLibrary();
+    showToast(added>0?`✅ ${added} ejercicio${added!==1?'s':''} del Reto agregado${added!==1?'s':''}!`:'✓ Todo ya estaba en la biblioteca');
+  }catch(e){showToast('Error al sincronizar');}
 }
 
 async function saveLibraryExercise(){
@@ -2573,17 +2658,24 @@ function openLibraryPicker(){
 
 function renderLibraryPicker(){
   const q=document.getElementById('lib-search').value.toLowerCase();
-  const filtered=exerciseLibrary.filter(e=>e.name.toLowerCase().includes(q));
+  const filtered=exerciseLibrary.filter(e=>e.name.toLowerCase().includes(q)||(e.muscleGroup||'').toLowerCase().includes(q));
   const list=document.getElementById('library-picker-list');
   if(!filtered.length){list.innerHTML='<div class="empty-state"><div class="ei">📚</div><p>Sin coincidencias.</p></div>';return;}
-  list.innerHTML=filtered.map(ex=>`
-    <div class="ex-lib-item" onclick="addExFromLib(${ex.id})" style="cursor:pointer;">
-      <div>
-        <div style="font-weight:700;font-size:13px;">${ex.name}</div>
-        <div style="font-size:11px;color:var(--gold2);">${ex.sets||''} ${ex.muscleGroup?'· '+ex.muscleGroup:''}</div>
-      </div>
-      <div style="color:var(--gold);font-size:20px;">+</div>
-    </div>`).join('');
+  const zoneIcons={'Piernas':'🦵','Glúteos':'🍑','Abdomen':'💪','Pecho':'🏋️','Espalda':'🔙','Hombros':'🤸','Cardio':'🏃','Full Body':'⚡','General':'📌'};
+  const groups={};
+  filtered.forEach(e=>{const g=e.muscleGroup||'General';if(!groups[g])groups[g]=[];groups[g].push(e);});
+  const ORDER=['Piernas','Glúteos','Abdomen','Pecho','Espalda','Hombros','Bíceps','Tríceps','Cardio','Full Body','General'];
+  const sortedGroups=Object.keys(groups).sort((a,b)=>(ORDER.indexOf(a)+1||99)-(ORDER.indexOf(b)+1||99));
+  list.innerHTML=sortedGroups.map(g=>`
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold2);padding:8px 10px 4px;text-transform:uppercase;">${zoneIcons[g]||'💪'} ${g}</div>
+    ${groups[g].map(ex=>`
+      <div class="ex-lib-item" onclick="addExFromLib(${ex.id})" style="cursor:pointer;">
+        <div>
+          <div style="font-weight:700;font-size:13px;">${ex.name}</div>
+          <div style="font-size:11px;color:var(--gold2);">${ex.sets||''}</div>
+        </div>
+        <div style="color:var(--gold);font-size:20px;">+</div>
+      </div>`).join('')}`).join('');
 }
 
 function addExFromLib(id){
@@ -3165,14 +3257,16 @@ function getRetoDay() {
   return Math.max(1,Math.min(21,Math.floor((t-s)/86400000)+1));
 }
 function getRetoStreak() {
+  // Normalize all completion dates to Mexico timezone and deduplicate
+  const uniqueDates = [...new Set(retoCompletions.map(c => {
+    const d = new Date(c.date + 'T12:00:00');
+    return getMexDate(d);
+  }))].sort().reverse();
   let streak=0;
   for(let i=0;i<21;i++){
     const d=new Date(); d.setDate(d.getDate()-i);
     const dsMex=getMexDate(d);
-    const dsUTC=new Date(d.getTime()+6*60*60*1000).toISOString().split('T')[0];
-    const dsUTCm=new Date(d.getTime()-6*60*60*1000).toISOString().split('T')[0];
-    const found=retoCompletions.find(c=>c.date===dsMex||c.date===dsUTC||c.date===dsUTCm);
-    if(found) streak++;
+    if(uniqueDates.includes(dsMex)) streak++;
     else if(i>0) break;
   }
   return streak;
@@ -3399,12 +3493,33 @@ function renderRetoEjercicios() {
   let exs = hasLevels ? allEx.filter(ex=>ex.level===retoLevel) : allEx;
   const levelColors={'principiante':'#2E7D32','intermedio':'#F57F17','avanzado':'#C62828'};
   const levelLabels={'principiante':'🟢 PRINCIPIANTE','intermedio':'🟡 INTERMEDIO','avanzado':'🔴 AVANZADO'};
-  exList.innerHTML=`<div style="background:rgba(201,149,42,0.1);border:1px solid rgba(201,149,42,0.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;">
-    <div style="font-size:11px;color:var(--gray2);letter-spacing:1px;">${routine.focus||'ENTRENAMIENTO'}</div>
-    ${routine.description?'<div style="font-size:12px;color:var(--gray);margin-top:2px;">'+routine.description+'</div>':''}
-    <div style="margin-top:6px;font-size:11px;font-weight:700;color:${levelColors[retoLevel]}">${levelLabels[retoLevel]}</div>
-  </div>`+
-    exs.map((ex,i)=>`<div class="reto-ex-card ${alreadyDone?'done':''}" id="rex-${i}">
+  // Group exercises by muscle group if available
+  const hasGroups = exs.some(ex=>ex.muscleGroup||ex.category);
+  let exsHtml = '';
+  if(hasGroups){
+    const groups = {};
+    exs.forEach((ex,i)=>{
+      const g = ex.muscleGroup||ex.category||'General';
+      if(!groups[g]) groups[g]=[];
+      groups[g].push({...ex,_idx:i});
+    });
+    exsHtml = Object.entries(groups).map(([g,gExs])=>`
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold2);text-transform:uppercase;margin:10px 0 6px;padding-left:4px;">💪 ${g}</div>
+      ${gExs.map(ex=>`<div class="reto-ex-card ${alreadyDone?'done':''}" id="rex-${ex._idx}">
+        <div class="reto-ex-header">
+          <div class="reto-ex-check ${alreadyDone?'done':''}" onclick="toggleRetoEx(${ex._idx})" id="rck-${ex._idx}">${alreadyDone?'✓':''}</div>
+          <div style="flex:1">
+            <div class="reto-ex-name">${ex.name||ex}</div>
+            <div class="reto-ex-sets" style="font-size:11px;color:var(--gray2)">${ex.sets||''} ${ex.notes||''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button class="ex-video-btn" style="background:rgba(201,149,42,0.12);font-size:16px;padding:5px 8px;" onclick="openTimerForEx('${(ex.name||ex).toString().replace(/'/g,"\\'")}','${(ex.sets||'').replace(/'/g,"\\'")}')">⏱</button>
+            ${ex.video?`<button class="ex-video-btn" onclick="openVideoModal('${ex.video.replace(/'/g,"\\'")}','${(ex.name||ex).toString().replace(/'/g,"\\'")}')">▶ Video</button>`:''}
+          </div>
+        </div>
+      </div>`).join('')}`).join('');
+  } else {
+    exsHtml = exs.map((ex,i)=>`<div class="reto-ex-card ${alreadyDone?'done':''}" id="rex-${i}">
       <div class="reto-ex-header">
         <div class="reto-ex-check ${alreadyDone?'done':''}" onclick="toggleRetoEx(${i})" id="rck-${i}">${alreadyDone?'✓':''}</div>
         <div style="flex:1">
@@ -3417,6 +3532,13 @@ function renderRetoEjercicios() {
         </div>
       </div>
     </div>`).join('');
+  }
+
+  exList.innerHTML=`<div style="background:rgba(201,149,42,0.1);border:1px solid rgba(201,149,42,0.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+    <div style="font-size:11px;color:var(--gray2);letter-spacing:1px;">${routine.focus||'ENTRENAMIENTO'}</div>
+    ${routine.description?'<div style="font-size:12px;color:var(--gray);margin-top:2px;">'+routine.description+'</div>':''}
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:${levelColors[retoLevel]}">${levelLabels[retoLevel]}</div>
+  </div>`+exsHtml;
   const btn=document.getElementById('reto-complete-btn');
   if(alreadyDone){btn.textContent='✅ DÍA COMPLETADO';btn.disabled=true;btn.style.background='var(--success)';}
   else{btn.textContent='MARCAR DÍA COMPLETO';btn.disabled=false;btn.style.background='';window._rexDone={};}
@@ -3513,17 +3635,18 @@ async function renderRetoRanking(){
         diasDisponibles=Math.min(21,Math.max(1,Math.floor((today-startD)/86400000)+1));
       }
 
-      // Streak - robust calculation checking each day back from today
+      // Streak - robust calculation, deduplicate by day first
+      const uniqueDates = [...new Set(mc.map(x => {
+        // Normalize all dates to Mexico timezone
+        const d = new Date(x.date + 'T12:00:00');
+        return getMexDate(d);
+      }))].sort().reverse();
       let streak=0;
       for(let i=0;i<21;i++){
         const d=new Date(today); d.setDate(d.getDate()-i);
         const dsMex=getMexDate(d);
-        const dsUTC=new Date(d.getTime()+6*60*60*1000).toISOString().split('T')[0];
-        const dsUTCm=new Date(d.getTime()-6*60*60*1000).toISOString().split('T')[0];
-        // Check if any completion matches this day (by date or day_num)
-        const found=mc.find(x=>x.date===dsMex||x.date===dsUTC||x.date===dsUTCm);
-        if(found) streak++;
-        else if(i>0) break; // only break on gap after first day
+        if(uniqueDates.includes(dsMex)) streak++;
+        else if(i>0) break;
       }
 
       // Speed: total days elapsed to complete mc.length days
@@ -3676,9 +3799,18 @@ function renderChatFeed(posts, cls, reacciones, comentarios, currentClient, isTr
     const comentHtml=postComents.map(c=>{
       const ccl=cls.find(x=>x.id===c.reto_client_id);
       const cname=c.reto_client_id===null?'🥊 Entrenador':(ccl?ccl.name:'Participante');
-      return `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;">
-        <div style="font-weight:700;font-size:12px;color:var(--gold);white-space:nowrap;">${cname}:</div>
-        <div style="font-size:12px;color:var(--white);line-height:1.4;">${c.comentario}</div>
+      const canEdit=isTrainerView?(c.reto_client_id===null):(currentClient&&c.reto_client_id===currentClient.id);
+      return `<div id="coment-row-${c.id}" style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;">
+        <div style="flex:1;">
+          <span style="font-weight:700;font-size:12px;color:var(--gold);">${cname}: </span>
+          <span id="coment-text-${c.id}" style="font-size:12px;color:var(--white);line-height:1.4;">${c.comentario}</span>
+          <input id="coment-edit-input-${c.id}" style="display:none;width:100%;background:#1a1a1a;border:1px solid var(--gold);border-radius:6px;color:var(--white);padding:4px 8px;font-size:12px;margin-top:4px;" value="${c.comentario.replace(/"/g,'&quot;')}">
+        </div>
+        ${canEdit?`<div style="display:flex;gap:4px;flex-shrink:0;">
+          <button id="coment-edit-btn-${c.id}" onclick="startEditComent(${c.id})" style="background:none;border:none;color:var(--gray2);font-size:13px;cursor:pointer;padding:0 2px;">✏️</button>
+          <button id="coment-save-btn-${c.id}" onclick="saveEditComent(${c.id},${isTrainerView},'${feedId}')" style="display:none;background:rgba(201,149,42,0.2);border:1px solid var(--gold);color:var(--gold);border-radius:4px;font-size:11px;cursor:pointer;padding:2px 6px;">✓</button>
+          <button onclick="deleteComent(${c.id},${isTrainerView},'${feedId}')" style="background:none;border:none;color:var(--danger);font-size:13px;cursor:pointer;padding:0 2px;">🗑</button>
+        </div>`:''}
       </div>`;
     }).join('');
 
@@ -3720,6 +3852,39 @@ async function deleteChatPost(id){
   } else {
     showToast('Error al eliminar');
   }
+}
+
+// ─── COMMENT EDIT/DELETE ───
+function startEditComent(id){
+  document.getElementById('coment-text-'+id).style.display='none';
+  document.getElementById('coment-edit-input-'+id).style.display='block';
+  document.getElementById('coment-edit-btn-'+id).style.display='none';
+  document.getElementById('coment-save-btn-'+id).style.display='inline';
+  document.getElementById('coment-edit-input-'+id).focus();
+}
+async function saveEditComent(id, isTrainerView, feedId){
+  const newText=document.getElementById('coment-edit-input-'+id).value.trim();
+  if(!newText){showToast('El comentario no puede estar vacío');return;}
+  const res=await fetch(SB_URL+'/reto_chat_comentarios?id=eq.'+id+'&apikey='+SB_KEY,{
+    method:'PATCH',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+    body:JSON.stringify({comentario:newText})
+  });
+  if(res.ok||res.status===204){
+    showToast('✓ Comentario editado');
+    if(isTrainerView) loadRetoChatAdmin(); else loadRetoChat();
+  } else showToast('Error al editar');
+}
+async function deleteComent(id, isTrainerView, feedId){
+  if(!confirm('¿Borrar este comentario?')) return;
+  const res=await fetch(SB_URL+'/reto_chat_comentarios?id=eq.'+id+'&apikey='+SB_KEY,{
+    method:'DELETE',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+  });
+  if(res.ok||res.status===204){
+    showToast('🗑 Comentario eliminado');
+    if(isTrainerView) loadRetoChatAdmin(); else loadRetoChat();
+  } else showToast('Error al eliminar');
 }
 
 // ─── CHAT AUTO-REFRESH (solo cuando hay mensajes nuevos) ───
@@ -4118,7 +4283,14 @@ function addRetoExRow(ex={}){
   const c=document.getElementById('reto-routine-exs');
   const d=document.createElement('div');
   d.style.cssText='display:flex;gap:6px;margin-bottom:6px;align-items:center;flex-wrap:wrap;';
-  d.innerHTML=`<input class="form-input reto-ex-name-inp" style="flex:2;min-width:120px" placeholder="Ejercicio" value="${ex.name||ex||''}"><input class="form-input reto-ex-sets-inp" style="flex:1;min-width:80px" placeholder="Series" value="${ex.sets||''}"><input class="form-input reto-ex-video-inp" style="flex:1;min-width:80px" placeholder="Video URL" value="${ex.video||''}"><button onclick="this.parentElement.remove()" style="background:#2a0a0a;border:1px solid #5a1a1a;color:var(--danger);padding:8px;border-radius:6px;cursor:pointer">✕</button>`;
+  const muscles=['Piernas','Glúteos','Abdomen','Pecho','Espalda','Hombros','Bíceps','Tríceps','Cardio','Full Body','General'];
+  d.innerHTML=`<input class="form-input reto-ex-name-inp" style="flex:2;min-width:120px" placeholder="Ejercicio" value="${ex.name||ex||''}">
+    <input class="form-input reto-ex-sets-inp" style="flex:1;min-width:80px" placeholder="Series" value="${ex.sets||''}">
+    <select class="form-input reto-ex-muscle-inp" style="flex:1;min-width:100px;">
+      ${muscles.map(m=>`<option value="${m}" ${(ex.muscleGroup||'General')===m?'selected':''}>${m}</option>`).join('')}
+    </select>
+    <input class="form-input reto-ex-video-inp" style="flex:1;min-width:80px" placeholder="Video URL" value="${ex.video||''}">
+    <button onclick="this.parentElement.remove()" style="background:#2a0a0a;border:1px solid #5a1a1a;color:var(--danger);padding:8px;border-radius:6px;cursor:pointer">✕</button>`;
   c.appendChild(d);
 }
 function openRetoBiblioteca(){
@@ -4129,18 +4301,25 @@ function openRetoBiblioteca(){
 function filterRetoBiblioteca(){
   const q=document.getElementById('reto-lib-search').value.toLowerCase();
   const list=document.getElementById('reto-lib-list');
-  const filtered=exerciseLibrary.filter(e=>!q||e.name.toLowerCase().includes(q));
+  const filtered=exerciseLibrary.filter(e=>!q||e.name.toLowerCase().includes(q)||((e.muscleGroup||'').toLowerCase().includes(q)));
   if(!filtered.length){list.innerHTML='<div style="color:var(--gray);font-size:12px;padding:8px;">Sin resultados</div>';return;}
-  list.innerHTML=filtered.map(e=>
-    `<div onclick="retoSelectLibEx(${JSON.stringify(e.name)},${JSON.stringify(e.sets||'')},${JSON.stringify(e.video||'')},${JSON.stringify(e.notes||'')})"
-      style="padding:10px;border-radius:6px;cursor:pointer;font-size:13px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:8px;">
+  // Group by muscleGroup
+  const groups={};
+  filtered.forEach(e=>{
+    const g=e.muscleGroup||e.category||'General';
+    if(!groups[g]) groups[g]=[];
+    groups[g].push(e);
+  });
+  list.innerHTML=Object.entries(groups).map(([g,exs])=>`
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold2);text-transform:uppercase;padding:8px 10px 4px;">💪 ${g}</div>
+    ${exs.map(e=>`<div onclick="retoSelectLibEx(${JSON.stringify(e.name)},${JSON.stringify(e.sets||'')},${JSON.stringify(e.video||'')},${JSON.stringify(e.notes||'')},${JSON.stringify(e.muscleGroup||'General')})"
+      style="padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:8px;">
       ${e.level?`<span style="font-size:10px;padding:2px 6px;border-radius:10px;background:${e.level==='principiante'?'rgba(46,125,50,0.2)':e.level==='intermedio'?'rgba(245,127,23,0.2)':'rgba(198,40,40,0.2)'};color:${e.level==='principiante'?'#4CAF50':e.level==='intermedio'?'#FFA726':'#EF5350'}">${e.level}</span>`:''}
       <div style="flex:1"><span style="font-weight:600;">${e.name}</span> <span style="color:var(--gray2);font-size:11px;">${e.sets||''}</span></div>
-    </div>`
-  ).join('');
+    </div>`).join('')}`).join('');
 }
-function retoSelectLibEx(name,sets,video,notes){
-  addRetoExRow({name,sets,video,notes});
+function retoSelectLibEx(name,sets,video,notes,muscleGroup){
+  addRetoExRow({name,sets,video,notes,muscleGroup:muscleGroup||'General'});
   document.getElementById('reto-library-picker').style.display='none';
   document.getElementById('reto-lib-search').value='';
 }
@@ -4154,7 +4333,7 @@ async function saveRetoRoutine(){
   let allExs=[]; try{allExs=existing?(Array.isArray(existing.exercises)?existing.exercises:JSON.parse(existing.exercises||'[]')):[]}catch(e){}
   const otherLevelExs=allExs.filter(ex=>ex.level!==_retoEditLevel);
   const newLevelExs=[]; 
-  rows.forEach(r=>{const n=r.querySelector('.reto-ex-name-inp')?.value.trim();if(n)newLevelExs.push({name:n,sets:r.querySelector('.reto-ex-sets-inp')?.value.trim()||'',video:r.querySelector('.reto-ex-video-inp')?.value.trim()||'',level:_retoEditLevel});});
+  rows.forEach(r=>{const n=r.querySelector('.reto-ex-name-inp')?.value.trim();if(n)newLevelExs.push({name:n,sets:r.querySelector('.reto-ex-sets-inp')?.value.trim()||'',video:r.querySelector('.reto-ex-video-inp')?.value.trim()||'',muscleGroup:r.querySelector('.reto-ex-muscle-inp')?.value||'General',level:_retoEditLevel});});
   const exs=[...otherLevelExs,...newLevelExs];
   const payload={day_num:day,focus,description:desc,exercises:JSON.stringify(exs)};
   let ok;
