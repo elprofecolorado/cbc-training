@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '36';
+const APP_VERSION = '37';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -2607,9 +2607,12 @@ function renderLibrary(){
 async function syncRetoExercisesToLibrary(){
   showToast('⏳ Sincronizando ejercicios del Reto...');
   try{
-    const res=await fetch(SB_URL+'/reto_routines?select=exercises&apikey='+SB_KEY);
-    if(!res.ok){showToast('Error al cargar rutinas del Reto');return;}
+    const res=await fetch(SB_URL+'/reto_routines?select=exercises&apikey='+SB_KEY, {
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    });
+    if(!res.ok){showToast('Error al cargar rutinas del Reto: '+res.status);return;}
     const routines=await res.json();
+    if(!Array.isArray(routines)||!routines.length){showToast('No hay rutinas del Reto aún');return;}
     let added=0;
     for(const r of routines){
       let exs=[];
@@ -2628,7 +2631,7 @@ async function syncRetoExercisesToLibrary(){
     }
     renderLibrary();
     showToast(added>0?`✅ ${added} ejercicio${added!==1?'s':''} del Reto agregado${added!==1?'s':''}!`:'✓ Todo ya estaba en la biblioteca');
-  }catch(e){showToast('Error al sincronizar');}
+  }catch(e){showToast('Error al sincronizar: '+e.message);}
 }
 
 async function saveLibraryExercise(){
