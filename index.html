@@ -19,7 +19,7 @@
 <!-- App version: v16 - 2026-03-15 -->
 <script>
 // Force cache refresh — increment APP_VERSION with every deploy
-const APP_VERSION = '37';
+const APP_VERSION = '39';
 const savedVersion = localStorage.getItem('cbc_app_version');
 if (savedVersion && savedVersion !== APP_VERSION) {
   localStorage.setItem('cbc_app_version', APP_VERSION);
@@ -424,6 +424,7 @@ body.trainer-mode .client-only{display:none;}
       <div style="display:flex;gap:8px;margin-bottom:12px;">
         <button class="btn btn-gold btn-sm" style="flex:1;" onclick="openModal('modal-add-exercise')">+ Agregar</button>
         <button class="btn btn-outline btn-sm" style="flex:1;" onclick="syncRetoExercisesToLibrary()">🔄 Sincronizar Reto</button>
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="autoClassifyLibrary().then(()=>renderLibrary())">🏷 Clasificar</button>
       </div>
       <input class="form-input" id="lib-search-main" placeholder="🔍 Buscar ejercicio..." oninput="renderLibrary()" style="margin-bottom:10px;">
       <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none;" id="lib-zone-filters">
@@ -2610,28 +2611,66 @@ async function syncRetoExercisesToLibrary(){
     const res=await fetch(SB_URL+'/reto_routines?select=exercises&apikey='+SB_KEY, {
       headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
     });
-    if(!res.ok){showToast('Error al cargar rutinas del Reto: '+res.status);return;}
+    if(!res.ok){showToast('Error leyendo reto: '+res.status);return;}
     const routines=await res.json();
-    if(!Array.isArray(routines)||!routines.length){showToast('No hay rutinas del Reto aún');return;}
-    let added=0;
+    if(!Array.isArray(routines)||!routines.length){showToast('Sin rutinas del Reto todavía');return;}
+    let added=0, skipped=0;
     for(const r of routines){
       let exs=[];
       try{ exs=Array.isArray(r.exercises)?r.exercises:(typeof r.exercises==='string'?JSON.parse(r.exercises):[]);}catch(e){}
       for(const ex of exs){
         if(!ex.name) continue;
         const exists=exerciseLibrary.find(e=>e.name.toLowerCase()===ex.name.toLowerCase());
-        if(!exists){
-          const newEx={id:Date.now()+Math.random()*1000|0,name:ex.name,sets:ex.sets||'',video:ex.video||'',notes:ex.notes||'',muscleGroup:ex.muscleGroup||'General',level:ex.level||'',source:'reto'};
-          if(await dbInsert('training_exercises',newEx)){
-            exerciseLibrary.push(newEx);
-            added++;
-          }
-        }
+        if(exists){skipped++;continue;}
+        const newEx={id:Date.now()+Math.random()*1000|0,name:ex.name,sets:ex.sets||'',video:ex.video||'',notes:ex.notes||'',muscleGroup:detectMuscleGroup(ex.name, ex.muscleGroup),level:ex.level||''};
+        const r2=await xhrPost(SB_URL+'/training_exercises', newEx, 'POST');
+        if(r2){exerciseLibrary.push(newEx);added++;}
+        else{showToast('Error guardando: '+ex.name);return;}
       }
     }
+    // Also auto-classify existing exercises without muscleGroup
+    await autoClassifyLibrary();
     renderLibrary();
-    showToast(added>0?`✅ ${added} ejercicio${added!==1?'s':''} del Reto agregado${added!==1?'s':''}!`:'✓ Todo ya estaba en la biblioteca');
-  }catch(e){showToast('Error al sincronizar: '+e.message);}
+    showToast(added>0?`✅ ${added} ejercicios agregados (${skipped} ya existían)`:'✓ Biblioteca actualizada');
+  }catch(e){showToast('Error: '+e.message);}
+}
+
+// ─── AUTO CLASIFICADOR DE ZONAS ───
+function detectMuscleGroup(name, existing){
+  if(existing && existing!=='General' && existing!=='') return existing;
+  const n=(name||'').toLowerCase();
+  const zones=[
+    {g:'Piernas', k:['sentadilla','squat','zancada','lunge','leg','pierna','cuádricep','femoral','pantorrilla','calf','prensa','extensión de rodilla','curl de pierna','paso','step','salto','jump squat','sumo','goblet','pistol','búlgara','bulgarian','wall sit','skater']},
+    {g:'Glúteos', k:['glúteo','glute','hip thrust','puente','bridge','patada de burro','donkey','abductor','patada','clam','clamshell','fire hydrant','kickback','elevación de cadera']},
+    {g:'Abdomen', k:['abdom','plancha','plank','crunch','sit up','oblicuo','oblique','twis','bicicleta','bicycle','v-up','hollow','dragon flag','rueda','wheel','leg raise','elevación de pierna','flutter','mountain climber','escalador','russian']},
+    {g:'Pecho', k:['pecho','chest','press','lagartija','pushup','push up','fondo','dip','apertura','fly','apert','pectoral','inclinado','declinado','incline','decline']},
+    {g:'Espalda', k:['espalda','back','dominada','pull up','pullup','jalón','lat','remo','row','peso muerto','deadlift','hiperextensión','superman','cobra','bird dog','tracción','good morning','rack pull']},
+    {g:'Hombros', k:['hombro','shoulder','press militar','military','elevación lateral','lateral raise','frontal','rear delt','posterior','deltoid','arnold','pike','pique']},
+    {g:'Bíceps', k:['bícep','bicep','curl','martillo','hammer','concentrado','predicador','preacher','supinado']},
+    {g:'Tríceps', k:['trícep','tricep','extensión','dip','fondos','jaloneo','pushdown','skull','testa','frances']},
+    {g:'Cardio', k:['cardio','carrera','correr','trote','salto','jump','burpee','jumping jack','mountain','escalador','cuerda','rope','bicicleta estática','elíptica','remo cardio','sprints','hiit','tabata','box jump','squat jump','star jump','high knee','rodilla alta']},
+    {g:'Full Body', k:['burpee','clean','snatch','thruster','swing','kettlebell','funcional','full body','completo','total','circuito','wod','crossfit','battle rope','cuerda de batalla','slam']},
+  ];
+  for(const z of zones){
+    if(z.k.some(k=>n.includes(k))) return z.g;
+  }
+  return 'General';
+}
+
+async function autoClassifyLibrary(){
+  let updated=0;
+  for(const ex of exerciseLibrary){
+    if(ex.muscleGroup && ex.muscleGroup!=='General' && ex.muscleGroup!=='') continue;
+    const zone=detectMuscleGroup(ex.name, null);
+    if(zone==='General') continue;
+    const res=await fetch(SB_URL+'/training_exercises?id=eq.'+ex.id+'&apikey='+SB_KEY,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+      body:JSON.stringify({muscleGroup:zone})
+    });
+    if(res.ok||res.status===204){ex.muscleGroup=zone;updated++;}
+  }
+  if(updated>0) showToast('🏷 '+updated+' ejercicios clasificados automáticamente');
 }
 
 async function saveLibraryExercise(){
